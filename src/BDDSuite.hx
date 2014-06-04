@@ -62,6 +62,7 @@ class Spec
 	{
 		this.description = description;
 		this.run = run;
+		this.async = async;
 
 		if (run == null) this.status = TestStatus.Pending;
 		else this.status = pending ? TestStatus.Pending : TestStatus.Unknown;

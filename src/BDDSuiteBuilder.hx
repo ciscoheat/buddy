@@ -15,10 +15,10 @@ class BDDSuiteBuilder
 	{
 		switch(e)
 		{
-			case macro $a.should().$b, macro $a.should.$b:
-				var change = macro $a.should(__status).$b;
+			case macro $a.should(), macro $a.should:
+				var change = macro $a.should(__status);
 				e.expr = change.expr;
-				e.iter(injectAsync);
+				a.iter(injectAsync);
 
 			/////
 
@@ -30,7 +30,7 @@ class BDDSuiteBuilder
 			/////
 
 			case macro before(function($n) $f):
-				var change = macro syncBefore(function($n, __status) $f);
+				var change = macro before(function($n, __status) $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
@@ -42,7 +42,7 @@ class BDDSuiteBuilder
 			/////
 
 			case macro after(function($n) $f):
-				var change = macro syncAfter(function($n, __status) $f);
+				var change = macro after(function($n, __status) $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
@@ -54,7 +54,7 @@ class BDDSuiteBuilder
 			/////
 
 			case macro it($s, function($n) $f):
-				var change = macro syncIt($s, function($n, __status) $f);
+				var change = macro it($s, function($n, __status) $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
@@ -66,7 +66,7 @@ class BDDSuiteBuilder
 			/////
 
 			case macro xit($s, function($n) $f):
-				var change = macro syncXit($s, function($n, __status) $f);
+				var change = macro xit($s, function($n, __status) $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
