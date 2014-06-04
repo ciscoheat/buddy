@@ -30,8 +30,11 @@ class Equal<T>
 		this.assert = assert;
 	}
 
-	public function equal(test : T) : Void
+	public function equal(expected : T) : Void
 	{
-		assert(value == test, 'Expected $value, was $test');
+		if (Std.is(expected, String))
+			assert(value == expected, 'Expected "$expected", was "$value"');
+		else
+			assert(value == expected, 'Expected $expected, was $value');
 	}
 }

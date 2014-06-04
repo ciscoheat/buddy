@@ -8,11 +8,11 @@ class Main
 {
 	static function main()
 	{
-		var t = new TestClass();
+		var t = new TestAfterAndBefore();
 		t.run().then(function(_) { done(t); });
 	}
 
-	static function done(t : TestClass)
+	static function done(t : TestAfterAndBefore)
 	{
 		for (s in t.suites)
 		{
@@ -28,43 +28,35 @@ class Main
 	}
 }
 
-/*
-class Test1 implements BDDSuite
+class TestAfterAndBefore extends BDDSuite
 {
-	@describe("A test suite") function _()
-	{
-		var a;
+	private var testAfter : String;
 
-		@before {
-			a = 1;
-		}
-
-		@it("contains spec with an expectation") {
-			a.should.be(1);
-		}
-	}
-}
-*/
-
-class TestClass extends BDDSuite
-{
 	public function new()
 	{
-		describe("A test suite", {
+		describe("When testing before", {
 			var a;
 
 			before({
-				trace("Before");
 				a = 1;
 			});
 
-			it("should definitely set a = 1", {
+			it("should set the variable a to 1 in before", {
 				a.should().equal(1);
-				trace("Running!");
+			});
+		});
+
+		describe("When testing after", {
+			it("should not set 'testAfter' in the first spec", {
+				testAfter.should().equal(null);
+			});
+
+			it("should call after before the second spec, and set 'testAfter'", {
+				testAfter.should().equal("after executed");
 			});
 
 			after({
-				trace("After");
+				testAfter = "after executed";
 			});
 		});
 	}
