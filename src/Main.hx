@@ -11,6 +11,16 @@ class Main
 	static function main()
 	{
 		var t = new TestBasicFeatures();
+
+		t.progress = function(s : Spec) {
+			Lib.print(switch(s.status) {
+				case TestStatus.Failed: "X";
+				case TestStatus.Passed: ".";
+				case TestStatus.Pending: "*";
+				case TestStatus.Unknown: "?";
+			});
+		};
+
 		t.run().then(function(_) { done(t); } );
 
 		var t2 = new TestAsync();
@@ -21,6 +31,7 @@ class Main
 
 	static function done(t : BDDSuite)
 	{
+		Lib.println("");
 		for (s in t.suites)
 		{
 			Lib.println(s.name);

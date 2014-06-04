@@ -75,17 +75,19 @@ class BDDSuite
 	public static var current(default, default) : BDDSuite = new BDDSuite();
 
 	public var suites(default, null) : List<Suite>;
+	public var progress(default, default) : Spec -> Void;
 
-	public function new()
+	public function new(progress : Spec -> Void = null)
 	{
-		suites = new List<Suite>();
+		this.suites = new List<Suite>();
+		this.progress = progress;
 	}
 
 	///// Public API /////
 
 	public function run() : Promise<BDDSuite>
 	{
-		return suites.iterateAsync(function(s) { return new SuiteRunner(s).run(); }, this);
+		return suites.iterateAsync(function(s) { return new SuiteRunner(s, progress).run(); }, this);
 	}
 
 	///// Private API /////
@@ -142,10 +144,12 @@ class BDDSuite
 private class SuiteRunner
 {
 	var suite : Suite;
+	var progress : Spec -> Void;
 
-	public function new(suite : Suite)
+	public function new(suite : Suite, progress : Spec -> Void)
 	{
 		this.suite = suite;
+		this.progress = progress;
 	}
 
 	public function run() : Promise<Suite>
@@ -196,7 +200,12 @@ private class SuiteRunner
 
 			suite.before.iterateAsyncBool(runBeforeAfter)
 				.pipe(function(_) { spec.run(done, status); if (!spec.async) done(); return itPromise; } )
-				.pipe(function(result) { spec.setStatus(result.status, result.error); return suite.after.iterateAsyncBool(runBeforeAfter); } )
+				.pipe(function(result)
+				{
+					spec.setStatus(result.status, result.error);
+					if (progress != null) progress(spec);
+					return suite.after.iterateAsyncBool(runBeforeAfter);
+				})
 				.then(function(_) { specDone.resolve(spec); } );
 		}
 		else
