@@ -1,9 +1,10 @@
 package ;
 import promhx.Deferred;
 import promhx.Promise;
+import Should;
 using AsyncTools;
 
-typedef Action = (Void -> Void) -> Void;
+typedef Action = (Void -> Void) -> SpecAssertion -> Void;
 
 enum TestStatus
 {
@@ -47,9 +48,15 @@ class Spec
 	public var description(default, null) : String;
 	public var async(default, null) : Bool;
 	public var status(default, null) : TestStatus;
+	public var error(default, null) : String;
 
 	@:allow(SuiteRunner) private var run : Action;
-	@:allow(SuiteRunner) private function setStatus(s : TestStatus) { this.status = s; };
+
+	@:allow(SuiteRunner) private function setStatus(s : TestStatus, err : String)
+	{
+		this.status = s;
+		this.error = err;
+	}
 
 	public function new(description : String, run : Action, async = false, pending = false)
 	{
@@ -65,6 +72,7 @@ class Spec
 class BDDSuite
 {
 	public static var current(default, default) : BDDSuite = new BDDSuite();
+
 	public var suites(default, null) : List<Suite>;
 
 	public function new()
@@ -151,7 +159,7 @@ private class SuiteRunner
 
 		var done = function() { def.resolve(b); };
 
-		b.run(done);
+		b.run(done, function(s : Bool, err : String) {});
 		if (!b.async) done();
 
 		return pr;
@@ -164,18 +172,31 @@ private class SuiteRunner
 		var specPr = specDone.promise();
 
 		// Test = The it part only
-		var itDone = new Deferred<Bool>();
+		var itDone = new Deferred<{status : TestStatus, error : String}>();
 		var itPromise = itDone.promise();
-		var done = function() { itDone.resolve(true); };
 
 		// Only run tests that are not executed yet.
 		if (spec.status == TestStatus.Unknown)
 		{
+			var hasStatus = false;
+
+			var status = function(s, error)
+			{
+				hasStatus = true;
+				if (!s && !itPromise.isResolved())
+					itDone.resolve( { status: TestStatus.Failed, error: error } );
+			};
+
+			var done = function()
+			{
+				if (!itPromise.isResolved())
+					itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null } );
+			};
+
 			suite.before.iterateAsyncBool(runBeforeAfter)
-				.pipe(function(_) { spec.run(done); if (!spec.async) done(); return itPromise; } )
-				.pipe(function(_) { spec.setStatus(TestStatus.Passed); return suite.after.iterateAsyncBool(runBeforeAfter); } )
-				.then(function(_) { specDone.resolve(spec); } )
-				.catchError(function(_) { spec.setStatus(TestStatus.Failed); specDone.resolve(spec); } );
+				.pipe(function(_) { spec.run(done, status); if (!spec.async) done(); return itPromise; } )
+				.pipe(function(result) { spec.setStatus(result.status, result.error); return suite.after.iterateAsyncBool(runBeforeAfter); } )
+				.then(function(_) { specDone.resolve(spec); } );
 		}
 		else
 		{

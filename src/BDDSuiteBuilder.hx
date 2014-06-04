@@ -15,53 +15,65 @@ class BDDSuiteBuilder
 	{
 		switch(e)
 		{
-			case macro describe($s, function() $f):
-				f.iter(injectAsync);
+			case macro $a.should().$b, macro $a.should.$b:
+				var change = macro $a.should(__status).$b;
+				e.expr = change.expr;
+				e.iter(injectAsync);
 
-			case macro describe($s, $f):
+			/////
+
+			case macro describe($s, function() $f), macro describe($s, $f):
 				var change = macro describe($s, function() $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
 			/////
 
-			case macro before(function() $f):
-				var change = macro syncBefore(function(__asyncDone) $f);
+			case macro before(function($n) $f):
+				var change = macro syncBefore(function($n, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
-			case macro before($f):
-				var change = macro syncBefore(function(__asyncDone) $f);
+			case macro before(function() $f), macro before($f):
+				var change = macro syncBefore(function(__asyncDone, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
 			/////
 
-			case macro after(function() $f):
-				var change = macro syncAfter(function(__asyncDone) $f);
+			case macro after(function($n) $f):
+				var change = macro syncAfter(function($n, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
-			case macro after($f):
-				var change = macro syncAfter(function(__asyncDone) $f);
+			case macro after(function() $f), macro after($f):
+				var change = macro syncAfter(function(__asyncDone, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
 			/////
 
-			case macro it($s, function() $f):
-				var change = macro syncIt($s, function(__asyncDone) $f);
+			case macro it($s, function($n) $f):
+				var change = macro syncIt($s, function($n, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
-			case macro it($s, $f):
-				var change = macro syncIt($s, function(__asyncDone) $f);
+			case macro it($s, function() $f), macro it($s, $f):
+				var change = macro syncIt($s, function(__asyncDone, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
 			/////
 
-			case macro xit($s, function() $f):
-				var change = macro syncXit($s, function(__asyncDone) $f);
+			case macro xit($s, function($n) $f):
+				var change = macro syncXit($s, function($n, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
-			case macro xit($s, $f):
-				var change = macro syncXit($s, function(__asyncDone) $f);
+			case macro xit($s, function() $f), macro xit($s, $f):
+				var change = macro syncXit($s, function(__asyncDone, __status) $f);
 				e.expr = change.expr;
+				f.iter(injectAsync);
 
 			case _: e.iter(injectAsync);
 		}

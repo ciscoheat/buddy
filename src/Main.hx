@@ -19,7 +19,10 @@ class Main
 			Lib.println(s.name);
 			for (sp in s.specs)
 			{
-				Lib.println("  " + sp.description + " (" + sp.status + ")");
+				if (sp.status == TestStatus.Failed)
+					Lib.println("  " + sp.description + " (FAILED: " + sp.error + ")");
+				else
+					Lib.println("  " + sp.description + " (" + sp.status + ")");
 			}
 		}
 	}
@@ -56,6 +59,7 @@ class TestClass extends BDDSuite
 			});
 
 			it("should definitely set a = 1", {
+				a.should().equal(1);
 				trace("Running!");
 			});
 

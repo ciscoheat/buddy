@@ -1,32 +1,37 @@
 package ;
+import BDDSuite;
+
+typedef SpecAssertion = Bool -> String -> Void;
 
 class ShouldInt
 {
-	static public function should(d : Int)
+	static public function should(i : Int, assert : SpecAssertion)
 	{
-		return new Be<Int>(d);
+		return new Equal<Int>(i, assert);
 	}
 }
 
 class ShouldString
 {
-	static public function should(d : String)
+	static public function should(str : String, assert : SpecAssertion)
 	{
-		return new Be<String>(d);
+		return new Equal<String>(str, assert);
 	}
 }
 
-class Be<T>
+class Equal<T>
 {
-	var input : T;
+	var value : T;
+	var assert : SpecAssertion;
 
-	public function new(input : T)
+	public function new(value : T, assert : SpecAssertion)
 	{
-		this.input = input;
+		this.value = value;
+		this.assert = assert;
 	}
 
-	public function be(v : T)
+	public function equal(test : T) : Void
 	{
-		if (input != v) throw 'Fail: "$v" != "$input"';
+		assert(value == test, 'Expected $value, was $test');
 	}
 }
