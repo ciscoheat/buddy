@@ -1,5 +1,4 @@
 package ;
-import BDDSuite;
 
 /*
 toBe(b);

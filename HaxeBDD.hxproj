@@ -16,13 +16,14 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
+    <class path="tests" />
   </classpaths>
   <!-- Build options -->
   <build>
     <option directives="fdb" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
-    <option mainClass="Main" />
+    <option mainClass="AllTests" />
     <option enabledebug="True" />
     <option additional="" />
   </build>
