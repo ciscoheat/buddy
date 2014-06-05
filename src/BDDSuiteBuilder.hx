@@ -4,20 +4,38 @@ import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
+import sys.io.File;
+import sys.io.FileInput;
 using haxe.macro.ExprTools;
 
 //@:autoBuild(BDDSuiteBuilder.build()) interface BDDSuite { }
+
+/*var f = File.write("e:\\temp\\test.txt", false);
+f.writeString(Std.string(e.expr));
+f.close();*/
 
 class BDDSuiteBuilder
 {
 	private static function injectAsync(e : Expr)
 	{
+		switch(e.expr)
+		{
+			// Fix autocomplete for should without parenthesis
+			case EDisplay(e2, isCall):
+				switch(e2.expr)
+				{
+					case EField(e3, f3) if(f3 == "should"):
+						e2.expr = ECall({ expr: e2.expr, pos: e2.pos }, []);
+					case _:
+				}
+			case _:
+		}
+
 		switch(e)
 		{
 			case macro $a.should().$b, macro $a.should.$b:
 				var change = macro $a.should(__status).$b;
 				e.expr = change.expr;
-				a.iter(injectAsync);
 
 			/////
 
