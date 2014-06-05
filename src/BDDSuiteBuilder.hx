@@ -4,8 +4,6 @@ import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
-import BDDReporter;
-using Lambda;
 using haxe.macro.ExprTools;
 
 //@:autoBuild(BDDSuiteBuilder.build()) interface BDDSuite { }
@@ -16,8 +14,8 @@ class BDDSuiteBuilder
 	{
 		switch(e)
 		{
-			case macro $a.should(), macro $a.should:
-				var change = macro $a.should(__status);
+			case macro $a.should().$b, macro $a.should.$b:
+				var change = macro $a.should(__status).$b;
 				e.expr = change.expr;
 				a.iter(injectAsync);
 

@@ -1,6 +1,9 @@
 package ;
 import BDDSuite;
 
+/**
+ * A function that specifies the status for a spec with an optional error message.
+ */
 typedef SpecAssertion = Bool -> String -> Void;
 
 class ShouldInt extends Should<Int>
@@ -10,21 +13,19 @@ class ShouldInt extends Should<Int>
 		return new ShouldInt(i, assert);
 	}
 
+	public function beLessThan(expected : Float)
+	{
+		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value');
+	}
+
+	public function beMoreThan(expected : Float)
+	{
+		assert(inverse ? value <= expected : value > expected, 'Expected more than $expected, was $value');
+	}
+
 	public function new(value : Int, assert : SpecAssertion)
 	{
 		super(value, assert);
-	}
-
-	public function beLessThan(expected : Float)
-	{
-		if (!inverse)
-		{
-			assert(value < expected, 'Expected less than $expected, was $value');
-		}
-		else
-		{
-			assert(value >= expected, 'Expected less than $expected, was $value');
-		}
 	}
 }
 

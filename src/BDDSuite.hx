@@ -2,7 +2,6 @@ package ;
 import promhx.Deferred;
 import promhx.Promise;
 import Should;
-import BDDReporter;
 using AsyncTools;
 
 typedef Action = (Void -> Void) -> SpecAssertion -> Void;
@@ -81,15 +80,6 @@ class BDDSuite
 	{
 		this.suites = new List<Suite>();
 	}
-
-	///// Public API /////
-
-	/*
-	public function run() : Promise<BDDSuite>
-	{
-		return suites.iterateAsync(function(s) { return new SuiteRunner(s, reporter).run(); }, this);
-	}
-	*/
 
 	///// Private API /////
 

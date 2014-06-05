@@ -10,16 +10,12 @@ class Main
 {
 	static function main()
 	{
+		var suites = [new TestBasicFeatures(), new TestAsync()];
+		var reporter = new ConsoleReporter();
+
 		var testsRunning = true;
-
-		new BDDSuiteRunner(
-			[new TestBasicFeatures(), new TestAsync()],
-			new ConsoleReporter()
-		)
-		.run().then(function(_) { testsRunning = false; } );
-
-		while (testsRunning)
-			Sys.sleep(0.1);
+		new BDDSuiteRunner(suites, reporter).run().then(function(_) { testsRunning = false; });
+		while(testsRunning)	Sys.sleep(0.1);
 	}
 }
 
@@ -62,6 +58,14 @@ class TestBasicFeatures extends BDDSuite
 
 			it("beLessThan should compare against float", {
 				3.should().beLessThan(3.1);
+			});
+
+			it("should have a beMoreThan method", {
+				(3).should().beMoreThan(2);
+			});
+
+			it("beMoreThan should compare against float", {
+				3.should().beMoreThan(2.9);
 			});
 		});
 

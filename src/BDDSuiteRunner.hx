@@ -3,7 +3,6 @@ import promhx.Deferred;
 import promhx.Promise;
 import BDDSuite;
 using AsyncTools;
-using Lambda;
 
 class BDDSuiteRunner
 {
