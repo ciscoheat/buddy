@@ -10,39 +10,10 @@ class Main
 {
 	static function main()
 	{
-		var t = new TestBasicFeatures();
-
-		t.progress = function(s : Spec) {
-			Lib.print(switch(s.status) {
-				case TestStatus.Failed: "X";
-				case TestStatus.Passed: ".";
-				case TestStatus.Pending: "*";
-				case TestStatus.Unknown: "?";
-			});
-		};
-
-		t.run().then(function(_) { done(t); } );
-
-		var t2 = new TestAsync();
-		t2.run().then(function(_) { done(t2); } );
+		var t = new TestBasicFeatures().run();
+		var t2 = new TestAsync().run();
 
 		Sys.sleep(0.2);
-	}
-
-	static function done(t : BDDSuite)
-	{
-		Lib.println("");
-		for (s in t.suites)
-		{
-			Lib.println(s.name);
-			for (sp in s.specs)
-			{
-				if (sp.status == TestStatus.Failed)
-					Lib.println("  " + sp.description + " (FAILED: " + sp.error + ")");
-				else
-					Lib.println("  " + sp.description + " (" + sp.status + ")");
-			}
-		}
 	}
 }
 

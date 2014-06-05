@@ -4,6 +4,7 @@ import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
+import BDDReporter;
 using Lambda;
 using haxe.macro.ExprTools;
 
@@ -108,7 +109,7 @@ class BDDSuiteBuilder
 							}
 
 							if(!exists)
-								exprs.unshift(macro super());
+								exprs.unshift(macro super(new ConsoleReporter()));
 
 						case _:
 					}

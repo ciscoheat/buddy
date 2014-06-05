@@ -2,6 +2,7 @@ package ;
 import promhx.Deferred;
 import promhx.Promise;
 import Should;
+import BDDReporter;
 using AsyncTools;
 
 typedef Action = (Void -> Void) -> SpecAssertion -> Void;
@@ -45,6 +46,7 @@ class Suite
 
 class Spec
 {
+	public var suite(default, null) : Suite;
 	public var description(default, null) : String;
 	public var async(default, null) : Bool;
 	public var status(default, null) : TestStatus;
@@ -58,8 +60,9 @@ class Spec
 		this.error = err;
 	}
 
-	public function new(description : String, run : Action, async = false, pending = false)
+	public function new(suite : Suite, description : String, run : Action, async = false, pending = false)
 	{
+		this.suite = suite;
 		this.description = description;
 		this.run = run;
 		this.async = async;
@@ -72,22 +75,30 @@ class Spec
 @:autoBuild(BDDSuiteBuilder.build())
 class BDDSuite
 {
-	public static var current(default, default) : BDDSuite = new BDDSuite();
+	public static var current(default, default) : BDDSuite = new BDDSuite(new ConsoleReporter());
 
 	public var suites(default, null) : List<Suite>;
-	public var progress(default, default) : Spec -> Void;
+	public var reporter(default, null) : BDDReporter;
 
-	public function new(progress : Spec -> Void = null)
+	public function new(reporter : BDDReporter)
 	{
 		this.suites = new List<Suite>();
-		this.progress = progress;
+		this.reporter = reporter;
 	}
 
 	///// Public API /////
 
 	public function run() : Promise<BDDSuite>
 	{
-		return suites.iterateAsync(function(s) { return new SuiteRunner(s, progress).run(); }, this);
+		var def = new Deferred<BDDSuite>();
+		var defPr = def.promise();
+
+		reporter.start();
+
+		suites.iterateAsyncBool(function(s) { return new SuiteRunner(s, reporter).run(); } )
+			.then(function(_) { reporter.done(this.suites); def.resolve(this); } );
+
+		return defPr;
 	}
 
 	///// Private API /////
@@ -132,28 +143,31 @@ class BDDSuite
 
 	@:noCompletion private function syncIt(desc : String, test : Action, async = false)
 	{
-		suites.last().specs.add(new Spec(desc, test, async));
+		var suite = suites.last();
+		suite.specs.add(new Spec(suite, desc, test, async));
 	}
 
 	@:noCompletion private function syncXit(desc : String, test : Action, async = false)
 	{
-		suites.last().specs.add(new Spec(desc, test, async, true));
+		var suite = suites.last();
+		suite.specs.add(new Spec(suite, desc, test, async, true));
 	}
 }
 
 private class SuiteRunner
 {
 	var suite : Suite;
-	var progress : Spec -> Void;
+	var reporter : BDDReporter;
 
-	public function new(suite : Suite, progress : Spec -> Void)
+	public function new(suite : Suite, reporter : BDDReporter)
 	{
 		this.suite = suite;
-		this.progress = progress;
+		this.reporter = reporter;
 	}
 
 	public function run() : Promise<Suite>
 	{
+		reporter.start();
 		return suite.specs.iterateAsync(runSpec, suite);
 	}
 
@@ -203,7 +217,8 @@ private class SuiteRunner
 				.pipe(function(result)
 				{
 					spec.setStatus(result.status, result.error);
-					if (progress != null) progress(spec);
+					reporter.progress(spec);
+
 					return suite.after.iterateAsyncBool(runBeforeAfter);
 				})
 				.then(function(_) { specDone.resolve(spec); } );
