@@ -18,9 +18,23 @@ class ConsoleReporter implements BDDReporter
 		});
 	}
 
-	public function done(suites : List<Suite>)
+	public function done(suites : Iterable<Suite>)
 	{
 		Lib.println("");
+
+		var total = 0;
+		var failures = 0;
+		var pending = 0;
+		for (s in suites)
+		{
+			for (sp in s.specs)
+			{
+				total++;
+				if (sp.status == TestStatus.Failed) failures++;
+				else if (sp.status == TestStatus.Pending) pending++;
+			}
+		}
+
 		for (s in suites)
 		{
 			Lib.println(s.name);
@@ -32,5 +46,7 @@ class ConsoleReporter implements BDDReporter
 					Lib.println("  " + sp.description + " (" + sp.status + ")");
 			}
 		}
+
+		Lib.println('$total specs, $failures failures, $pending pending');
 	}
 }

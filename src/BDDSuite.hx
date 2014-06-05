@@ -75,31 +75,21 @@ class Spec
 @:autoBuild(BDDSuiteBuilder.build())
 class BDDSuite
 {
-	public static var current(default, default) : BDDSuite = new BDDSuite(new ConsoleReporter());
-
 	public var suites(default, null) : List<Suite>;
-	public var reporter(default, null) : BDDReporter;
 
-	public function new(reporter : BDDReporter)
+	public function new()
 	{
 		this.suites = new List<Suite>();
-		this.reporter = reporter;
 	}
 
 	///// Public API /////
 
+	/*
 	public function run() : Promise<BDDSuite>
 	{
-		var def = new Deferred<BDDSuite>();
-		var defPr = def.promise();
-
-		reporter.start();
-
-		suites.iterateAsyncBool(function(s) { return new SuiteRunner(s, reporter).run(); } )
-			.then(function(_) { reporter.done(this.suites); def.resolve(this); } );
-
-		return defPr;
+		return suites.iterateAsync(function(s) { return new SuiteRunner(s, reporter).run(); }, this);
 	}
+	*/
 
 	///// Private API /////
 
@@ -154,7 +144,7 @@ class BDDSuite
 	}
 }
 
-private class SuiteRunner
+class SuiteRunner
 {
 	var suite : Suite;
 	var reporter : BDDReporter;
@@ -167,7 +157,6 @@ private class SuiteRunner
 
 	public function run() : Promise<Suite>
 	{
-		reporter.start();
 		return suite.specs.iterateAsync(runSpec, suite);
 	}
 
@@ -175,7 +164,6 @@ private class SuiteRunner
 	{
 		var def = new Deferred<BeforeAfter>();
 		var pr = def.promise();
-
 		var done = function() { def.resolve(b); };
 
 		b.run(done, function(s : Bool, err : String) {});
@@ -190,43 +178,40 @@ private class SuiteRunner
 		var specDone = new Deferred<Spec>();
 		var specPr = specDone.promise();
 
+		if (spec.status != TestStatus.Unknown)
+		{
+			specDone.resolve(spec);
+			return specPr;
+		}
+
 		// Test = The it part only
 		var itDone = new Deferred<{status : TestStatus, error : String}>();
 		var itPromise = itDone.promise();
 
-		// Only run tests that are not executed yet.
-		if (spec.status == TestStatus.Unknown)
+		var hasStatus = false;
+		var status = function(s, error)
 		{
-			var hasStatus = false;
+			hasStatus = true;
+			if (!s && !itPromise.isResolved())
+				itDone.resolve({ status: TestStatus.Failed, error: error });
+		};
 
-			var status = function(s, error)
-			{
-				hasStatus = true;
-				if (!s && !itPromise.isResolved())
-					itDone.resolve( { status: TestStatus.Failed, error: error } );
-			};
-
-			var done = function()
-			{
-				if (!itPromise.isResolved())
-					itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null } );
-			};
-
-			suite.before.iterateAsyncBool(runBeforeAfter)
-				.pipe(function(_) { spec.run(done, status); if (!spec.async) done(); return itPromise; } )
-				.pipe(function(result)
-				{
-					spec.setStatus(result.status, result.error);
-					reporter.progress(spec);
-
-					return suite.after.iterateAsyncBool(runBeforeAfter);
-				})
-				.then(function(_) { specDone.resolve(spec); } );
-		}
-		else
+		var done = function()
 		{
-			specDone.resolve(spec);
-		}
+			if (!itPromise.isResolved())
+				itDone.resolve({ status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null });
+		};
+
+		suite.before.iterateAsyncBool(runBeforeAfter)
+			.pipe(function(_) { spec.run(done, status); if (!spec.async) done(); return itPromise; } )
+			.pipe(function(result)
+			{
+				spec.setStatus(result.status, result.error);
+				if(reporter != null) reporter.progress(spec);
+
+				return suite.after.iterateAsyncBool(runBeforeAfter);
+			})
+			.then(function(_) { specDone.resolve(spec); } );
 
 		return specPr;
 	}

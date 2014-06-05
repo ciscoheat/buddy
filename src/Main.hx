@@ -10,10 +10,16 @@ class Main
 {
 	static function main()
 	{
-		var t = new TestBasicFeatures().run();
-		var t2 = new TestAsync().run();
+		var testsRunning = true;
 
-		Sys.sleep(0.2);
+		new BDDSuiteRunner(
+			[new TestBasicFeatures(), new TestAsync()],
+			new ConsoleReporter()
+		)
+		.run().then(function(_) { testsRunning = false; } );
+
+		while (testsRunning)
+			Sys.sleep(0.1);
 	}
 }
 

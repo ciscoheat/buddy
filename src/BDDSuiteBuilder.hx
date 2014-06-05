@@ -109,7 +109,7 @@ class BDDSuiteBuilder
 							}
 
 							if(!exists)
-								exprs.unshift(macro super(new ConsoleReporter()));
+								exprs.unshift(macro super());
 
 						case _:
 					}
