@@ -1,6 +1,28 @@
 package ;
 import BDDSuite;
 
+/*
+toBe(b);
+toBe(false);
+toBeCloseTo(e, 0);
+toBeDefined();
+toBeFalsy();
+toBeGreaterThan(0);
+toBeLessThan(e);
+toBeNull();
+toBeTruthy();
+toBeUndefined();
+toContain("bar");
+toEqual("I");
+toHaveBeenCalled();
+toHaveBeenCalledWith(456, 'another param');
+toHaveBeenCalledWith(jasmine.any(Number), jasmine.any(Function));
+toHaveBeenCalledWith(jasmine.objectContaining({
+toMatch(/bar/);
+toThrow();
+toThrowError("quux");
+*/
+
 /**
  * A function that specifies the status for a spec with an optional error message.
  */
@@ -18,9 +40,9 @@ class ShouldInt extends Should<Int>
 		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value');
 	}
 
-	public function beMoreThan(expected : Float)
+	public function beGreaterThan(expected : Float)
 	{
-		assert(inverse ? value <= expected : value > expected, 'Expected more than $expected, was $value');
+		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value');
 	}
 
 	public function new(value : Int, assert : SpecAssertion)

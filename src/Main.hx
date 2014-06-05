@@ -61,11 +61,11 @@ class TestBasicFeatures extends BDDSuite
 			});
 
 			it("should have a beMoreThan method", {
-				3.should.beMoreThan(2);
+				3.should.beGreaterThan(2);
 			});
 
 			it("beMoreThan should compare against float", {
-				(3).should.beMoreThan(2.9);
+				(3).should.beGreaterThan(2.9);
 			});
 		});
 
