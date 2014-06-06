@@ -95,7 +95,6 @@ class TestAsync extends BuddySuite
 				Timer.delay(function() { a = 1; done(); }, 1);
 			});
 			#elseif cs
-			// -net-lib c:\HaxeToolkit\haxe\lib\hxcs\3,1,1\netlib\net-40\System.dll
 			before(function(done) {
 				var t = new Timer(10);
 				t.add_Elapsed(new ElapsedEventHandler(function(sender : Dynamic, e : ElapsedEventArgs) {
