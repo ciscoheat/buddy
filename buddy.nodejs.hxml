@@ -1,6 +1,6 @@
 -cp src 
 -lib promhx
--js bin/buddy.js
+-js bin/buddy.nodejs.js
 -main buddy.tests.AllTests
 --times
 -D macro-times

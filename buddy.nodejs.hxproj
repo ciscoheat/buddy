@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\buddynodejs.js" />
+    <movie path="bin\buddy.nodejs.js" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
@@ -46,7 +46,7 @@
   <options>
     <option showHiddenPaths="False" />
     <option testMovie="Custom" />
-    <option testMovieCommand="node bin\buddynodejs.js" />
+    <option testMovieCommand="node bin\buddy.nodejs.js" />
   </options>
   <!-- Plugin storage -->
   <storage />

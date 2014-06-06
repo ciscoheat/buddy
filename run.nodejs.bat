@@ -1,3 +1,3 @@
 @echo off
-node bin\buddynodejs.js
+node bin\buddy.nodejs.js
 pause

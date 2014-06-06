@@ -83,22 +83,37 @@ class GenerateMain
 	private static function buildMain(exprs : Array<Expr>, cls : ClassType)
 	{
 		var e = AutoIncluder.toTypeStringExpr(cls);
-
-		var body = macro {
-			var reporter = new buddy.reporting.ConsoleReporter();
-			var suites = [];
-			for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-				suites.push(Type.createInstance(Type.resolveClass(a), []));
-			}
-
-			var testsRunning = true;
-			new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
-		};
-
-		exprs.push(body);
+		var body : Expr;
 
 		if (Context.defined("neko"))
-			exprs.push(macro while(testsRunning) Sys.sleep(0.1));
+		{
+			body = macro {
+				var reporter = new buddy.reporting.ConsoleReporter();
+				var suites = [];
+				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
+					suites.push(Type.createInstance(Type.resolveClass(a), []));
+				}
+
+				var testsRunning = true;
+				new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
+				while (testsRunning) Sys.sleep(0.1);
+			};
+		}
+		else
+		{
+			body = macro {
+				var reporter = new buddy.reporting.ConsoleReporter();
+				var suites = [];
+				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
+					suites.push(Type.createInstance(Type.resolveClass(a), []));
+				}
+
+				var testsRunning = true;
+				new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
+			};
+		}
+
+		exprs.push(body);
 	}
 }
 #end
