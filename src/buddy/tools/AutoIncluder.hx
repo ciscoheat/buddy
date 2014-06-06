@@ -1,4 +1,4 @@
-package ;
+package buddy.tools ;
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
@@ -33,7 +33,7 @@ class AutoIncluder
 			switch(a)
 			{
 				case TInst(t, params) if(allowed(t.get())):
-					classes.push(toTypeIdentifier(t.get()));
+					classes.push(toTypeStringExpr(t.get()));
 
 				case _:
 			}
@@ -45,14 +45,11 @@ class AutoIncluder
 
 	public static function toTypeString(type : ClassType) : String
 	{
-		if (type.pack.length > 0)
-			return type.pack.join(".") + "." + type.name;
-
-		return type.name;
+		return type.pack.concat([type.name]).join(".");
 	}
 
-	public static function toTypeIdentifier(type : ClassType) : Expr
+	public static function toTypeStringExpr(type : ClassType) : Expr
 	{
-		return macro $v{toTypeString(type)};
+		return {expr: EConst(CString(toTypeString(type))), pos: Context.currentPos()};
 	}
 }

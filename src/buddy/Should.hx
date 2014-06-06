@@ -1,4 +1,4 @@
-package ;
+package buddy;
 
 /*
 toBe(b);

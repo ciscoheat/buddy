@@ -1,4 +1,7 @@
-package ;
+package buddy.internal;
+
+import buddy.reporting.ConsoleReporter;
+import buddy.internal.SuitesRunner;
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
@@ -6,12 +9,10 @@ import haxe.macro.Type;
 import haxe.macro.Context;
 import haxe.rtti.Meta;
 using haxe.macro.ExprTools;
-import AutoIncluder;
+import buddy.tools.AutoIncluder;
 using Lambda;
 
-@:autoBuild(BDDMainClass.build()) interface BDD { }
-
-class BDDMainClass
+class GenerateMain
 {
 	macro public static function build() : Array<Field>
 	{
@@ -75,21 +76,21 @@ class BDDMainClass
 	private static function typeIsSuite(type : ClassType) : Bool
 	{
 		var superClass = type.superClass;
-		return superClass != null && superClass.t.get().name == "BDDSuite";
+		return superClass != null && superClass.t.get().name == "BuddySuite";
 	}
 
 	private static function buildMain(exprs : Array<Expr>, cls : ClassType)
 	{
-		var e = AutoIncluder.toTypeString(cls);
+		var e = AutoIncluder.toTypeStringExpr(cls);
 		var body = macro {
-			var reporter = new ConsoleReporter();
+			var reporter = new buddy.reporting.ConsoleReporter();
 			var suites = [];
-			for (a in haxe.rtti.Meta.getType($i{e}).autoIncluded) {
+			for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
 				suites.push(Type.createInstance(Type.resolveClass(a), []));
 			}
 
 			var testsRunning = true;
-			new BDDSuiteRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
+			new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
 			while (testsRunning) Sys.sleep(0.1);
 		};
 

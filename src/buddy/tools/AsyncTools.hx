@@ -1,4 +1,4 @@
-package ;
+package buddy.tools ;
 import promhx.Promise;
 import promhx.Deferred;
 

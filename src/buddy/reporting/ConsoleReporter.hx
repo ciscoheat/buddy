@@ -1,8 +1,9 @@
-package ;
-import BDDSuite;
+package buddy.reporting ;
+import buddy.BuddySuite;
+import buddy.reporting.Reporter;
 import neko.Lib;
 
-class ConsoleReporter implements BDDReporter
+class ConsoleReporter implements Reporter
 {
 	public function new() {}
 

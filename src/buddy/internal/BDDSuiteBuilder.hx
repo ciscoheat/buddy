@@ -1,4 +1,4 @@
-package ;
+package buddy.internal ;
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
@@ -7,8 +7,6 @@ import haxe.macro.Context;
 import sys.io.File;
 import sys.io.FileInput;
 using haxe.macro.ExprTools;
-
-//@:autoBuild(BDDSuiteBuilder.build()) interface BDDSuite { }
 
 /*var f = File.write("e:\\temp\\test.txt", false);
 f.writeString(Std.string(e.expr));

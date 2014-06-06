@@ -1,23 +1,24 @@
-package ;
+package buddy.internal ;
+import buddy.reporting.Reporter;
 import promhx.Deferred;
 import promhx.Promise;
-import BDDSuite;
-using AsyncTools;
+import buddy.BuddySuite;
+using buddy.tools.AsyncTools;
 
-class BDDSuiteRunner
+class SuitesRunner
 {
 	private var suites : Array<Suite>;
-	private var reporter : BDDReporter;
+	private var reporter : Reporter;
 
-	public function new(suites : Iterable<BDDSuite>, reporter : BDDReporter)
+	public function new(suites : Iterable<BuddySuite>, reporter : Reporter)
 	{
 		this.suites = [for(s in suites) for(su in s.suites) su];
 		this.reporter = reporter;
 	}
 
-	public function run() : Promise<BDDSuiteRunner>
+	public function run() : Promise<SuitesRunner>
 	{
-		var def = new Deferred<BDDSuiteRunner>();
+		var def = new Deferred<SuitesRunner>();
 		var defPr = def.promise();
 
 		reporter.start();

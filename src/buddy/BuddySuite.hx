@@ -1,10 +1,11 @@
-package ;
+package buddy ;
+import buddy.reporting.Reporter;
 import promhx.Deferred;
 import promhx.Promise;
-import Should;
-using AsyncTools;
+import buddy.Should;
+using buddy.tools.AsyncTools;
 
-typedef Action = (Void -> Void) -> SpecAssertion -> Void;
+private typedef Action = (Void -> Void) -> SpecAssertion -> Void;
 
 enum TestStatus
 {
@@ -17,7 +18,7 @@ enum TestStatus
 private class BeforeAfter
 {
 	public var async(default, null) : Bool;
-	@:allow(SuiteRunner) private var run : Action;
+	@:allow(buddy.SuiteRunner) private var run : Action;
 
 	public function new(run : Action, async = false)
 	{
@@ -31,8 +32,8 @@ class Suite
 	public var name(default, null) : String;
 	public var specs(default, null) : List<Spec>;
 
-	@:allow(SuiteRunner) @:allow(BDDSuite) private var before : List<BeforeAfter>;
-	@:allow(SuiteRunner) @:allow(BDDSuite) private var after : List<BeforeAfter>;
+	@:allow(buddy.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
+	@:allow(buddy.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
 
 	public function new(name : String)
 	{
@@ -51,9 +52,9 @@ class Spec
 	public var status(default, null) : TestStatus;
 	public var error(default, null) : String;
 
-	@:allow(SuiteRunner) private var run : Action;
+	@:allow(buddy.SuiteRunner) private var run : Action;
 
-	@:allow(SuiteRunner) private function setStatus(s : TestStatus, err : String)
+	@:allow(buddy.SuiteRunner) private function setStatus(s : TestStatus, err : String)
 	{
 		this.status = s;
 		this.error = err;
@@ -71,8 +72,8 @@ class Spec
 	}
 }
 
-@:autoBuild(BDDSuiteBuilder.build())
-class BDDSuite
+@:autoBuild(buddy.internal.BDDSuiteBuilder.build())
+class BuddySuite
 {
 	public var suites(default, null) : List<Suite>;
 
@@ -137,9 +138,9 @@ class BDDSuite
 class SuiteRunner
 {
 	var suite : Suite;
-	var reporter : BDDReporter;
+	var reporter : Reporter;
 
-	public function new(suite : Suite, reporter : BDDReporter)
+	public function new(suite : Suite, reporter : Reporter)
 	{
 		this.suite = suite;
 		this.reporter = reporter;

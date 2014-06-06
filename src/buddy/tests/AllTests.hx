@@ -1,18 +1,19 @@
-package ;
+package buddy.tests ;
+import buddy.BuddySuite;
 import neko.vm.Thread;
-import BDD;
-using Should;
+import buddy.Buddy;
+using buddy.Should;
 
-class AllTests implements BDD {}
+class AllTests implements Buddy {}
 
-class TestBasicFeatures extends BDDSuite
+class TestBasicFeatures extends BuddySuite
 {
 	private var testAfter : String;
 
 	public function new()
 	{
 		describe("When testing before", {
-			var a;
+			var a = 0;
 
 			before({
 				a = 1;
@@ -38,20 +39,22 @@ class TestBasicFeatures extends BDDSuite
 		});
 
 		describe("When testing ints", {
+			var number = 3;
+
 			it("should have a beLessThan method", {
-				(3).should.beLessThan(4);
+				number.should.beLessThan(4);
 			});
 
 			it("beLessThan should compare against float", {
-				3.should.beLessThan(3.1);
+				number.should.beLessThan(3.1);
 			});
 
 			it("should have a beMoreThan method", {
-				3.should.beGreaterThan(2);
+				number.should.beGreaterThan(2);
 			});
 
 			it("beMoreThan should compare against float", {
-				(3).should.beGreaterThan(2.9);
+				number.should.beGreaterThan(2.9);
 			});
 		});
 
@@ -63,7 +66,7 @@ class TestBasicFeatures extends BDDSuite
 	}
 }
 
-class TestAsync extends BDDSuite
+class TestAsync extends BuddySuite
 {
 	public function new()
 	{

@@ -1,8 +1,8 @@
-package ;
-import BDDSuite;
+package buddy.reporting ;
+import buddy.BuddySuite;
 import neko.Lib;
 
-interface BDDReporter
+interface Reporter
 {
 	public function start() : Void;
 	public function progress(spec : Spec) : Void;
