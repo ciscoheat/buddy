@@ -93,10 +93,12 @@ class GenerateMain
 
 			var testsRunning = true;
 			new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
-			//while (testsRunning) Sys.sleep(0.1);
 		};
 
 		exprs.push(body);
+
+		if (Context.defined("neko"))
+			exprs.push(macro while(testsRunning) Sys.sleep(0.1));
 	}
 }
 #end

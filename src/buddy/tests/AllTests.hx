@@ -87,7 +87,7 @@ class TestAsync extends BuddySuite
 			});
 			#elseif (js || flash)
 			before(function(done) {
-				Timer.delay(function() { a = 1; }, 1);
+				Timer.delay(function() { a = 1; done(); }, 1);
 			});
 			#else
 				#error
