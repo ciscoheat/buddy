@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\buddyjs.js" />
+    <movie path="bin\buddy.js" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
@@ -45,8 +45,8 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="OpenDocument" />
-    <option testMovieCommand="bin\index.html" />
+    <option testMovie="Custom" />
+    <option testMovieCommand="run.js.bat" />
   </options>
   <!-- Plugin storage -->
   <storage />
