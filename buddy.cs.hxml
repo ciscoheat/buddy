@@ -1,0 +1,6 @@
+-cp src 
+-lib promhx
+-cs bin/buddy
+-main buddy.tests.AllTests
+--times
+-D macro-times

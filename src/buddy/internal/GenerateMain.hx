@@ -99,6 +99,20 @@ class GenerateMain
 				while (testsRunning) Sys.sleep(0.1);
 			};
 		}
+		else if(Context.defined("cs"))
+		{
+			body = macro {
+				var reporter = new buddy.reporting.ConsoleReporter();
+				var suites = [];
+				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
+					suites.push(Type.createInstance(Type.resolveClass(a), []));
+				}
+
+				var testsRunning = true;
+				new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
+				while (testsRunning) cs.system.threading.Thread.Sleep(10);
+			};
+		}
 		else
 		{
 			body = macro {

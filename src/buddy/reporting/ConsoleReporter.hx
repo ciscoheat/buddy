@@ -13,6 +13,9 @@ typedef Lib = JsLib;
 #elseif flash
 import buddy.internal.lib.FlashLib;
 typedef Lib = FlashLib;
+#elseif cs
+import buddy.internal.lib.CsLib;
+typedef Lib = CsLib;
 #end
 
 class ConsoleReporter implements Reporter

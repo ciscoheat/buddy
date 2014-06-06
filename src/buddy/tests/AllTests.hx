@@ -1,11 +1,16 @@
 package buddy.tests ;
 import buddy.BuddySuite;
 import buddy.Buddy;
-import haxe.Timer;
 using buddy.Should;
 
 #if neko
 import neko.vm.Thread;
+#elseif cs
+import cs.system.timers.ElapsedEventHandler;
+import cs.system.timers.ElapsedEventArgs;
+import cs.system.timers.Timer;
+#else
+import haxe.Timer;
 #end
 
 class AllTests implements Buddy {}
@@ -88,6 +93,18 @@ class TestAsync extends BuddySuite
 			#elseif (js || flash)
 			before(function(done) {
 				Timer.delay(function() { a = 1; done(); }, 1);
+			});
+			#elseif cs
+			// -net-lib c:\HaxeToolkit\haxe\lib\hxcs\3,1,1\netlib\net-40\System.dll
+			before(function(done) {
+				var t = new Timer(10);
+				t.add_Elapsed(new ElapsedEventHandler(function(sender : Dynamic, e : ElapsedEventArgs) {
+					t.Stop();
+					a = 1;
+					done();
+				}));
+
+				t.Start();
 			});
 			#else
 				#error
