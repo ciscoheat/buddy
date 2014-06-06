@@ -1,7 +1,8 @@
-package buddy.internal.js;
+package buddy.internal.lib;
+#if js
 import js.Browser;
 
-class Lib
+class JsLib
 {
 	public static function print(s : String)
 	{
@@ -13,3 +14,4 @@ class Lib
 		Browser.document.writeln(s);
 	}
 }
+#end

@@ -1,10 +1,7 @@
-package buddy.internal.nodejs;
+package buddy.internal.lib;
 
-/**
- * ...
- * @author ciscoheat
- */
-class Lib
+#if nodejs
+class NodeJsLib
 {
 	public static function print(s : String)
 	{
@@ -16,3 +13,4 @@ class Lib
 		untyped __js__("console.log(s)");
 	}
 }
+#end

@@ -5,9 +5,14 @@ import buddy.reporting.Reporter;
 #if neko
 import neko.Lib;
 #elseif nodejs
-import buddy.internal.nodejs.Lib;
+import buddy.internal.lib.NodeJsLib;
+typedef Lib = NodeJsLib;
 #elseif js
-import buddy.internal.js.Lib;
+import buddy.internal.lib.JsLib;
+typedef Lib = JsLib;
+#elseif flash
+import buddy.internal.lib.FlashLib;
+typedef Lib = FlashLib;
 #end
 
 class ConsoleReporter implements Reporter

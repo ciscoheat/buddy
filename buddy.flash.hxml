@@ -1,0 +1,6 @@
+-cp src 
+-lib promhx
+-swf bin/buddy.flash.swf
+-main buddy.tests.AllTests
+--times
+-D macro-times
