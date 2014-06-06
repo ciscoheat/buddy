@@ -1,4 +1,4 @@
 @echo off
 cd bin
-neko HaxeBDD.n
+neko buddy.n
 pause
