@@ -1,7 +1,12 @@
 package buddy.reporting ;
+
 import buddy.BuddySuite;
 import buddy.reporting.Reporter;
+#if neko
 import neko.Lib;
+#elseif js
+import buddy.internal.nodejs.Lib;
+#end
 
 class ConsoleReporter implements Reporter
 {
@@ -51,3 +56,4 @@ class ConsoleReporter implements Reporter
 		Lib.println('$total specs, $failures failures, $pending pending');
 	}
 }
+

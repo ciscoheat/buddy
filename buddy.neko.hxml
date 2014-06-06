@@ -1,0 +1,6 @@
+-cp src 
+-lib promhx
+-neko bin/buddy.n
+-main buddy.tests.AllTests
+--times
+-D macro-times

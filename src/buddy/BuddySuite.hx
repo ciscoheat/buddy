@@ -15,10 +15,10 @@ enum TestStatus
 	Failed;
 }
 
-private class BeforeAfter
+class BeforeAfter
 {
 	public var async(default, null) : Bool;
-	@:allow(buddy.SuiteRunner) private var run : Action;
+	@:allow(buddy.internal.SuiteRunner) private var run : Action;
 
 	public function new(run : Action, async = false)
 	{
@@ -32,8 +32,8 @@ class Suite
 	public var name(default, null) : String;
 	public var specs(default, null) : List<Spec>;
 
-	@:allow(buddy.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
-	@:allow(buddy.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
+	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
+	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
 
 	public function new(name : String)
 	{
@@ -52,9 +52,9 @@ class Spec
 	public var status(default, null) : TestStatus;
 	public var error(default, null) : String;
 
-	@:allow(buddy.SuiteRunner) private var run : Action;
+	@:allow(buddy.internal.SuiteRunner) private var run : Action;
 
-	@:allow(buddy.SuiteRunner) private function setStatus(s : TestStatus, err : String)
+	@:allow(buddy.internal.SuiteRunner) private function setStatus(s : TestStatus, err : String)
 	{
 		this.status = s;
 		this.error = err;
@@ -72,7 +72,7 @@ class Spec
 	}
 }
 
-@:autoBuild(buddy.internal.BDDSuiteBuilder.build())
+@:autoBuild(buddy.internal.SuiteBuilder.build())
 class BuddySuite
 {
 	public var suites(default, null) : List<Suite>;
@@ -135,75 +135,3 @@ class BuddySuite
 	}
 }
 
-class SuiteRunner
-{
-	var suite : Suite;
-	var reporter : Reporter;
-
-	public function new(suite : Suite, reporter : Reporter)
-	{
-		this.suite = suite;
-		this.reporter = reporter;
-	}
-
-	public function run() : Promise<Suite>
-	{
-		return suite.specs.iterateAsync(runSpec, suite);
-	}
-
-	private function runBeforeAfter(b : BeforeAfter) : Promise<BeforeAfter>
-	{
-		var def = new Deferred<BeforeAfter>();
-		var pr = def.promise();
-		var done = function() { def.resolve(b); };
-
-		b.run(done, function(s : Bool, err : String) {});
-		if (!b.async) done();
-
-		return pr;
-	}
-
-	private function runSpec(spec : Spec) : Promise<Spec>
-	{
-		// Spec = The whole spec (before, it, after)
-		var specDone = new Deferred<Spec>();
-		var specPr = specDone.promise();
-
-		if (spec.status != TestStatus.Unknown)
-		{
-			specDone.resolve(spec);
-			return specPr;
-		}
-
-		// Test = The it part only
-		var itDone = new Deferred<{status : TestStatus, error : String}>();
-		var itPromise = itDone.promise();
-
-		var hasStatus = false;
-		var status = function(s, error)
-		{
-			hasStatus = true;
-			if (!s && !itPromise.isResolved())
-				itDone.resolve({ status: TestStatus.Failed, error: error });
-		};
-
-		var done = function()
-		{
-			if (!itPromise.isResolved())
-				itDone.resolve({ status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null });
-		};
-
-		suite.before.iterateAsyncBool(runBeforeAfter)
-			.pipe(function(_) { spec.run(done, status); if (!spec.async) done(); return itPromise; } )
-			.pipe(function(result)
-			{
-				spec.setStatus(result.status, result.error);
-				if(reporter != null) reporter.progress(spec);
-
-				return suite.after.iterateAsyncBool(runBeforeAfter);
-			})
-			.then(function(_) { specDone.resolve(spec); } );
-
-		return specPr;
-	}
-}

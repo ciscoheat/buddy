@@ -1,5 +1,6 @@
 package buddy.internal;
 
+#if macro
 import buddy.reporting.ConsoleReporter;
 import buddy.internal.SuitesRunner;
 import haxe.macro.Compiler;
@@ -82,6 +83,7 @@ class GenerateMain
 	private static function buildMain(exprs : Array<Expr>, cls : ClassType)
 	{
 		var e = AutoIncluder.toTypeStringExpr(cls);
+
 		var body = macro {
 			var reporter = new buddy.reporting.ConsoleReporter();
 			var suites = [];
@@ -91,9 +93,10 @@ class GenerateMain
 
 			var testsRunning = true;
 			new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
-			while (testsRunning) Sys.sleep(0.1);
+			//while (testsRunning) Sys.sleep(0.1);
 		};
 
 		exprs.push(body);
 	}
 }
+#end

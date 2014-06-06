@@ -1,0 +1,7 @@
+-cp src 
+-lib promhx
+-js bin/buddy.js
+-main buddy.tests.AllTests
+--times
+-D macro-times
+-D nodejs

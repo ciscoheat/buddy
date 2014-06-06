@@ -4,15 +4,9 @@ import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
-import sys.io.File;
-import sys.io.FileInput;
 using haxe.macro.ExprTools;
 
-/*var f = File.write("e:\\temp\\test.txt", false);
-f.writeString(Std.string(e.expr));
-f.close();*/
-
-class BDDSuiteBuilder
+class SuiteBuilder
 {
 	private static function injectAsync(e : Expr)
 	{

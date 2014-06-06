@@ -1,6 +1,5 @@
 package buddy.reporting ;
 import buddy.BuddySuite;
-import neko.Lib;
 
 interface Reporter
 {

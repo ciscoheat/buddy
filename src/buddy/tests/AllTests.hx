@@ -1,8 +1,12 @@
 package buddy.tests ;
 import buddy.BuddySuite;
-import neko.vm.Thread;
 import buddy.Buddy;
+import haxe.Timer;
 using buddy.Should;
+
+#if neko
+import neko.vm.Thread;
+#end
 
 class AllTests implements Buddy {}
 
@@ -73,6 +77,7 @@ class TestAsync extends BuddySuite
 		describe("When testing async", {
 			var a;
 
+			#if neko
 			before(function(done) {
 				Thread.create(function() {
 					Sys.sleep(0.1);
@@ -80,6 +85,13 @@ class TestAsync extends BuddySuite
 					done();
 				});
 			});
+			#elseif (js || flash)
+			before(function(done) {
+				Timer.delay(function() { a = 1; }, 1);
+			});
+			#else
+				#error
+			#end
 
 			it("should set the variable a to 1 in before even though it's an async operation", {
 				a.should.equal(1);

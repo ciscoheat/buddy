@@ -41,7 +41,6 @@ class AutoIncluder
 
 		onClass.meta.add(metaName, classes, onClass.pos);
 	}
-	#end
 
 	public static function toTypeString(type : ClassType) : String
 	{
@@ -52,4 +51,5 @@ class AutoIncluder
 	{
 		return {expr: EConst(CString(toTypeString(type))), pos: Context.currentPos()};
 	}
+	#end
 }
