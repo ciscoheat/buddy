@@ -1,4 +1,3 @@
 @echo off
-cd bin
-neko buddy.n
+neko bin\buddy.n
 pause

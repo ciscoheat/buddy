@@ -4,8 +4,10 @@ import buddy.BuddySuite;
 import buddy.reporting.Reporter;
 #if neko
 import neko.Lib;
-#elseif js
+#elseif nodejs
 import buddy.internal.nodejs.Lib;
+#elseif js
+import buddy.internal.js.Lib;
 #end
 
 class ConsoleReporter implements Reporter
