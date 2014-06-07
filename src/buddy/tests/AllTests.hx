@@ -9,6 +9,11 @@ import neko.vm.Thread;
 import cs.system.timers.ElapsedEventHandler;
 import cs.system.timers.ElapsedEventArgs;
 import cs.system.timers.Timer;
+#elseif java
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 #else
 import haxe.Timer;
 #end
@@ -106,9 +111,12 @@ class TestAsync extends BuddySuite
 
 				t.Start();
 			});
-			#elseif php
+			#elseif java
 			before(function(done) {
-				Timer.delay(function() { a = 1; done(); }, 1);
+				var executor = Executors.newFixedThreadPool(1);
+				var call = new AsyncCallable(function() { a = 1; executor.shutdown(); done(); } );
+
+				executor.execute(new FutureTask(call));
 			});
 			#else
 				#error
@@ -118,6 +126,25 @@ class TestAsync extends BuddySuite
 				a.should.equal(1);
 			});
 		});
+	}
+}
+#end
+
+#if java
+private class AsyncCallable implements Callable<String>
+{
+	private var done : Void -> Void;
+
+	public function new(done : Void -> Void)
+	{
+		this.done = done;
+	}
+
+	public function call() : String
+	{
+		Sys.sleep(0.1);
+		done();
+		return "done";
 	}
 }
 #end

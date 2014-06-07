@@ -1,0 +1,6 @@
+-cp src 
+-lib promhx
+-java bin
+-main buddy.tests.AllTests
+--times
+-D macro-times
