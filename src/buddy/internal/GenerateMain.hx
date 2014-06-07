@@ -85,7 +85,7 @@ class GenerateMain
 		var e = AutoIncluder.toTypeStringExpr(cls);
 		var body : Expr;
 
-		if (Context.defined("neko"))
+		if (Context.defined("neko") || Context.defined("cpp"))
 		{
 			body = macro {
 				var reporter = new buddy.reporting.ConsoleReporter();

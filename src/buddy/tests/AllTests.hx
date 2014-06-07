@@ -14,6 +14,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+#elseif cpp
+import cpp.vm.Thread;
 #else
 import haxe.Timer;
 #end
@@ -117,6 +119,14 @@ class TestAsync extends BuddySuite
 				var call = new AsyncCallable(function() { a = 1; executor.shutdown(); done(); } );
 
 				executor.execute(new FutureTask(call));
+			});
+			#elseif cpp
+			before(function(done) {
+				Thread.create(function() {
+					Sys.sleep(0.1);
+					a = 1;
+					done();
+				});
 			});
 			#else
 				#error
