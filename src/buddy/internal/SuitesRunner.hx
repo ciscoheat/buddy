@@ -27,6 +27,20 @@ class SuitesRunner
 		return defPr;
 	}
 
+	public function failed() : Bool
+	{
+		for (s in suites)
+			for (sp in s.specs)
+				if (sp.status == TestStatus.Failed) return true;
+
+		return false;
+	}
+
+	public function statusCode() : Int
+	{
+		return failed() ? 1 : 0;
+	}
+
 	private function runSuite(suite : Suite) : Promise<Suite>
 	{
 		return new SuiteRunner(suite, reporter).run();

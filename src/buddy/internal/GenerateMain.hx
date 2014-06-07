@@ -95,8 +95,11 @@ class GenerateMain
 				}
 
 				var testsRunning = true;
-				new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
+				var runner = new buddy.internal.SuitesRunner(suites, reporter);
+
+				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) Sys.sleep(0.1);
+				Sys.exit(runner.statusCode());
 			};
 		}
 		else if(Context.defined("cs"))
@@ -109,8 +112,37 @@ class GenerateMain
 				}
 
 				var testsRunning = true;
-				new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
+				var runner = new buddy.internal.SuitesRunner(suites, reporter);
+
+				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) cs.system.threading.Thread.Sleep(10);
+				cs.system.Environment.Exit(runner.statusCode());
+			};
+		}
+		else if(Context.defined("nodejs"))
+		{
+			body = macro {
+				var reporter = new buddy.reporting.ConsoleReporter();
+				var suites = [];
+				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
+					suites.push(Type.createInstance(Type.resolveClass(a), []));
+				}
+
+				new buddy.internal.SuitesRunner(suites, reporter).run()
+				.then(function(runner) { untyped __js__("process.exit(runner.statusCode())"); } );
+			};
+		}
+		else if(Context.defined("php") || Context.defined("java"))
+		{
+			body = macro {
+				var reporter = new buddy.reporting.ConsoleReporter();
+				var suites = [];
+				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
+					suites.push(Type.createInstance(Type.resolveClass(a), []));
+				}
+
+				new buddy.internal.SuitesRunner(suites, reporter).run()
+				.then(function(runner) { Sys.exit(runner.statusCode()); });
 			};
 		}
 		else
@@ -122,8 +154,7 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				var testsRunning = true;
-				new buddy.internal.SuitesRunner(suites, reporter).run().then(function(_) { testsRunning = false; } );
+				new buddy.internal.SuitesRunner(suites, reporter).run();
 			};
 		}
 

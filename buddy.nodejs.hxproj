@@ -46,7 +46,7 @@
   <options>
     <option showHiddenPaths="False" />
     <option testMovie="Custom" />
-    <option testMovieCommand="node bin\buddy.nodejs.js" />
+    <option testMovieCommand="run.nodejs.bat" />
   </options>
   <!-- Plugin storage -->
   <storage />

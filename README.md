@@ -47,9 +47,9 @@ class Main extends BuddySuite implements Buddy {
 }
 ```
 
-3) Make a quick test in Neko, and see the results right away:
+3) Make a quick test:
 
-`haxe -lib buddy -main Main -x Buddy.n`
+`haxe -lib buddy -main Main --interp`
 
 ```
 ..
@@ -63,7 +63,7 @@ But of course you shouldn't stop there. Try using it on other targets than Neko,
 
 ## Asynchronous support
 
-Buddy was built from the ground up to have great support for async testing, so it's fully compatible with NodeJS and handles ajax requests with ease. To use it, you just create the specification with a function that takes one argument (targeting javascript now):
+Buddy was built from the ground up to have great support for async testing, so it's fully compatible with NodeJS and handles ajax requests with ease. To use it, just create the specification with a function that takes one argument (targeting javascript now):
 
 ```actionscript
 package ;
@@ -75,6 +75,7 @@ class AsyncTest extends BuddySuite {
         describe("Using Buddy asynchronously", {
             var mood = "?";
             
+            // Add function(done) here to enable async testing:
             before(function(done) {
                 haxe.Timer.delay(function() { 
                     mood = "thrilled"; 
@@ -82,6 +83,7 @@ class AsyncTest extends BuddySuite {
                 }, 100);
             });
 
+			// Can be added to "it" and "after" as well if needed.
             it("cannot really be described in one sentence", {
                 mood.should.equal("thrilled");
             });
