@@ -16,6 +16,12 @@ typedef Lib = FlashLib;
 #elseif cs
 import buddy.internal.lib.CsLib;
 typedef Lib = CsLib;
+#elseif java
+import buddy.internal.lib.JavaLib;
+typedef Lib = JavaLib;
+#elseif php
+import buddy.internal.lib.PhpLib;
+typedef Lib = PhpLib;
 #end
 
 class ConsoleReporter implements Reporter

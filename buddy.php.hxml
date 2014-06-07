@@ -1,0 +1,6 @@
+-cp src 
+-lib promhx
+-php bin
+-main buddy.tests.AllTests
+--times
+-D macro-times

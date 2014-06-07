@@ -67,7 +67,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		describe("When testing should().not", {
+		describe("When testing should.not", {
 			it("should invert the test condition", {
 				"a".should.not.equal("b");
 			});
@@ -75,6 +75,7 @@ class TestBasicFeatures extends BuddySuite
 	}
 }
 
+#if !php
 class TestAsync extends BuddySuite
 {
 	public function new()
@@ -105,6 +106,10 @@ class TestAsync extends BuddySuite
 
 				t.Start();
 			});
+			#elseif php
+			before(function(done) {
+				Timer.delay(function() { a = 1; done(); }, 1);
+			});
 			#else
 				#error
 			#end
@@ -115,3 +120,4 @@ class TestAsync extends BuddySuite
 		});
 	}
 }
+#end
