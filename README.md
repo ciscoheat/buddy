@@ -10,7 +10,7 @@ Your friendly BDD testing library for Haxe!
 
 2) Create a test file:
 
-**Main .hx**
+**Main.hx**
 
 ```actionscript
 package ;
