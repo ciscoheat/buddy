@@ -83,7 +83,7 @@ class AsyncTest extends BuddySuite {
             });
 
             it("cannot really be described in one sentence", {
-                experience.should.equal("thrilled");
+                mood.should.equal("thrilled");
             });
         });
     }
