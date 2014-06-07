@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library.",
-  "version": "0.0.1",
-  "releasenote": "Initial release.",
+  "version": "0.1.0",
+  "releasenote": "All targets supported and passing the tests.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }
