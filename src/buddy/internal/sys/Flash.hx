@@ -1,10 +1,10 @@
-package buddy.internal.lib;
+package buddy.internal.sys;
 #if flash
 import flash.events.Event;
 import flash.text.TextField;
 import flash.Lib;
 
-class FlashLib
+class Flash
 {
 	private static var tf : TextField;
 	private static var firstDone = false;

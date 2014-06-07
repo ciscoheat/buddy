@@ -1,7 +1,7 @@
-package buddy.internal.lib;
+package buddy.internal.sys;
 
 #if nodejs
-class NodeJsLib
+class NodeJs
 {
 	public static function print(s : String)
 	{
