@@ -1,7 +1,7 @@
 -cp src 
 -lib promhx
+-D nodejs
 -js bin/buddy.nodejs.js
 -main buddy.tests.AllTests
---times
--D macro-times
--D nodejs
+-cmd echo "---------- NodeJs ----------"
+-cmd nodejs bin/buddy.nodejs.js

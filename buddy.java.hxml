@@ -2,5 +2,5 @@
 -lib promhx
 -java bin
 -main buddy.tests.AllTests
---times
--D macro-times
+-cmd echo "---------- JAVA ----------"
+-cmd java -jar bin/AllTests.jar

@@ -2,5 +2,7 @@
 -lib promhx
 -js bin/buddy.js
 -main buddy.tests.AllTests
---times
--D macro-times
+-cmd echo "---------- JS (PhantomJS) ----------"
+-cmd cp src/buddy/tests/index.html bin
+-cmd cp src/buddy/tests/buddy.phantomjs.js bin
+-cmd phantomjs bin/buddy.phantomjs.js
