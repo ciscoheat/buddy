@@ -8,17 +8,23 @@ using StringTools;
 
 class Js
 {
+	private static function replaceSpace(s : String)
+	{
+		if (Browser.navigator.userAgent.indexOf("PhantomJS") >= 0) return s;
+		return s.replace(" ", "&nbsp;");
+	}
+
 	public static function print(s : String)
 	{
 		var sp = Browser.document.createSpanElement();
-		sp.innerHTML = s.replace(" ", "&nbsp");
+		sp.innerHTML = replaceSpace(s);
 		Browser.document.body.appendChild(sp);
 	}
 
 	public static function println(s : String)
 	{
 		var div = Browser.document.createDivElement();
-		div.innerHTML = s.replace(" ", "&nbsp;");
+		div.innerHTML = replaceSpace(s);
 		Browser.document.body.appendChild(div);
 	}
 }
