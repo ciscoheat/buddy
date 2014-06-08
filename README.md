@@ -59,11 +59,11 @@ Using Buddy
 2 specs, 0 failures, 0 pending
 ```
 
-But of course you shouldn't stop there. Try using it on other targets than Neko, Buddy supports them all!
+But of course you shouldn't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js, and `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (that one seems to vary between Linux and Win though).
 
 ## Asynchronous support
 
-Buddy was built from the ground up to have great support for async testing, so it's fully compatible with NodeJS and handles ajax requests with ease. To use it, just create the specification with a function that takes one argument (targeting javascript now):
+Buddy was built from the ground up to have great support for async testing, so it's fully compatible with Node.js and handles ajax requests with ease. To use it, just create the specification with a function that takes one argument (targeting javascript now):
 
 ```actionscript
 package ;
@@ -94,7 +94,7 @@ class AsyncTest extends BuddySuite {
 
 ## Where's main() ?
 
-Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :)
+Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
 
 At this early point there is no ultra-convenient way of customizing how the tests are run, but if you really want to run your tests manually, use the `buddy.internal.SuitesRunner` class together with a `buddy.reporting.ConsoleReporter`, or make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface.
 
