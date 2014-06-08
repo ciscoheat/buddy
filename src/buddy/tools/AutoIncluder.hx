@@ -4,7 +4,6 @@ import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
-import sys.io.Process;
 
 using haxe.macro.ExprTools;
 using Lambda;
