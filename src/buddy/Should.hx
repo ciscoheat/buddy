@@ -165,8 +165,17 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 	 */
 	public function containAll(values : Iterable<T>)
 	{
-		var length = values.filter(function(v) { return value.exists(function(v2) { return v == v2; } ); } );
-		var test = length.count() == values.count();
+		var test = true;
+
+		// Having problem with java compilation for Lambda, using a simpler version:
+		for (a in values)
+		{
+			if (!value.exists(function(v) { return v == a; } ))
+			{
+				test = false;
+				break;
+			}
+		}
 
 		if(inverse)
 			assert(!test, 'Expected $value to not contain all of $values');
