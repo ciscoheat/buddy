@@ -137,6 +137,7 @@ package ;
 import buddy.*;
 
 class Main extends BuddySuite
+{
     public function new() {
         describe("Using Buddy", {
             it("should be a great testing experience");
