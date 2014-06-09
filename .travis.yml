@@ -6,13 +6,13 @@ language: node_js
 
 env:
     matrix:
-    #- TARGET=cpp
-    #- TARGET=cs
-    #- TARGET=java
-    #- TARGET=js
+    - TARGET=cpp
+    - TARGET=cs
+    - TARGET=java
+    - TARGET=js
     - TARGET=neko
-    #- TARGET=nodejs
-    #- TARGET=php
+    - TARGET=nodejs
+    - TARGET=php
 
 #matrix:
 #  fast_finish: true
@@ -23,6 +23,7 @@ env:
  
 # Install Haxe and dependencies before running the test.
 before_script:
+	# Until it's fixed on the OpenFL site:
   - wget https://gist.githubusercontent.com/ciscoheat/8884e80d6096fb3a211b/raw/a46a1566a9cbe49d9eed256477661eaf1856f0f5/install-haxe.sh
   - sudo sh install-haxe.sh -y
   - haxelib install promhx
