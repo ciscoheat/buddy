@@ -3,5 +3,5 @@
 -D nodejs
 -js bin/buddy.nodejs.js
 -main buddy.tests.AllTests
--cmd echo "---------- NodeJs ----------"
--cmd nodejs bin/buddy.nodejs.js
+-cmd echo "---------- Node.js ----------"
+-cmd node bin/buddy.nodejs.js
