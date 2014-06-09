@@ -28,24 +28,24 @@ class TestBasicFeatures extends BuddySuite
 
 	public function new()
 	{
-		describe("When testing before", {
+		describe("Testing before", {
 			var a = 0;
 
 			before({
 				a = 1;
 			});
 
-			it("should set the variable a to 1 in before", {
+			it("should set the variable a to 1 in the before function", {
 				a.should.equal(1);
 			});
 		});
 
-		describe("When testing after", {
-			it("should not set 'testAfter' in the first spec", {
+		describe("Testing after", {
+			it("should not set the property testAfter in this first spec", {
 				testAfter.should.equal(null);
 			});
 
-			it("should call after before the second spec, and set 'testAfter'", {
+			it("should run the after function before this spec, and set testAfter", {
 				testAfter.should.equal("after executed");
 			});
 
@@ -54,7 +54,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		describe("When testing ints", {
+		describe("Testing ints", {
 			var number = 3;
 
 			it("should have a beLessThan method", {
@@ -74,9 +74,11 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		describe("When testing should.not", {
+		describe("Testing should.not", {
 			it("should invert the test condition", {
 				"a".should.not.equal("b");
+				"a".should.not.not.equal("a");
+				(123).should.not.beLessThan(100);
 			});
 		});
 	}

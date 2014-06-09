@@ -1,4 +1,5 @@
 package buddy.internal ;
+#if macro
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
@@ -8,25 +9,38 @@ using haxe.macro.ExprTools;
 
 class SuiteBuilder
 {
+	private static function debugDisplay(e : Expr)
+	{
+		var file = sys.io.File.write("e:\\temp\\buddy.txt", false);
+		file.writeString(Std.string(e.expr));
+		file.writeString("\r\n\r\n" + e.toString());
+		file.close();
+	}
+
 	private static function injectAsync(e : Expr)
 	{
 		switch(e.expr)
 		{
 			// Fix autocomplete for should without parenthesis
 			case EDisplay(e2, isCall):
-				switch(e2.expr)
+
+				switch(e2)
 				{
-					case EField(e3, f3) if(f3 == "should"):
-						e2.expr = ECall({ expr: e2.expr, pos: e2.pos }, []);
+					case macro $a.should:
+						var change = macro $a.should();
+						e2.expr = change.expr;
+
 					case _:
 				}
+
 			case _:
 		}
 
 		switch(e)
 		{
 			case macro $a.should().$b, macro $a.should.$b:
-				var change = macro $a.should(__status).$b;
+				// Need to use untyped here for some unknown macro reason...
+				var change = macro $a.should(untyped __status).$b;
 				e.expr = change.expr;
 
 			/////
@@ -129,3 +143,4 @@ class SuiteBuilder
 		return fields;
 	}
 }
+#end

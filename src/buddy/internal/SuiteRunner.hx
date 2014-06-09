@@ -45,7 +45,7 @@ class SuiteRunner
 			return specPr;
 		}
 
-		// Test = The it part only
+		// It = The it part only
 		var itDone = new Deferred<{status : TestStatus, error : String}>();
 		var itPromise = itDone.promise();
 

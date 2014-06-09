@@ -34,6 +34,9 @@ class ShouldInt extends Should<Int>
 		return new ShouldInt(i, assert);
 	}
 
+	public var not(get, never) : ShouldInt;
+	private function get_not() { return new ShouldInt(value, assert, !inverse); }
+
 	public function beLessThan(expected : Float)
 	{
 		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value');
@@ -44,9 +47,9 @@ class ShouldInt extends Should<Int>
 		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value');
 	}
 
-	public function new(value : Int, assert : SpecAssertion)
+	public function new(value : Int, assert : SpecAssertion, inverse = false)
 	{
-		super(value, assert);
+		super(value, assert, inverse);
 	}
 }
 
@@ -57,9 +60,12 @@ class ShouldString extends Should<String>
 		return new ShouldString(str, assert);
 	}
 
-	public function new(value : String, assert : SpecAssertion)
+	public var not(get, never) : ShouldString;
+	private function get_not() { return new ShouldString(value, assert, !inverse); }
+
+	public function new(value : String, assert : SpecAssertion, inverse = false)
 	{
-		super(value, assert);
+		super(value, assert, inverse);
 	}
 }
 
@@ -68,13 +74,6 @@ class Should<T>
 	var value : T;
 	var assert : SpecAssertion;
 	var inverse : Bool;
-
-	public var not(get, never) : Should<T>;
-
-	private function get_not()
-	{
-		return new Should(value, assert, !inverse);
-	}
 
 	public function new(value : T, assert : SpecAssertion, inverse = false)
 	{
