@@ -82,7 +82,10 @@ class Should<T>
 		this.inverse = inverse;
 	}
 
-	public function equal(expected : T) : Void
+	/**
+	 * Test for equality between two value types, or identity for reference types
+	 */
+	public function be(expected : T) : Void
 	{
 		if (Std.is(expected, String))
 		{

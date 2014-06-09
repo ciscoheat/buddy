@@ -36,17 +36,17 @@ class TestBasicFeatures extends BuddySuite
 			});
 
 			it("should set the variable a to 1 in the before function", {
-				a.should.equal(1);
+				a.should.be(1);
 			});
 		});
 
 		describe("Testing after", {
 			it("should not set the property testAfter in this first spec", {
-				testAfter.should.equal(null);
+				testAfter.should.be(null);
 			});
 
 			it("should run the after function before this spec, and set testAfter", {
-				testAfter.should.equal("after executed");
+				testAfter.should.be("after executed");
 			});
 
 			after({
@@ -76,8 +76,8 @@ class TestBasicFeatures extends BuddySuite
 
 		describe("Testing should.not", {
 			it("should invert the test condition", {
-				"a".should.not.equal("b");
-				"a".should.not.not.equal("a");
+				"a".should.not.be("b");
+				"a".should.not.not.be("a");
 				(123).should.not.beLessThan(100);
 			});
 		});
@@ -135,7 +135,7 @@ class TestAsync extends BuddySuite
 			#end
 
 			it("should set the variable a to 1 in before even though it's an async operation", {
-				a.should.equal(1);
+				a.should.be(1);
 			});
 		});
 	}

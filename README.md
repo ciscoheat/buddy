@@ -31,11 +31,11 @@ class Main extends BuddySuite implements Buddy {
             });
     
             it("should be a great testing experience", {
-                experience.should.equal("great");
+                experience.should.be("great");
             });
           	
             it("should really make the tester happy", {
-                mood.should.equal("happy");
+                mood.should.be("happy");
             });
           	
             // Executed after each "it":
@@ -85,18 +85,28 @@ class AsyncTest extends BuddySuite {
 
 			// Can be added to "it" and "after" as well if needed.
             it("cannot really be described in one sentence", {
-                mood.should.equal("thrilled");
+                mood.should.be("thrilled");
             });
         });
     }
 }
 ```
 
-## Where's main() ?
+## FAQ
+
+### Where's main() ?
 
 Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
 
 At this early point there is no ultra-convenient way of customizing how the tests are run, but if you really want to run your tests manually, use the `buddy.internal.SuitesRunner` class together with a `buddy.reporting.ConsoleReporter`, or make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface.
+
+### Autocompletion sometimes doesn't work for "x.should." or numbers.
+
+I think the compiler is a bit too good at optimizing sometimes, especially at the beginning of functions, so if you get this problem add a parenthesis after "should" and wrap numbers in parenthesis too.
+
+`x.should.be("ok")` -> `x.should().be("ok")`
+
+`123.should.beGreaterThan(100)` -> `(123).should.beGreaterThan(100)`
 
 ## The story behind Buddy
 
