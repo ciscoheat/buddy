@@ -12,7 +12,7 @@ Your friendly BDD testing library for Haxe!
 
 **Main.hx**
 
-```actionscript
+```haxe
 package ;
 import buddy.*;
 using buddy.Should;
@@ -65,7 +65,7 @@ But of course you shouldn't stop there. Try using it on other targets than Neko,
 
 Buddy was built from the ground up to have great support for async testing, so it's fully compatible with Node.js and handles ajax requests with ease. To use it, just create the specification with a function that takes one argument (targeting javascript now):
 
-```actionscript
+```haxe
 package ;
 import buddy.*;
 using buddy.Should;
