@@ -2,7 +2,7 @@ package buddy.internal;
 
 #if macro
 import buddy.reporting.ConsoleReporter;
-import buddy.internal.SuitesRunner;
+import buddy.SuitesRunner;
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
@@ -95,7 +95,7 @@ class GenerateMain
 				}
 
 				var testsRunning = true;
-				var runner = new buddy.internal.SuitesRunner(suites, reporter);
+				var runner = new buddy.SuitesRunner(suites, reporter);
 
 				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) Sys.sleep(0.1);
@@ -112,7 +112,7 @@ class GenerateMain
 				}
 
 				var testsRunning = true;
-				var runner = new buddy.internal.SuitesRunner(suites, reporter);
+				var runner = new buddy.SuitesRunner(suites, reporter);
 
 				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) cs.system.threading.Thread.Sleep(10);
@@ -128,7 +128,7 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				new buddy.internal.SuitesRunner(suites, reporter).run()
+				new buddy.SuitesRunner(suites, reporter).run()
 				.then(function(runner) { untyped __js__("process.exit(runner.statusCode())"); } );
 			};
 		}
@@ -141,7 +141,7 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				new buddy.internal.SuitesRunner(suites, reporter).run()
+				new buddy.SuitesRunner(suites, reporter).run()
 				.then(function(runner) { Sys.exit(runner.statusCode()); });
 			};
 		}
@@ -154,7 +154,7 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				new buddy.internal.SuitesRunner(suites, reporter).run();
+				new buddy.SuitesRunner(suites, reporter).run();
 			};
 		}
 

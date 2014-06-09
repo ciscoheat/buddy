@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library.",
-  "version": "0.2.0",
-  "releasenote": "Fixed haxelib and haxe path detection.",
+  "version": "0.3.0",
+  "releasenote": "Added more assertions, renamed should.equal to should.be for better semantics.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

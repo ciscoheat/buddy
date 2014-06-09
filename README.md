@@ -4,7 +4,7 @@ Your friendly BDD testing library for Haxe!
 
 ## Quickstart
 
-1) Install the lib: 
+1) Install the lib:
 
 `haxelib install buddy`
 
@@ -26,18 +26,18 @@ class Main extends BuddySuite implements Buddy {
             var mood = "?";
 
             // Executed before each "it":
-            before({ 
+            before({
                 experience = "great";
             });
-    
+
             it("should be a great testing experience", {
                 experience.should.be("great");
             });
-          	
+
             it("should really make the tester happy", {
                 mood.should.be("happy");
             });
-          	
+
             // Executed after each "it":
             after({
                 mood = "happy";
@@ -74,11 +74,11 @@ class AsyncTest extends BuddySuite {
     public function new() {
         describe("Using Buddy asynchronously", {
             var mood = "?";
-            
+
             // Add function(done) here to enable async testing:
             before(function(done) {
-                haxe.Timer.delay(function() { 
-                    mood = "thrilled"; 
+                haxe.Timer.delay(function() {
+                    mood = "thrilled";
                     done(); // Call the done() function when the async operation is complete.
                 }, 100);
             });
@@ -92,17 +92,83 @@ class AsyncTest extends BuddySuite {
 }
 ```
 
+## Should assertions
+
+As you've seen in the examples, testing if the specifications are correct is as simple as adding `using Buddy.should` to the package and then use the `should` extension for the identifier you want to test. The following assertions are supported:
+
+### All types
+
+`a.should.be(b)` - Tests for equality for value types (`Bool`, `Float`, `Int`) and identity for the other (reference) types.
+
+### Int
+
+`a.should.beLessThan(b)`
+
+`a.should.beGreaterThan(b)`
+
+### Float
+
+Same as Int plus
+
+`a.should.beCloseTo(b, p = 2)` - `a` should be close to `b` with `p` decimals precision, so you can easily compare floats without worrying about precision issues.
+
+### String
+
+`a.should.contain(substr)` - Test if `a` contains a given substring.
+
+`a.should.match(regexp)` - Test if `a` matches a regular expression (`EReg`).
+
+### Iterable<T>
+
+`a.should.contain(b)` - Test if an Iterable contains `b`.
+
+`a.should.containAll(b)` - Test if an Iterable contains all objects in Iterable `b`.
+
+`a.should.containExactly(b)` - Test if an Iterable contains exactly the same objects as in Iterable `b` and in the same order.
+
+## Pending tests
+
+Since BDD is also made for non-programmers to use, a common development style is to write empty, or *pending* tests, and let a programmer implement them later. To do this, just write the string in the `describe` and `it` methods. Our previous test class would then look like this:
+
+**Main.hx**
+
+```haxe
+package ;
+import buddy.*;
+
+class Main extends BuddySuite
+    public function new() {
+        describe("Using Buddy", {
+            it("should be a great testing experience");
+            it("should really make the tester happy");
+        });
+    }
+}
+```
+
+And the output would be:
+
+```
+PP
+Using Buddy
+  should be a great testing experience (Pending)
+  should really make the tester happy (Pending)
+2 specs, 0 failures, 2 pending
+```
+
+If good domain terms are used that matches the system architecture, the programmer should be able to implement system or integration tests that matches the users mental model of the system. (See [haxedci](https://github.com/ciscoheat/haxedci-example) for more details how to achieve this using the DCI architecture!)
+
 ## FAQ
 
 ### Where's main() ?
 
 Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
 
-At this early point there is no ultra-convenient way of customizing how the tests are run, but if you really want to run your tests manually, use the `buddy.internal.SuitesRunner` class together with a `buddy.reporting.ConsoleReporter`, or make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface.
+At this early point there is no ultra-convenient way of customizing how the tests are run, but if you really want to run your tests manually, use the `buddy.SuitesRunner` class together with a `buddy.reporting.ConsoleReporter`, or make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface.
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
-I think the compiler is a bit too good at optimizing sometimes, especially at the beginning of functions, so if you get this problem add a parenthesis after "should" and wrap numbers in parenthesis too.
+The compiler seems to be a bit too good at optimizing sometimes, especially at the beginning of functions, so if you get this problem add a parenthesis after "should" and wrap numbers in parenthesis too.
 
 `x.should.be("ok")` -> `x.should().be("ok")`
 
@@ -116,10 +182,10 @@ The [HaxeContracts](https://github.com/ciscoheat/HaxeContracts) library is a nic
 
 ## Upcoming features
 
-- [ ] More assertions for "should". 
+- [x] Tutorial for general guidelines when doing BDD.
+- [x] More assertions for "should".
 - [ ] Ways to customize running and reporting of test suites.
 - [ ] Nicer reporters (especially for the browser) with stack traces for failures.
-- [ ] Tutorial for general guidelines when doing BDD.
 - [ ] Your choice! Send me a gmail (ciscoheat) or create an issue here.
 
 Have a good time and much productivity with your new Buddy! :)

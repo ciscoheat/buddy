@@ -1,4 +1,6 @@
 package buddy;
+import buddy.Should.ShouldIterable;
+using Lambda;
 
 /*
 X toBe(b);
@@ -87,9 +89,9 @@ class ShouldFloat extends Should<Float>
 		var test = Math.abs(expected - value) < (Math.pow(10, -precision) / 2);
 
 		if(inverse)
-			return assert(!test, 'Expected $value not to be close to $expected');
+			assert(!test, 'Expected $value not to be close to $expected');
 		else
-			return assert(test, 'Expected close to $expected, was $value');
+			assert(test, 'Expected close to $expected, was $value');
 	}
 }
 
@@ -115,9 +117,9 @@ class ShouldString extends Should<String>
 		var test = value.indexOf(substring) >= 0;
 
 		if(inverse)
-			return assert(!test, 'Expected "$value" not to contain "$substring"');
+			assert(!test, 'Expected "$value" not to contain "$substring"');
 		else
-			return assert(test, 'Expected "$value" to contain "$substring"');
+			assert(test, 'Expected "$value" to contain "$substring"');
 	}
 
 	public function match(regexp : EReg)
@@ -125,11 +127,79 @@ class ShouldString extends Should<String>
 		var test = regexp.match(value);
 
 		if (inverse)
-			return assert(!test, 'Expected "$value" not to match regular expression');
+			assert(!test, 'Expected "$value" not to match regular expression');
 		else
-			return assert(test, 'Expected "$value" to match regular expression');
+			assert(test, 'Expected "$value" to match regular expression');
 	}
 }
+
+class ShouldIterable<T> extends Should<Iterable<T>>
+{
+	static public function should<T>(value : Iterable<T>, assert : SpecAssertion)
+	{
+		return new ShouldIterable<T>(value, assert);
+	}
+
+	public function new(value : Iterable<T>, assert : SpecAssertion, inverse = false)
+	{
+		super(value, assert, inverse);
+	}
+
+	public var not(get, never) : ShouldIterable<T>;
+	private function get_not() { return new ShouldIterable<T>(value, assert, !inverse); }
+
+	//////////
+
+	public function contain(o : T)
+	{
+		var test = Lambda.exists(value, function(el) { return el == o; });
+
+		if(inverse)
+			assert(!test, 'Expected $value not to contain "$o"');
+		else
+			assert(test, 'Expected $value to contain "$o"');
+	}
+
+	/**
+	 * Test if iterable contains all of the following values.
+	 */
+	public function containAll(values : Iterable<T>)
+	{
+		var length = values.filter(function(v) { return value.exists(function(v2) { return v == v2; } ); } );
+		var test = length.count() == values.count();
+
+		if(inverse)
+			assert(!test, 'Expected $value to not contain all of $values');
+		else
+			assert(test, 'Expected $value to contain all of $values');
+	}
+
+	/**
+	 * Test if iterable contains exactly the following values and in the same iteration order.
+	 */
+	public function containExactly(values : Iterable<T>)
+	{
+		var a = value.iterator();
+		var b = values.iterator();
+		var test = true;
+
+		while (a.hasNext() || b.hasNext())
+		{
+			if (a.next() != b.next())
+			{
+				test = false;
+				break;
+			}
+		}
+
+		if(inverse)
+			assert(!test, 'Expected "$value" to not contain exactly "$values"');
+		else
+			assert(test, 'Expected "$value" to contain exactly "$values"');
+	}
+}
+
+//////////
 
 class Should<T>
 {
@@ -145,7 +215,7 @@ class Should<T>
 	}
 
 	/**
-	 * Test for equality between two value types, or identity for reference types
+	 * Test for equality between two value types (bool, int, float), or identity for reference types
 	 */
 	public function be(expected : T) : Void
 	{

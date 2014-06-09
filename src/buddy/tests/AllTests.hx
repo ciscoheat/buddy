@@ -129,6 +129,46 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
+		describe("Testing Iterable", {
+			var a = [1,2,3];
+			var b = [1, 2, 3];
+
+			var c = new List<Int>();
+			c.add(1);
+			c.add(2);
+			c.add(3);
+
+			it("should compare by identity", {
+				a.should().be(a);
+				a.should().not.be(b);
+			});
+
+			it("should have a contain() method", {
+				a.should().contain(1);
+				a.should().not.contain(4);
+			});
+
+			it("should have a containExactly() method", {
+				a.should().containExactly([1, 2, 3]);
+				a.should().containExactly(b);
+				a.should().containExactly(c); // Different types
+
+				a.should().not.containExactly([3, 2, 1]);
+				a.should().not.containExactly([1, 2]);
+				a.should().not.containExactly([1, 2, 3, 4]);
+
+				[].should.containExactly([]);
+			});
+
+			it("should have a containAll() method", {
+				a.should().containAll([1, 2, 3]);
+				a.should().containAll(b);
+				a.should().containAll([1]);
+
+				a.should().not.containAll([3, 4]);
+			});
+		});
+
 		describe("Testing should.not", {
 			it("should invert the test condition", {
 				"a".should.not.be("b");
@@ -144,7 +184,7 @@ class TestAsync extends BuddySuite
 {
 	public function new()
 	{
-		describe("When testing async", {
+		describe("Testing async", {
 			var a;
 
 			#if neko
@@ -189,7 +229,7 @@ class TestAsync extends BuddySuite
 				#error
 			#end
 
-			it("should set the variable a to 1 in before even though it's an async operation", {
+			it("should set the variable a to 1 in before, even though it's an async operation", {
 				a.should.be(1);
 			});
 		});

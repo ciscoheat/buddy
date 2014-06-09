@@ -1,4 +1,5 @@
-package buddy.internal ;
+package buddy ;
+import buddy.internal.SuiteRunner;
 import buddy.reporting.Reporter;
 import promhx.Deferred;
 import promhx.Promise;
