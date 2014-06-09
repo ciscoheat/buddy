@@ -1,23 +1,23 @@
 package buddy;
 
 /*
-toBe(b);
-toBe(false);
-toBeCloseTo(e, 0);
-toBeDefined();
-toBeFalsy();
-toBeGreaterThan(0);
-toBeLessThan(e);
-toBeNull();
-toBeTruthy();
-toBeUndefined();
-toContain("bar");
-toEqual("I");
+X toBe(b);
+X toBe(false);
+X toBeCloseTo(e, 0);
+- toBeDefined();
+- toBeFalsy();
+X toBeGreaterThan(0);
+X toBeLessThan(e);
+- toBeNull();
+- toBeTruthy();
+- toBeUndefined();
+X toContain("bar");
+X toEqual("I");
 toHaveBeenCalled();
 toHaveBeenCalledWith(456, 'another param');
 toHaveBeenCalledWith(jasmine.any(Number), jasmine.any(Function));
 toHaveBeenCalledWith(jasmine.objectContaining({
-toMatch(/bar/);
+X toMatch(/bar/);
 toThrow();
 toThrowError("quux");
 */
@@ -34,8 +34,43 @@ class ShouldInt extends Should<Int>
 		return new ShouldInt(i, assert);
 	}
 
+	public function new(value : Int, assert : SpecAssertion, inverse = false)
+	{
+		super(value, assert, inverse);
+	}
+
 	public var not(get, never) : ShouldInt;
 	private function get_not() { return new ShouldInt(value, assert, !inverse); }
+
+	//////////
+
+	public function beLessThan(expected : Int)
+	{
+		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value');
+	}
+
+	public function beGreaterThan(expected : Int)
+	{
+		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value');
+	}
+}
+
+class ShouldFloat extends Should<Float>
+{
+	static public function should(i : Float, assert : SpecAssertion)
+	{
+		return new ShouldFloat(i, assert);
+	}
+
+	public function new(value : Float, assert : SpecAssertion, inverse = false)
+	{
+		super(value, assert, inverse);
+	}
+
+	public var not(get, never) : ShouldFloat;
+	private function get_not() { return new ShouldFloat(value, assert, !inverse); }
+
+	//////////
 
 	public function beLessThan(expected : Float)
 	{
@@ -47,9 +82,14 @@ class ShouldInt extends Should<Int>
 		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value');
 	}
 
-	public function new(value : Int, assert : SpecAssertion, inverse = false)
+	public function beCloseTo(expected : Float, precision : Int = 2)
 	{
-		super(value, assert, inverse);
+		var test = Math.abs(expected - value) < (Math.pow(10, -precision) / 2);
+
+		if(inverse)
+			return assert(!test, 'Expected $value not to be close to $expected');
+		else
+			return assert(test, 'Expected close to $expected, was $value');
 	}
 }
 
@@ -60,12 +100,34 @@ class ShouldString extends Should<String>
 		return new ShouldString(str, assert);
 	}
 
-	public var not(get, never) : ShouldString;
-	private function get_not() { return new ShouldString(value, assert, !inverse); }
-
 	public function new(value : String, assert : SpecAssertion, inverse = false)
 	{
 		super(value, assert, inverse);
+	}
+
+	public var not(get, never) : ShouldString;
+	private function get_not() { return new ShouldString(value, assert, !inverse); }
+
+	//////////
+
+	public function contain(substring : String)
+	{
+		var test = value.indexOf(substring) >= 0;
+
+		if(inverse)
+			return assert(!test, 'Expected "$value" not to contain "$substring"');
+		else
+			return assert(test, 'Expected "$value" to contain "$substring"');
+	}
+
+	public function match(regexp : EReg)
+	{
+		var test = regexp.match(value);
+
+		if (inverse)
+			return assert(!test, 'Expected "$value" not to match regular expression');
+		else
+			return assert(test, 'Expected "$value" to match regular expression');
 	}
 }
 

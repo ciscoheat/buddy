@@ -54,10 +54,31 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
+		describe("Testing strings", {
+			var str = "abc";
+
+			it("should compare same string value with be()", {
+				str.should().be("abc");
+				str.should().not.be("cde");
+			});
+
+			it("should have a contain() method for matching substrings", {
+				str.should().contain("a");
+				str.should().contain("abc");
+				str.should().not.contain("abcd");
+			});
+
+			it("should have a match() method for matching regexps", {
+				str.should().match(~/a/);
+				str.should().match(~/a\w+/);
+				str.should().not.match(~/\d+/);
+			});
+		});
+
 		describe("Testing ints", {
 			var number = 3;
 
-			it("should have a beLessThan method", {
+			it("should have a beLessThan() method", {
 				number.should.beLessThan(4);
 			});
 
@@ -65,12 +86,46 @@ class TestBasicFeatures extends BuddySuite
 				number.should.beLessThan(3.1);
 			});
 
-			it("should have a beMoreThan method", {
+			it("should have a beMoreThan() method", {
 				number.should.beGreaterThan(2);
 			});
 
 			it("beMoreThan should compare against float", {
 				number.should.beGreaterThan(2.9);
+			});
+		});
+
+		describe("Testing floats", {
+			var number = 3.14;
+			var lostSignificance = 3.140000001;
+
+			it("should have a beLessThan() method", {
+				number.should.beLessThan(4.23);
+			});
+
+			it("beLessThan should compare against int", {
+				number.should.beLessThan(cast(4, Int));
+			});
+
+			it("should have a beMoreThan() method", {
+				number.should.beGreaterThan(2.9);
+			});
+
+			it("beMoreThan should compare against int", {
+				number.should.beGreaterThan(cast(2, Int));
+			});
+
+			it("should have a beCloseTo() method", {
+				number.should().beCloseTo(3.14);
+				number.should().beCloseTo(3.1, 1);
+				number.should().beCloseTo(3.141);
+
+				number.should().beCloseTo(lostSignificance);
+				lostSignificance.should().beCloseTo(number);
+
+				number.should().not.beCloseTo(3.1);
+				number.should().not.beCloseTo(3.13);
+				number.should().not.beCloseTo(3.15);
 			});
 		});
 
