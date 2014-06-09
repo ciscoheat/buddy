@@ -22,16 +22,23 @@ env:
 
  
 # Install Haxe and dependencies before running the test.
-before_script:
-	# Until it's fixed on the OpenFL site:
+before_install:
+  # Until it's fixed on the OpenFL site:
   - wget https://gist.githubusercontent.com/ciscoheat/8884e80d6096fb3a211b/raw/a46a1566a9cbe49d9eed256477661eaf1856f0f5/install-haxe.sh
   - sudo sh install-haxe.sh -y
   - haxelib install promhx
+
+before_script:
+  # apt packages
   - sh -c "if [ '$TARGET' = 'cpp' ]; then sudo apt-get install gcc-multilib g++-multilib -y; fi"
+  - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get install mono-devel -y; fi"
+  - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get install phantomjs -y; fi"
+
+  # haxelib libraries
   - sh -c "if [ '$TARGET' = 'cpp' ]; then haxelib install hxcpp; fi"
   - sh -c "if [ '$TARGET' = 'java' ]; then haxelib install hxjava; fi"
-  - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get -y install mono-devel; fi"
-  - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get -y install phantomjs; fi"
+  - sh -c "if [ '$TARGET' = 'cs' ]; then haxelib install hxcs; fi"
+
  
 # Run the test!
 script:
