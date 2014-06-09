@@ -1,0 +1,40 @@
+# The first thing is to tell which VM environment we want the test to be run on.
+# It dosen't quite matter for Haxe, just choose one of the targets our project support (e.g. PHP),
+# and than apt-get install the others (e.g. Neko, C++).
+# For more info, see http://about.travis-ci.org/docs/user/ci-environment/
+language: php 
+
+env:
+    matrix:
+    #- TARGET=cpp
+    #- TARGET=cs
+    #- TARGET=java
+    #- TARGET=js
+    - TARGET=neko
+    #- TARGET=nodejs
+    #- TARGET=php
+
+#matrix:
+#  fast_finish: true
+#  allow_failures:
+#    - env: TARGET=cs
+#    - env: TARGET=php
+
+ 
+# Install Haxe and dependencies before running the test.
+before_script:
+  - wget https://gist.githubusercontent.com/ciscoheat/8884e80d6096fb3a211b/raw/a46a1566a9cbe49d9eed256477661eaf1856f0f5/install-haxe.sh
+  - sudo sh install-haxe.sh -y
+  - sh -c "if [ '$TARGET' = 'cpp' ]; then sudo apt-get install gcc-multilib g++-multilib -y; fi"
+  - sh -c "if [ '$TARGET' = 'cpp' ]; then haxelib install hxcpp; fi"
+  - sh -c "if [ '$TARGET' = 'java' ]; then haxelib install hxjava; fi"
+  - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get -y install mono-devel; fi"
+  - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get -y install phantomjs; fi"
+ 
+# Run the test!
+script:
+  - haxe buddy.${TARGET}.hxml
+
+branches:
+      only:
+          - master 
