@@ -2,7 +2,7 @@
 # It dosen't quite matter for Haxe, just choose one of the targets our project support (e.g. PHP),
 # and than apt-get install the others (e.g. Neko, C++).
 # For more info, see http://about.travis-ci.org/docs/user/ci-environment/
-language: php 
+language: node_js
 
 env:
     matrix:
@@ -25,6 +25,7 @@ env:
 before_script:
   - wget https://gist.githubusercontent.com/ciscoheat/8884e80d6096fb3a211b/raw/a46a1566a9cbe49d9eed256477661eaf1856f0f5/install-haxe.sh
   - sudo sh install-haxe.sh -y
+  - haxelib install promhx
   - sh -c "if [ '$TARGET' = 'cpp' ]; then sudo apt-get install gcc-multilib g++-multilib -y; fi"
   - sh -c "if [ '$TARGET' = 'cpp' ]; then haxelib install hxcpp; fi"
   - sh -c "if [ '$TARGET' = 'java' ]; then haxelib install hxjava; fi"
