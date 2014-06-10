@@ -208,11 +208,18 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 	}
 }
 
-class ShouldFunctions extends Should<Void -> Void>
+// Some problem with C++ forces this class not to be derived from Should<T>
+class ShouldFunctions
 {
+	var value : Void -> Void;
+	var assert : SpecAssertion;
+	var inverse : Bool;
+
 	public function new(value : Void -> Void, assert : SpecAssertion, inverse = false)
 	{
-		super(value, assert, inverse);
+		this.value = value;
+		this.assert = assert;
+		this.inverse = inverse;
 	}
 
 	public var not(get, never) : ShouldFunctions;
@@ -249,7 +256,7 @@ class ShouldFunctions extends Should<Void -> Void>
 		var test = false;
 		var name : String = null;
 
-		try { untyped value(); }
+		try { value(); }
 		catch (e : Dynamic)
 		{
 			name = Type.getClassName(type);
@@ -260,6 +267,27 @@ class ShouldFunctions extends Should<Void -> Void>
 			assert(!test, 'Expected $value not to throw type $name');
 		else
 			assert(test, 'Expected $value to throw type $name');
+	}
+
+	/**
+	 * Test for equality between two value types (bool, int, float), or identity for reference types
+	 */
+	public function be(expected : Void -> Void) : Void
+	{
+		if (Std.is(expected, String))
+		{
+			if(!inverse)
+				assert(value == expected, 'Expected "$expected", was "$value"');
+			else
+				assert(value != expected, 'Expected not "$expected" but was equal to that');
+		}
+		else
+		{
+			if(!inverse)
+				assert(value == expected, 'Expected $expected, was $value');
+			else
+				assert(value != expected, 'Expected not $expected but was equal to that');
+		}
 	}
 }
 
