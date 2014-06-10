@@ -22,6 +22,8 @@ import haxe.Timer;
 
 class AllTests implements Buddy {}
 
+class EmptyTestClass { public function new() {} }
+
 class TestBasicFeatures extends BuddySuite
 {
 	private var testAfter : String;
@@ -166,6 +168,40 @@ class TestBasicFeatures extends BuddySuite
 				a.should().containAll([1]);
 
 				a.should().not.containAll([3, 4]);
+			});
+		});
+
+		describe("Testing functions", {
+			var f = function() { throw "a"; };
+			var g = function() { throw new EmptyTestClass(); };
+
+			var h = function(a : String) { throw a; };
+			var i = function(a : String) { throw a.toUpperCase(); };
+
+			var j = function(a : String) : String { throw a; };
+			var k = function(a : String) : String { throw a.toUpperCase(); };
+
+			it("should have a be method", {
+				f.should().be(f);
+				f.should().not.be(function(){});
+			});
+
+			it("should have a throwValue() method", {
+				f.should().throwValue("a");
+				f.should().not.throwValue("b");
+			});
+
+			it("should have a throwType() method", {
+				g.should().throwType(EmptyTestClass);
+				g.should().not.throwType(String);
+			});
+
+			it("should have a throwType() method that can be used with bind", {
+				h.bind("a").should().throwValue("a");
+				i.bind("a").should().not.throwValue("a");
+
+				j.bind("a").should().throwValue("a");
+				k.bind("a").should().not.throwValue("a");
 			});
 		});
 

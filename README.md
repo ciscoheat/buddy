@@ -126,6 +126,22 @@ Same as Int plus
 
 `a.should.containExactly(b)` - Test if an Iterable contains exactly the same objects as in Iterable `b` and in the same order.
 
+### Exceptions
+
+Testing if a function throws an exception is made easy using the special `bind` field which exists for every function.
+
+If the function signature is `String -> Void` then apply the string argument like this:
+
+`a.bind("test").should.throwValue("error")`
+
+`a.bind("test").should.throwType(String)`
+
+### Inverting assertions
+
+Every assertion can be negated using `not` which is present on all `should` fields:
+
+`a.should.not.contain("test")`
+
 ## Pending tests
 
 Since BDD is also made for non-programmers to use, a common development style is to write empty, or *pending* tests, and let a programmer implement them later. To do this, just write the string in the `describe` and `it` methods. Our previous test class would then look like this:

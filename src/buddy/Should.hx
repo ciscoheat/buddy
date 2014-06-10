@@ -208,6 +208,61 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 	}
 }
 
+class ShouldFunctions extends Should<Void -> Void>
+{
+	public function new(value : Void -> Void, assert : SpecAssertion, inverse = false)
+	{
+		super(value, assert, inverse);
+	}
+
+	public var not(get, never) : ShouldFunctions;
+	private function get_not() { return new ShouldFunctions(value, assert, !inverse); }
+
+	static public function should(value : Void -> Void, assert : SpecAssertion)
+	{
+		return new ShouldFunctions(value, assert);
+	}
+
+	/**
+	 * Will call the specified method and test if it throws a specific value.
+	 */
+	public function throwValue(v : Dynamic)
+	{
+		var test = false;
+		try { value(); }
+		catch (e : Dynamic)
+		{
+			test = e == v;
+		}
+
+		if(inverse)
+			assert(!test, 'Expected $value not to throw "$v"');
+		else
+			assert(test, 'Expected $value to throw "$v"');
+	}
+
+	/**
+	 * Will call the specified method and test if it throws a specific type.
+	 */
+	public function throwType(type : Class<Dynamic>)
+	{
+		var test = false;
+		var name : String = null;
+
+		try { untyped value(); }
+		catch (e : Dynamic)
+		{
+			name = Type.getClassName(type);
+			test = Std.is(e, type);
+		}
+
+		if(inverse)
+			assert(!test, 'Expected $value not to throw type $name');
+		else
+			assert(test, 'Expected $value to throw type $name');
+	}
+}
+
 //////////
 
 class Should<T>
