@@ -14,21 +14,13 @@ env:
     - TARGET=nodejs
     - TARGET=php
 
-#matrix:
-#  fast_finish: true
-#  allow_failures:
-#    - env: TARGET=cs
-#    - env: TARGET=php
-
- 
-# Install Haxe and dependencies before running the test.
 before_install:
-  # Until it's fixed on the OpenFL site:
+  # Install Haxe
+  # Until it's fixed on the OpenFL site, use the patched script:
   - wget https://gist.githubusercontent.com/ciscoheat/8884e80d6096fb3a211b/raw/a46a1566a9cbe49d9eed256477661eaf1856f0f5/install-haxe.sh
   - sudo sh install-haxe.sh -y
   - haxelib install promhx
 
-before_script:
   # apt packages
   - sh -c "if [ '$TARGET' = 'cpp' ]; then sudo apt-get install gcc-multilib g++-multilib -y; fi"
   - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get install mono-devel -y; fi"
