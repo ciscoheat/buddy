@@ -274,20 +274,10 @@ class ShouldFunctions
 	 */
 	public function be(expected : Void -> Void) : Void
 	{
-		if (Std.is(expected, String))
-		{
-			if(!inverse)
-				assert(value == expected, 'Expected "$expected", was "$value"');
-			else
-				assert(value != expected, 'Expected not "$expected" but was equal to that');
-		}
+		if(!inverse)
+			assert(value == expected, 'Expected ' + Std.string(expected) + ', was $value');
 		else
-		{
-			if(!inverse)
-				assert(value == expected, 'Expected $expected, was $value');
-			else
-				assert(value != expected, 'Expected not $expected but was equal to that');
-		}
+			assert(value != expected, 'Expected not ' + Std.string(expected) + ' but was equal to that');
 	}
 }
 
@@ -321,9 +311,9 @@ class Should<T>
 		else
 		{
 			if(!inverse)
-				assert(value == expected, 'Expected $expected, was $value');
+				assert(value == expected, 'Expected ' + Std.string(expected) + ', was $value');
 			else
-				assert(value != expected, 'Expected not $expected but was equal to that');
+				assert(value != expected, 'Expected not ' + Std.string(expected) + ' but was equal to that');
 		}
 	}
 }
