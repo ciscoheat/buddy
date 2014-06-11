@@ -16,9 +16,19 @@ typedef Sys = Flash;
 
 class ConsoleReporter implements Reporter
 {
+	#if php
+	var cli : Bool;
+	#end
+
 	public function new() {}
 
-	public function start() {}
+	public function start()
+	{
+		#if php
+		cli = (untyped __call__("php_sapi_name")) == 'cli';
+		if(!cli) Sys.println("<pre>");
+		#end
+	}
 
 	public function progress(spec : Spec)
 	{
@@ -60,6 +70,10 @@ class ConsoleReporter implements Reporter
 		}
 
 		Sys.println('$total specs, $failures failures, $pending pending');
+
+		#if php
+		if(!cli) Sys.println("</pre>");
+		#end
 	}
 }
 

@@ -67,7 +67,8 @@ class AsyncTools
 			done();
 		});
 		#else
-			#error
+		Sys.sleep(ms / 1000);
+		done();
 		#end
 
 		return pr;
