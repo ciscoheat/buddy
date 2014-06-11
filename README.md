@@ -92,6 +92,26 @@ class AsyncTest extends BuddySuite {
 }
 ```
 
+The default timeout is 5000 ms, after which the spec will automatically fail if `done()` hasn't been called. If you want to change the timeout, set the property `timeoutMs` in the `BuddySuite` **before** the actual `it()` specification, or in the before/after block. Here's an example:
+
+```haxe
+package ;
+import buddy.*;
+using buddy.Should;
+
+class AsyncTest extends BuddySuite {
+    public function new() {
+        describe("Using Buddy asynchronously", {
+            this.timeoutMs = 100;
+            it("should fail specs after a timeout set before it()", function(done) {
+                // This test will fail after 100 ms.
+                haxe.Timer.delay(done, 200);
+            });
+        });
+    }
+}
+```
+
 ## Should assertions
 
 As you've seen in the examples, testing if the specifications are correct is as simple as adding `using Buddy.should` to the package and then use the `should` extension for the identifier you want to test. The following assertions are supported:
@@ -201,7 +221,7 @@ The [HaxeContracts](https://github.com/ciscoheat/HaxeContracts) library is a nic
 
 - [x] Tutorial for general guidelines when doing BDD.
 - [x] More assertions for "should".
-- [ ] Ways to customize running and reporting of test suites.
+- [ ] Ways to customize running and reporting of specific test suites.
 - [ ] Nicer reporters (especially for the browser) with stack traces for failures.
 - [ ] Your choice! Send me a gmail (ciscoheat) or create an issue here.
 

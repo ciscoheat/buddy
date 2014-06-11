@@ -8,12 +8,12 @@ using buddy.tools.AsyncTools;
 
 class SuitesRunner
 {
-	private var suites : Array<Suite>;
+	private var suites : Iterable<BuddySuite>;
 	private var reporter : Reporter;
 
 	public function new(suites : Iterable<BuddySuite>, reporter : Reporter)
 	{
-		this.suites = [for(s in suites) for(su in s.suites) su];
+		this.suites = suites;
 		this.reporter = reporter;
 	}
 
@@ -23,16 +23,20 @@ class SuitesRunner
 		var defPr = def.promise();
 
 		reporter.start();
-		suites.iterateAsyncBool(runSuite).then(function(_) { reporter.done(suites); def.resolve(this); });
+
+		suites.iterateAsyncBool(runBuddySuite)
+			.then(function(b) {
+				reporter.done([for (b in suites) for (s in b.suites) s]);
+				def.resolve(this);
+			});
 
 		return defPr;
 	}
 
 	public function failed() : Bool
 	{
-		for (s in suites)
-			for (sp in s.specs)
-				if (sp.status == TestStatus.Failed) return true;
+		for (buddy in suites) for(s in buddy.suites) for (sp in s.specs)
+			if (sp.status == TestStatus.Failed) return true;
 
 		return false;
 	}
@@ -42,8 +46,14 @@ class SuitesRunner
 		return failed() ? 1 : 0;
 	}
 
-	private function runSuite(suite : Suite) : Promise<Suite>
+	private function runBuddySuite(buddySuite : BuddySuite) : Promise<BuddySuite>
 	{
-		return new SuiteRunner(suite, reporter).run();
+		var run = runSuite.bind(_, buddySuite);
+		return buddySuite.suites.iterateAsync(run, buddySuite);
+	}
+
+	private function runSuite(suite : Suite, buddySuite : BuddySuite) : Promise<Suite>
+	{
+		return new SuiteRunner(buddySuite, suite, reporter).run();
 	}
 }

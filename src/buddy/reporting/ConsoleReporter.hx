@@ -25,7 +25,7 @@ class ConsoleReporter implements Reporter
 		Sys.print(switch(spec.status) {
 			case TestStatus.Failed: "X";
 			case TestStatus.Passed: ".";
-			case TestStatus.Pending: "*";
+			case TestStatus.Pending: "P";
 			case TestStatus.Unknown: "?";
 		});
 	}

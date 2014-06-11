@@ -77,9 +77,15 @@ class BuddySuite
 {
 	public var suites(default, null) : List<Suite>;
 
+	/**
+	 * Milliseconds before an async spec timeout with an error. Default is 5000 (5 sec).
+	 */
+	public var timeoutMs(default, default) : Int;
+
 	public function new()
 	{
 		this.suites = new List<Suite>();
+		this.timeoutMs = 5000;
 	}
 
 	///// Private API /////

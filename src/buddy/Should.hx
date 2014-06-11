@@ -29,6 +29,17 @@ toThrowError("quux");
  */
 typedef SpecAssertion = Bool -> String -> Void;
 
+/**
+ * This must be the first class in this package, since it overrides all other assertions otherwise.
+ */
+class ShouldDynamic
+{
+	static public function should<T>(d : T, assert : SpecAssertion)
+	{
+		return new Should<T>(d, assert);
+	}
+}
+
 class ShouldInt extends Should<Int>
 {
 	static public function should(i : Int, assert : SpecAssertion)
