@@ -128,8 +128,8 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				new buddy.SuitesRunner(suites, reporter).run()
-				.then(function(runner) { untyped __js__("process.exit(runner.statusCode())"); } );
+				var runner = new buddy.SuitesRunner(suites, reporter);
+				runner.run().then(function(_) { untyped __js__("process.exit(runner.statusCode())"); } );
 			};
 		}
 		else if(Context.defined("php") || Context.defined("java"))
