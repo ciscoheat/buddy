@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library.",
-  "version": "0.3.1",
-  "releasenote": "Added exception assertions.",
+  "version": "0.4.0",
+  "releasenote": "Added timeout för async operations and a generic assertion.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }
