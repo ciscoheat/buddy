@@ -17,18 +17,21 @@ class SuitesRunner
 		this.reporter = reporter;
 	}
 
-	public function run() : Promise<SuitesRunner>
+	public function run() : Promise<Bool>
 	{
-		var def = new Deferred<SuitesRunner>();
+		var def = new Deferred<Bool>();
 		var defPr = def.promise();
 
-		reporter.start();
-
-		suites.iterateAsyncBool(runBuddySuite)
-			.then(function(b) {
-				reporter.done([for (b in suites) for (s in b.suites) s]);
-				def.resolve(this);
-			});
+		reporter.start().then(function(ok) {
+			if(ok)
+			{
+				suites.iterateAsyncBool(runBuddySuite)
+					.pipe(function(_) return reporter.done([for (b in suites) for (s in b.suites) s]))
+					.then(function(_) def.resolve(ok));
+			}
+			else
+				def.resolve(ok);
+		});
 
 		return defPr;
 	}

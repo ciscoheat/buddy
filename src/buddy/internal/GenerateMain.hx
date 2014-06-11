@@ -141,8 +141,8 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				new buddy.SuitesRunner(suites, reporter).run()
-				.then(function(runner) { Sys.exit(runner.statusCode()); });
+				var runner = new buddy.SuitesRunner(suites, reporter);
+				runner.run().then(function(_) { Sys.exit(runner.statusCode()); });
 			};
 		}
 		else

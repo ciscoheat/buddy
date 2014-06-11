@@ -41,7 +41,9 @@ class SuiteRunner
 		var specDone = new Deferred<Spec>();
 		var specPr = specDone.promise();
 
-		specPr.then(function(s) { if (this.reporter != null) reporter.progress(s); } );
+		specPr.pipe(function(s) {
+			return this.reporter != null ? reporter.progress(s) : specPr;
+		});
 
 		// It = The it part only
 		var itDone = new Deferred<{status : TestStatus, error : String}>();

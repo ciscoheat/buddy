@@ -2,6 +2,8 @@ package buddy.reporting ;
 
 import buddy.BuddySuite;
 import buddy.reporting.Reporter;
+import promhx.Deferred;
+import promhx.Promise;
 
 #if nodejs
 import buddy.internal.sys.NodeJs;
@@ -28,6 +30,8 @@ class ConsoleReporter implements Reporter
 		cli = (untyped __call__("php_sapi_name")) == 'cli';
 		if(!cli) Sys.println("<pre>");
 		#end
+
+		return resolveImmediately(true);
 	}
 
 	public function progress(spec : Spec)
@@ -38,6 +42,8 @@ class ConsoleReporter implements Reporter
 			case TestStatus.Pending: "P";
 			case TestStatus.Unknown: "?";
 		});
+
+		return resolveImmediately(spec);
 	}
 
 	public function done(suites : Iterable<Suite>)
@@ -74,6 +80,16 @@ class ConsoleReporter implements Reporter
 		#if php
 		if(!cli) Sys.println("</pre>");
 		#end
+
+		return resolveImmediately(suites);
+	}
+
+	private function resolveImmediately<T>(o : T) : Promise<T>
+	{
+		var def = new Deferred<T>();
+		var pr = def.promise();
+		def.resolve(o);
+		return pr;
 	}
 }
 
