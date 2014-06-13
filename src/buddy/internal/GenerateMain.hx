@@ -76,6 +76,8 @@ class GenerateMain
 
 	private static function typeIsSuite(type : ClassType) : Bool
 	{
+		if (type.meta.has("exclude")) return false;
+
 		var superClass = type.superClass;
 		return superClass != null && superClass.t.get().name == "BuddySuite";
 	}

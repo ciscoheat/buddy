@@ -4,6 +4,7 @@ import buddy.Buddy;
 import buddy.tools.AsyncTools;
 using buddy.Should;
 using Lambda;
+using StringTools;
 
 class AllTests implements Buddy {}
 
@@ -195,6 +196,54 @@ class TestBasicFeatures extends BuddySuite
 				"a".should.not.be("b");
 				"a".should.not.not.be("a");
 				(123).should.not.beLessThan(100);
+			});
+		});
+
+		describe("Excluding specs with @exclude and xit()", {
+			@exclude it("should mark this spec as pending.", {
+				true.should.be(false); // Make it fail if it runs
+			});
+
+			xit("should mark this as pending too.", {
+				true.should.be(false); // Make it fail if it runs
+			});
+
+			it("should set specs marked with @exclude to Pending", {
+				var suite = this.suites.find(function(s) { return s.name == "Excluding specs with @exclude and xit()"; } );
+				suite.specs[0].status.should.be(TestStatus.Pending);
+				suite.specs[1].status.should.be(TestStatus.Pending);
+			});
+		});
+
+		xdescribe("Excluding suites with xdescribe()", {
+			it("should not display this suite or its specs at all.", {
+				true.should.be(false);
+			});
+		});
+
+		@exclude describe("Excluding suites with @exclude", {
+			it("should not display this suite or its specs at all.", {
+				true.should.be(false);
+			});
+		});
+
+		describe("Excluding suites with @exclude and xdescribe()", {
+			it("should not display suites or their specs at all.", {
+				this.suites.find(function(s) { return s.name == "Excluding suites with xdescribe()"; } ).should.be(null);
+				this.suites.find(function(s) { return s.name == "Excluding suites with @exclude"; } ).should.be(null);
+			});
+		});
+	}
+}
+
+@exclude
+class TestExclude extends BuddySuite
+{
+	public function new()
+	{
+		describe("Excluding a whole BuddySuite", {
+			it("should not not display any suites inside a class marked with @exclude.", {
+				true.should.be(false);
 			});
 		});
 	}

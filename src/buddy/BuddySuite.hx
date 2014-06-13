@@ -30,7 +30,7 @@ class BeforeAfter
 class Suite
 {
 	public var name(default, null) : String;
-	public var specs(default, null) : List<Spec>;
+	public var specs(default, null) : Array<Spec>;
 
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
@@ -38,7 +38,7 @@ class Suite
 	public function new(name : String)
 	{
 		this.name = name;
-		this.specs = new List<Spec>();
+		this.specs = new Array<Spec>();
 		this.before = new List<BeforeAfter>();
 		this.after = new List<BeforeAfter>();
 	}
@@ -96,6 +96,9 @@ class BuddySuite
 		addSpecs();
 	}
 
+	private function xdescribe(name : String, addSpecs : Void -> Void)
+	{}
+
 	private function before(init : Action)
 	{
 		syncBefore(init, true);
@@ -131,13 +134,13 @@ class BuddySuite
 	@:noCompletion private function syncIt(desc : String, test : Action, async = false)
 	{
 		var suite = suites.last();
-		suite.specs.add(new Spec(suite, desc, test, async));
+		suite.specs.push(new Spec(suite, desc, test, async));
 	}
 
 	@:noCompletion private function syncXit(desc : String, test : Action, async = false)
 	{
 		var suite = suites.last();
-		suite.specs.add(new Spec(suite, desc, test, async, true));
+		suite.specs.push(new Spec(suite, desc, test, async, true));
 	}
 }
 

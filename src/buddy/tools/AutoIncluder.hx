@@ -35,10 +35,7 @@ class AutoIncluder
 			});
 		});
 
-		Context.onGenerate(function(types : Array<Type>) {
-			getClasses(types, onClass, allowed, metaName);
-		});
-
+		Context.onGenerate(getClasses.bind(_, onClass, allowed, metaName));
 		Compiler.include("", true, [], paths);
 	}
 
