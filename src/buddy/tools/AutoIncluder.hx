@@ -12,7 +12,7 @@ using StringTools;
 class AutoIncluder
 {
 	#if macro
-	public static function run(onClass : ClassType, allowed : ClassType -> Bool, metaName = "autoIncluded")
+	public static function run(onClass : ClassType, allowed : Array<ClassType> -> Array<ClassType>, metaName = "autoIncluded")
 	{
 		var excludePaths = [];
 
@@ -39,21 +39,17 @@ class AutoIncluder
 		Compiler.include("", true, [], paths);
 	}
 
-	private static function getClasses(types : Array<Type>, onClass : ClassType, allowed : ClassType -> Bool, metaName : String) : Void
+	private static function getClasses(types : Array<Type>, onClass : ClassType, allowed : Array<ClassType> -> Array<ClassType>, metaName : String) : Void
 	{
-		var classes = new Array<Expr>();
-
-		for (a in types)
-		{
-			switch(a)
-			{
-				case TInst(t, params) if(allowed(t.get())):
-					classes.push(toTypeStringExpr(t.get()));
-
-				case _:
-			}
+		var classTypes = new Array<ClassType>();
+		for (t in types) switch t {
+			case TInst(t, params): classTypes.push(t.get());
+			case _:
 		}
 
+		var classes = allowed(classTypes).map(function(c) { return toTypeStringExpr(c); } );
+
+		//classes.push(toTypeStringExpr(t.get()));
 		onClass.meta.add(metaName, classes, onClass.pos);
 	}
 

@@ -74,12 +74,22 @@ class GenerateMain
 		return fields;
 	}
 
-	private static function typeIsSuite(type : ClassType) : Bool
+	private static function typeIsSuite(classes : Array<ClassType>) : Array<ClassType>
 	{
-		if (type.meta.has("exclude")) return false;
+		var output = new Array<ClassType>();
+		var only = new Array<ClassType>();
 
-		var superClass = type.superClass;
-		return superClass != null && superClass.t.get().name == "BuddySuite";
+		for (c in classes)
+		{
+			if (c.meta.has("exclude")) continue;
+			if (c.superClass != null && c.superClass.t.get().name == "BuddySuite")
+			{
+				if (c.meta.has("only")) only.push(c);
+				else output.push(c);
+			}
+		}
+
+		return only.length > 0 ? only : output;
 	}
 
 	private static function buildMain(exprs : Array<Expr>, cls : ClassType)
