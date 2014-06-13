@@ -77,19 +77,19 @@ class GenerateMain
 	private static function typeIsSuite(classes : Array<ClassType>) : Array<ClassType>
 	{
 		var output = new Array<ClassType>();
-		var only = new Array<ClassType>();
+		var include = new Array<ClassType>();
 
 		for (c in classes)
 		{
-			if (c.meta.has("exclude")) continue;
+			if (c.meta.has(BuddySuite.exclude)) continue;
 			if (c.superClass != null && c.superClass.t.get().name == "BuddySuite")
 			{
-				if (c.meta.has("only")) only.push(c);
+				if (c.meta.has(BuddySuite.include)) include.push(c);
 				else output.push(c);
 			}
 		}
 
-		return only.length > 0 ? only : output;
+		return include.length > 0 ? include : output;
 	}
 
 	private static function buildMain(exprs : Array<Expr>, cls : ClassType)

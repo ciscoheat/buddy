@@ -195,6 +195,10 @@ Using Buddy
 
 If good domain terms are used that matches the system architecture, the programmer should be able to implement system or integration tests that matches the users mental model of the system. (See [haxedci](https://github.com/ciscoheat/haxedci-example) for more details how to achieve this using the DCI architecture!)
 
+## Including and excluding tests
+
+Classes, suites and specs can all be marked with `@include` and `@exclude`. `@include` will only run the tests that are marked, `@exclude` does the opposite, it prevents the marked ones from running. If you have a huge test suite, it can be convenient to mark the suite you're currently working on with `@include`.
+
 ## FAQ
 
 ### Where's main() ?

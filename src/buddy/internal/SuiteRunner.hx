@@ -11,9 +11,9 @@ class SuiteRunner
 	var suite : Suite;
 	var reporter : Reporter;
 
-	public function new(buddySuite : BuddySuite, suite : Suite, reporter : Reporter)
+	public function new(suite : Suite, reporter : Reporter)
 	{
-		this.buddySuite = buddySuite;
+		this.buddySuite = suite.buddySuite;
 		this.suite = suite;
 		this.reporter = reporter;
 	}

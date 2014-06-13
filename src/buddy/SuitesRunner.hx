@@ -1,6 +1,7 @@
 package buddy ;
 import buddy.internal.SuiteRunner;
 import buddy.reporting.Reporter;
+import haxe.rtti.Meta;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.BuddySuite;
@@ -8,12 +9,12 @@ using buddy.tools.AsyncTools;
 
 class SuitesRunner
 {
-	private var suites : Iterable<BuddySuite>;
+	private var suites : Iterable<Suite>;
 	private var reporter : Reporter;
 
-	public function new(suites : Iterable<BuddySuite>, reporter : Reporter)
+	public function new(buddySuites : Iterable<BuddySuite>, reporter : Reporter)
 	{
-		this.suites = suites;
+		this.suites = [for (b in buddySuites) for(s in b.suites) s];
 		this.reporter = reporter;
 	}
 
@@ -25,8 +26,8 @@ class SuitesRunner
 		reporter.start().then(function(ok) {
 			if(ok)
 			{
-				suites.iterateAsyncBool(runBuddySuite)
-					.pipe(function(_) return reporter.done([for (b in suites) for (s in b.suites) s]))
+				suites.iterateAsyncBool(runSuite)
+					.pipe(function(_) return reporter.done(suites))
 					.then(function(_) def.resolve(ok));
 			}
 			else
@@ -38,7 +39,7 @@ class SuitesRunner
 
 	public function failed() : Bool
 	{
-		for (buddy in suites) for(s in buddy.suites) for (sp in s.specs)
+		for(s in suites) for (sp in s.specs)
 			if (sp.status == TestStatus.Failed) return true;
 
 		return false;
@@ -49,14 +50,8 @@ class SuitesRunner
 		return failed() ? 1 : 0;
 	}
 
-	private function runBuddySuite(buddySuite : BuddySuite) : Promise<BuddySuite>
+	private function runSuite(suite : Suite) : Promise<Suite>
 	{
-		var run = runSuite.bind(_, buddySuite);
-		return buddySuite.suites.iterateAsync(run, buddySuite);
-	}
-
-	private function runSuite(suite : Suite, buddySuite : BuddySuite) : Promise<Suite>
-	{
-		return new SuiteRunner(buddySuite, suite, reporter).run();
+		return new SuiteRunner(suite, reporter).run();
 	}
 }

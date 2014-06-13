@@ -1,4 +1,6 @@
 package buddy ;
+import buddy.BuddySuite.Spec;
+import buddy.BuddySuite.Suite;
 import buddy.reporting.Reporter;
 import promhx.Deferred;
 import promhx.Promise;
@@ -30,14 +32,18 @@ class BeforeAfter
 class Suite
 {
 	public var name(default, null) : String;
-	public var specs(default, null) : Array<Spec>;
+	public var buddySuite(default, null) : BuddySuite;
+	@:allow(buddy.BuddySuite) public var specs(default, null) : Array<Spec>;
 
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
+	@:allow(buddy.BuddySuite) private var include : Bool;
 
-	public function new(name : String)
+	public function new(name : String, buddySuite : BuddySuite)
 	{
 		this.name = name;
+		this.buddySuite = buddySuite;
+
 		this.specs = new Array<Spec>();
 		this.before = new List<BeforeAfter>();
 		this.after = new List<BeforeAfter>();
@@ -52,6 +58,7 @@ class Spec
 	public var status(default, null) : TestStatus;
 	public var error(default, null) : String;
 
+	@:allow(buddy.BuddySuite) private var include : Bool;
 	@:allow(buddy.internal.SuiteRunner) private var run : Action;
 
 	@:allow(buddy.internal.SuiteRunner) private function setStatus(s : TestStatus, err : String)
@@ -77,6 +84,12 @@ class BuddySuite
 {
 	public var suites(default, null) : List<Suite>;
 
+	// If set, suites are only included if marked by @include or if one of its specs are marked with @include
+	private static var includeMode : Bool;
+
+	public static var exclude(default, never) : String = "exclude";
+	public static var include(default, never) : String = "include";
+
 	/**
 	 * Milliseconds before an async spec timeout with an error. Default is 5000 (5 sec).
 	 */
@@ -92,8 +105,7 @@ class BuddySuite
 
 	private function describe(name : String, addSpecs : Void -> Void)
 	{
-		suites.add(new Suite(name));
-		addSpecs();
+		addSuite(new Suite(name, this), addSpecs);
 	}
 
 	private function xdescribe(name : String, addSpecs : Void -> Void)
@@ -119,6 +131,46 @@ class BuddySuite
 		syncXit(desc, test, true);
 	}
 
+	///// Hidden "include" handlers /////
+
+	@:noCompletion private function addSuite(suite : Suite, addSpecs : Void -> Void)
+	{
+		suites.add(suite);
+		addSpecs();
+
+		if (!includeMode) return;
+
+		if (!suite.include)
+		{
+			// If current suite has specs marked with @include, add them only.
+			suite.specs = suite.specs.filter(function(sp) return sp.include);
+			if (suite.specs.length > 0) suite.include = true;
+		}
+
+		suites = suites.filter(function(s) return s.include);
+	}
+
+	@:noCompletion private function describeInclude(name : String, addSpecs : Void -> Void)
+	{
+		includeMode = true;
+		var suite = new Suite(name, this);
+		suite.include = true;
+
+		addSuite(suite, addSpecs);
+	}
+
+	@:noCompletion private function itInclude(desc : String, test : Action = null)
+	{
+		includeMode = true;
+		syncIt(desc, test, true, true);
+	}
+
+	@:noCompletion private function syncItInclude(desc : String, test : Action = null)
+	{
+		includeMode = true;
+		syncIt(desc, test, false, true);
+	}
+
 	///// Hidden syncronous handlers /////
 
 	@:noCompletion private function syncBefore(init : Action, async = false)
@@ -131,16 +183,21 @@ class BuddySuite
 		suites.last().after.add(new BeforeAfter(deinit, async));
 	}
 
-	@:noCompletion private function syncIt(desc : String, test : Action, async = false)
+	@:noCompletion private function syncIt(desc : String, test : Action, async = false, include = false)
 	{
 		var suite = suites.last();
-		suite.specs.push(new Spec(suite, desc, test, async));
+		var spec = new Spec(suite, desc, test, async);
+
+		spec.include = include;
+		suite.specs.push(spec);
 	}
 
 	@:noCompletion private function syncXit(desc : String, test : Action, async = false)
 	{
 		var suite = suites.last();
-		suite.specs.push(new Spec(suite, desc, test, async, true));
+		var spec = new Spec(suite, desc, test, async, true);
+
+		suite.specs.push(spec);
 	}
 }
 

@@ -45,13 +45,17 @@ class SuiteBuilder
 
 			/////
 
+			case macro @include describe($s, function() $f), macro @include describe($s, $f):
+				var change = macro describeInclude($s, function() $f);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
 			case macro describe($s, function() $f), macro describe($s, $f):
 				var change = macro describe($s, function() $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro xdescribe($s, function() $f), macro xdescribe($s, $f),
-				 macro @exclude describe($s, function() $f), macro @exclude describe($s, $f):
+			case macro xdescribe($s, function() $f), macro xdescribe($s, $f), macro @exclude describe($s, function() $f), macro @exclude describe($s, $f):
 				var change = macro xdescribe($s, function() $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
@@ -82,8 +86,20 @@ class SuiteBuilder
 
 			/////
 
+			case macro @include it($s, function($n) $f):
+				var change = macro itInclude($s, function($n, __status) $f);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
 			case macro it($s, function($n) $f):
 				var change = macro it($s, function($n, __status) $f);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			/////
+
+			case macro @include it($s, function() $f), macro @include it($s, $f):
+				var change = macro syncItInclude($s, function(__asyncDone, __status) $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
@@ -99,8 +115,7 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro xit($s, function() $f), macro xit($s, $f),
-				 macro @exclude it($s, function() $f), macro @exclude it($s, $f):
+			case macro xit($s, function() $f), macro xit($s, $f), macro @exclude it($s, function() $f), macro @exclude it($s, $f):
 				var change = macro syncXit($s, function(__asyncDone, __status) $f);
 				e.expr = change.expr;
 				f.iter(injectAsync);

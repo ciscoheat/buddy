@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library.",
-  "version": "0.4.1",
-  "releasenote": "Reporter interface now uses promises.",
+  "version": "0.5.0",
+  "releasenote": "Added @include and @exclude for classes, suites and specs.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

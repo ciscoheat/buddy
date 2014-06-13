@@ -273,8 +273,9 @@ class TestAsync extends BuddySuite
 			it(timeoutTestDescription, function(done) {
 				// No done() call in this spec, timeout will take care of it, going to "after" automatically.
 				timeoutErrorTest = this.suites.first().specs.find(function(s) {
-					return s.description.indexOf(timeoutTestDescription) == 0;
+					return s.description == timeoutTestDescription;
 				});
+
 				timeoutErrorTest.status.should.be(TestStatus.Unknown);
 
 				AsyncTools.wait(20).then(function(_) {
