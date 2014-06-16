@@ -45,12 +45,17 @@ class SuiteRunner
 			return this.reporter != null ? reporter.progress(s) : specPr;
 		});
 
+		if (spec.status != TestStatus.Unknown)
+		{
+			specDone.resolve(spec);
+			return specPr;
+		}
+
 		// It = The it part only
 		var itDone = new Deferred<{status : TestStatus, error : String}>();
 		var itPromise = itDone.promise();
 
-		var errorTimeout : Promise<Bool> = null;
-
+		// The function that sets test status
 		var hasStatus = false;
 		var status = function(s, error)
 		{
@@ -59,18 +64,14 @@ class SuiteRunner
 				itDone.resolve( { status: TestStatus.Failed, error: error } );
 		};
 
-		if (spec.status != TestStatus.Unknown)
-		{
-			specDone.resolve(spec);
-			return specPr;
-		}
-
+		// The function that should be called when an async operation has completed.
 		var done = function()
 		{
 			if (!itPromise.isResolved())
 				itDone.resolve({ status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null });
 		};
 
+		var errorTimeout : Promise<Bool> = null;
 		suite.before.iterateAsyncBool(runBeforeAfter)
 			.pipe(function(_)
 			{
@@ -79,16 +80,21 @@ class SuiteRunner
 					var timeout = buddySuite.timeoutMs;
 					errorTimeout = AsyncTools.wait(timeout);
 
+					// This promise will be rejected if done is called before timeout occurs.
 					errorTimeout
-						.catchError(function(_) {})
+						.catchError(function(e : Dynamic) if(e != null) throw e)
 						.then(function(_) {
 							status(false, 'Timeout after $timeout ms');
 						});
 				}
 
-				spec.run(done, status);
-
-				if (!spec.async) done();
+				try {
+					spec.run(done, status);
+					if (!spec.async) done();
+				}
+				catch (e : Dynamic) {
+					status(false, Std.string(e));
+				}
 
 				return itPromise;
 			})

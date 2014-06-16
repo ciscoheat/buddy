@@ -297,3 +297,24 @@ class TestAsync extends BuddySuite
 	}
 }
 #end
+
+class TestExceptionHandling extends BuddySuite
+{
+	public function new()
+	{
+		describe("An exception thrown during testing", {
+			this.timeoutMs = 50;
+			var throwError = function() throw "Test error!";
+
+			it("should be caught and the current spec will fail.", {
+				throwError();
+			});
+
+			after({
+				var test = this.suites.first().specs[0];
+				if (test.status == TestStatus.Failed && test.error == "Test error!")
+					Reflect.setProperty(test, "status", TestStatus.Passed);
+			});
+		});
+	}
+}
