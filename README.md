@@ -225,7 +225,7 @@ The [HaxeContracts](https://github.com/ciscoheat/HaxeContracts) library is a nic
 
 - [x] Tutorial for general guidelines when doing BDD.
 - [x] More assertions for "should".
-- [ ] Ways to customize running and reporting of specific test suites.
+- [x] Ways to customize running and reporting of specific test suites.
 - [ ] Nicer reporters (especially for the browser) with stack traces for failures.
 - [ ] Your choice! Send me a gmail (ciscoheat) or create an issue here.
 
