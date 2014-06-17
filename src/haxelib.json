@@ -3,8 +3,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "description": "Your friendly BDD testing library.",
-  "version": "0.5.1",
+  "description": "Fixed @include for multiple suites.",
+  "version": "0.5.2",
   "releasenote": "Exceptions are now caught and will fail the running spec.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }

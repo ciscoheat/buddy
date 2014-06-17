@@ -12,9 +12,9 @@ class SuitesRunner
 	private var suites : Iterable<Suite>;
 	private var reporter : Reporter;
 
-	public function new(buddySuites : Iterable<BuddySuite>, reporter : Reporter)
+	public function new(buddySuites : Iterable<BuddySuite>, reporter : Reporter, includeMode = false)
 	{
-		this.suites = [for (b in buddySuites) for(s in b.suites) s];
+		this.suites = [for (b in buddySuites) for (s in b.suites) if(!includeMode || s.include) s];
 		this.reporter = reporter;
 	}
 

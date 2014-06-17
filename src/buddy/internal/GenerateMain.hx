@@ -107,7 +107,7 @@ class GenerateMain
 				}
 
 				var testsRunning = true;
-				var runner = new buddy.SuitesRunner(suites, reporter);
+				var runner = new buddy.SuitesRunner(suites, reporter, BuddySuite.includeMode);
 
 				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) Sys.sleep(0.1);
@@ -124,7 +124,7 @@ class GenerateMain
 				}
 
 				var testsRunning = true;
-				var runner = new buddy.SuitesRunner(suites, reporter);
+				var runner = new buddy.SuitesRunner(suites, reporter, BuddySuite.includeMode);
 
 				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) cs.system.threading.Thread.Sleep(10);
@@ -140,7 +140,7 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				var runner = new buddy.SuitesRunner(suites, reporter);
+				var runner = new buddy.SuitesRunner(suites, reporter, BuddySuite.includeMode);
 				runner.run().then(function(_) { untyped __js__("process.exit(runner.statusCode())"); } );
 			};
 		}
@@ -153,7 +153,7 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				var runner = new buddy.SuitesRunner(suites, reporter);
+				var runner = new buddy.SuitesRunner(suites, reporter, BuddySuite.includeMode);
 				runner.run().then(function(_) { Sys.exit(runner.statusCode()); });
 			};
 		}
@@ -166,7 +166,7 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				new buddy.SuitesRunner(suites, reporter).run();
+				new buddy.SuitesRunner(suites, reporter, BuddySuite.includeMode).run();
 			};
 		}
 

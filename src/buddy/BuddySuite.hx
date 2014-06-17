@@ -33,11 +33,11 @@ class Suite
 {
 	public var name(default, null) : String;
 	public var buddySuite(default, null) : BuddySuite;
+	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
 	@:allow(buddy.BuddySuite) public var specs(default, null) : Array<Spec>;
 
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
-	@:allow(buddy.BuddySuite) private var include : Bool;
 
 	public function new(name : String, buddySuite : BuddySuite)
 	{
@@ -57,8 +57,8 @@ class Spec
 	public var async(default, null) : Bool;
 	public var status(default, null) : TestStatus;
 	public var error(default, null) : String;
+	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
 
-	@:allow(buddy.BuddySuite) private var include : Bool;
 	@:allow(buddy.internal.SuiteRunner) private var run : Action;
 
 	@:allow(buddy.internal.SuiteRunner) private function setStatus(s : TestStatus, err : String)
@@ -85,7 +85,7 @@ class BuddySuite
 	public var suites(default, null) : List<Suite>;
 
 	// If set, suites are only included if marked by @include or if one of its specs are marked with @include
-	private static var includeMode : Bool;
+	public static var includeMode : Bool;
 
 	public static var exclude(default, never) : String = "exclude";
 	public static var include(default, never) : String = "include";
