@@ -6,7 +6,6 @@ import promhx.Deferred;
 import promhx.Promise;
 import buddy.BuddySuite;
 using buddy.tools.AsyncTools;
-using Lambda;
 
 class SuitesRunner
 {
@@ -15,7 +14,9 @@ class SuitesRunner
 
 	public function new(buddySuites : Iterable<BuddySuite>, reporter : Reporter)
 	{
-		var includeMode = buddySuites.exists(function(b) return b.suites.exists(function(s) return s.include));
+		// Cannot use Lambda here, Java problem in Linux.
+		var includeMode = [for (b in buddySuites) for (s in b.suites) if (s.include) s].length > 0;
+
 		this.suites = [for (b in buddySuites) for (s in b.suites) if(!includeMode || s.include) s];
 		this.reporter = reporter;
 	}
