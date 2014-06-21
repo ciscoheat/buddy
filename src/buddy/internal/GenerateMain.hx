@@ -15,13 +15,13 @@ using Lambda;
 
 class GenerateMain
 {
-	macro public static function build() : Array<Field>
+	macro public static function build( ?packages:Array<String> ) : Array<Field>
 	{
 		var cls = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
 		var found = false;
 
-		AutoIncluder.run(cls, typeIsSuite);
+		AutoIncluder.run(cls, packages, typeIsSuite);
 
 		for (f in fields)
 		{
