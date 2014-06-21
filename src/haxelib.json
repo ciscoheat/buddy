@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.5.3",
-  "releasenote": "Removed parameter from SuitesRunner.",
-  "contributors": ["ciscoheat"],
+  "version": "0.6.0",
+  "releasenote": "Added ability to import only certain packages.",
+  "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
