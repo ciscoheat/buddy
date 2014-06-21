@@ -207,6 +207,13 @@ Ok, you noticed that it was missing! Using some macro magic, you only need to im
 
 At this early point there is no ultra-convenient way of customizing how the tests are run, but if you really want to run your tests manually, use the `buddy.SuitesRunner` class together with a `buddy.reporting.ConsoleReporter`, or make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface.
 
+The build macro used will by default include all `.hx` files in the class path so it can find the relevant subclasses of `buddy.BuddySuite` without you having to import them manually. If you would prefer to control which packages are imported, you can call the build macro manually:
+
+```haxe
+@:build(buddy.internal.GenerateMain.build(["pack1","pack2.subpack"]))
+class Tests extends BuddySuite {}
+```
+
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
 The compiler seems to be a bit too good at optimizing sometimes, especially at the beginning of functions, so if you get this problem add a parenthesis after "should" and wrap numbers in parenthesis too.

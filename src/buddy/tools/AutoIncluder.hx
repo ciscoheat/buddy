@@ -12,8 +12,9 @@ using StringTools;
 class AutoIncluder
 {
 	#if macro
-	public static function run(onClass : ClassType, allowed : Array<ClassType> -> Array<ClassType>, metaName = "autoIncluded")
+	public static function run(onClass : ClassType, includePackages : Array<String>, allowed : Array<ClassType> -> Array<ClassType>, metaName = "autoIncluded")
 	{
+		if (includePackages == null) includePackages = [""];
 		var excludePaths = [];
 
 		for (p in Context.getClassPath())
@@ -36,7 +37,9 @@ class AutoIncluder
 		});
 
 		Context.onGenerate(getClasses.bind(_, onClass, allowed, metaName));
-		Compiler.include("", true, [], paths);
+		for (pack in includePackages) {
+			Compiler.include(pack, true, [], paths);
+		}
 	}
 
 	private static function getClasses(types : Array<Type>, onClass : ClassType, allowed : Array<ClassType> -> Array<ClassType>, metaName : String) : Void
