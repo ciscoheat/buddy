@@ -66,6 +66,8 @@ class AsyncTools
 			Sys.sleep(ms / 1000);
 			done();
 		});
+		#elseif php
+		throw "AsyncTools.wait not supported for PHP.";
 		#else
 		Sys.sleep(ms / 1000);
 		done();

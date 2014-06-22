@@ -340,7 +340,6 @@ class TestExceptionHandling extends BuddySuite
 	}
 }
 
-#if utest
 class UtestUsage extends BuddySuite
 {
 	public function new()
@@ -358,12 +357,14 @@ class UtestUsage extends BuddySuite
 				Assert.isTrue(false);
 			});
 
+			#if !php
 			it("should pass on asynchronous tests.", function(done) {
 				AsyncTools.wait(5).then(function(_) {
 					Assert.match(~/\d{3}/, "abc123");
 					done();
 				});
 			});
+			#end
 
 			after({
 				var test = this.suites.first().specs[1];
@@ -373,4 +374,3 @@ class UtestUsage extends BuddySuite
 		});
 	}
 }
-#end
