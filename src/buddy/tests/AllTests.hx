@@ -10,6 +10,8 @@ class AllTests implements Buddy {}
 
 class EmptyTestClass { public function new() {} }
 
+enum Color { Red; Green; Blue; }
+
 class TestBasicFeatures extends BuddySuite
 {
 	private var testAfter : String;
@@ -39,6 +41,20 @@ class TestBasicFeatures extends BuddySuite
 
 			after({
 				testAfter = "after executed";
+			});
+		});
+
+		describe("Testing dynamics", {
+			var obj1 = { id: 1 };
+			var obj2 = { id: 2 };
+			var color1 = Red;
+			var color2 = Green;
+
+			it("should compare objects with be()", {
+				obj1.should.be(obj1);
+				obj1.should.not.be(obj2);
+				Red.should.be( Red );
+				Red.should.not.be( Green );
 			});
 		});
 
