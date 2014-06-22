@@ -1,5 +1,6 @@
 -cp src 
 -lib promhx
+-lib utest
 -js bin/buddy.js
 -main buddy.tests.AllTests
 -cmd echo "---------- JS (PhantomJS) ----------"

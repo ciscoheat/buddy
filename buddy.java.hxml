@@ -1,5 +1,6 @@
 -cp src 
 -lib promhx
+-lib utest
 -java bin
 -main buddy.tests.AllTests
 -cmd echo "---------- JAVA ----------"

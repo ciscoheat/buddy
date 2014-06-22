@@ -222,6 +222,10 @@ The compiler seems to be a bit too good at optimizing sometimes, especially at t
 
 `123.should.beGreaterThan(100)` -> `(123).should.beGreaterThan(100)`
 
+### Can I use other assertion libraries than the built-in 'should'?
+
+Yes, there is special support for [utest](http://code.google.com/p/utest/) and general support for all libraries that throws an exception on failure (like [mockatoo](https://github.com/misprintt/mockatoo) ). To use utest, just call any `utest.Assert` method inside a spec, no need to set up anything else.
+
 ## The story behind Buddy
 
 After my speech about Contracts at [WWX2014](wwx.silexlabs.org/2014/), I concluded that one does not simply bash unit testing without providing a nice alternative! Having used [Jasmine](http://jasmine.github.io/2.0/introduction.html) before, I borrowed some if its nice features, and found the perfect aid to implementing async support with the [promhx](https://github.com/jdonaldson/promhx) library.

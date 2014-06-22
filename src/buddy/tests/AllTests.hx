@@ -2,6 +2,11 @@ package buddy.tests ;
 import buddy.BuddySuite;
 import buddy.Buddy;
 import buddy.tools.AsyncTools;
+
+#if utest
+import utest.Assert;
+#end
+
 using buddy.Should;
 using Lambda;
 using StringTools;
@@ -334,3 +339,38 @@ class TestExceptionHandling extends BuddySuite
 		});
 	}
 }
+
+#if utest
+class UtestUsage extends BuddySuite
+{
+	public function new()
+	{
+		describe("Using utest for assertions", {
+			it("should pass a test when using the Assert class.", {
+				var a = { test: {a: 123}, cls: new EmptyTestClass() };
+				var b = { test: { a: 123 }, cls: new EmptyTestClass() };
+
+				Assert.isTrue(true);
+				Assert.same(a, b);
+			});
+
+			it("should fail a test when using the Assert class.", {
+				Assert.isTrue(false);
+			});
+
+			it("should pass on asynchronous tests.", function(done) {
+				AsyncTools.wait(5).then(function(_) {
+					Assert.match(~/\d{3}/, "abc123");
+					done();
+				});
+			});
+
+			after({
+				var test = this.suites.first().specs[1];
+				if (test.status == TestStatus.Failed && test.error == "expected true")
+					Reflect.setProperty(test, "status", TestStatus.Passed);
+			});
+		});
+	}
+}
+#end

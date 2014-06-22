@@ -3,6 +3,12 @@ import buddy.BuddySuite;
 import buddy.reporting.Reporter;
 import promhx.Deferred;
 import promhx.Promise;
+
+#if utest
+import utest.Assert;
+import utest.Assertation;
+#end
+
 using buddy.tools.AsyncTools;
 
 class SuiteRunner
@@ -67,8 +73,24 @@ class SuiteRunner
 		// The function that should be called when an async operation has completed.
 		var done = function()
 		{
+			#if utest
+			for (a in Assert.results)
+			{
+				switch a {
+					case Success(_): hasStatus = true;
+					case Failure(e, _), Error(e, _), SetupError(e, _), TeardownError(e, _), AsyncError(e, _):
+						status(false, Std.string(e));
+						break;
+					case TimeoutError(e, _):
+						status(false, Std.string(e));
+						break;
+					case Warning(_):
+				}
+			}
+			#end
+
 			if (!itPromise.isResolved())
-				itDone.resolve({ status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null });
+				itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null } );
 		};
 
 		var errorTimeout : Promise<Bool> = null;
@@ -89,6 +111,9 @@ class SuiteRunner
 				}
 
 				try {
+					#if utest
+					Assert.results = new List<Assertation>();
+					#end
 					spec.run(done, status);
 					if (!spec.async) done();
 				}
