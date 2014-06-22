@@ -32,12 +32,15 @@ typedef SpecAssertion = Bool -> String -> Void;
 /**
  * This must be the first class in this package, since it overrides all other assertions otherwise.
  */
-class ShouldDynamic
+class ShouldDynamic extends Should<Dynamic>
 {
 	static public function should<T>(d : T, assert : SpecAssertion)
 	{
-		return new Should<T>(d, assert);
+		return new ShouldDynamic(d, assert);
 	}
+
+	public var not(get, never) : ShouldDynamic;
+	private function get_not() { return new ShouldDynamic(value, assert, !inverse); }
 }
 
 class ShouldInt extends Should<Int>
