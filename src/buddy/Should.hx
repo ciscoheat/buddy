@@ -1,5 +1,6 @@
 package buddy;
 import buddy.Should.ShouldIterable;
+import haxe.PosInfos;
 using Lambda;
 
 /*
@@ -60,14 +61,14 @@ class ShouldInt extends Should<Int>
 
 	//////////
 
-	public function beLessThan(expected : Int)
+	public function beLessThan(expected : Int, ?p : PosInfos)
 	{
-		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value');
+		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value @ ${p.fileName}:${p.lineNumber}');
 	}
 
-	public function beGreaterThan(expected : Int)
+	public function beGreaterThan(expected : Int, ?p : PosInfos)
 	{
-		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value');
+		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value @ ${p.fileName}:${p.lineNumber}');
 	}
 }
 
@@ -88,24 +89,24 @@ class ShouldFloat extends Should<Float>
 
 	//////////
 
-	public function beLessThan(expected : Float)
+	public function beLessThan(expected : Float, ?p : PosInfos)
 	{
-		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value');
+		assert(inverse ? value >= expected : value < expected, 'Expected less than $expected, was $value @ ${p.fileName}:${p.lineNumber}');
 	}
 
-	public function beGreaterThan(expected : Float)
+	public function beGreaterThan(expected : Float, ?p : PosInfos)
 	{
-		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value');
+		assert(inverse ? value <= expected : value > expected, 'Expected greater than $expected, was $value @ ${p.fileName}:${p.lineNumber}');
 	}
 
-	public function beCloseTo(expected : Float, precision : Int = 2)
+	public function beCloseTo(expected : Float, precision : Int = 2, ?p : PosInfos)
 	{
 		var test = Math.abs(expected - value) < (Math.pow(10, -precision) / 2);
 
 		if(inverse)
-			assert(!test, 'Expected $value not to be close to $expected');
+			assert(!test, 'Expected $value not to be close to $expected @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected close to $expected, was $value');
+			assert(test, 'Expected close to $expected, was $value @ ${p.fileName}:${p.lineNumber}');
 	}
 }
 
@@ -126,24 +127,24 @@ class ShouldString extends Should<String>
 
 	//////////
 
-	public function contain(substring : String)
+	public function contain(substring : String, ?p : PosInfos)
 	{
 		var test = value.indexOf(substring) >= 0;
 
 		if(inverse)
-			assert(!test, 'Expected "$value" not to contain "$substring"');
+			assert(!test, 'Expected "$value" not to contain "$substring" @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected "$value" to contain "$substring"');
+			assert(test, 'Expected "$value" to contain "$substring" @ ${p.fileName}:${p.lineNumber}');
 	}
 
-	public function match(regexp : EReg)
+	public function match(regexp : EReg, ?p : PosInfos)
 	{
 		var test = regexp.match(value);
 
 		if (inverse)
-			assert(!test, 'Expected "$value" not to match regular expression');
+			assert(!test, 'Expected "$value" not to match regular expression @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected "$value" to match regular expression');
+			assert(test, 'Expected "$value" to match regular expression @ ${p.fileName}:${p.lineNumber}');
 	}
 }
 
@@ -164,20 +165,20 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 
 	//////////
 
-	public function contain(o : T)
+	public function contain(o : T, ?p : PosInfos)
 	{
 		var test = Lambda.exists(value, function(el) { return el == o; });
 
 		if(inverse)
-			assert(!test, 'Expected $value not to contain "$o"');
+			assert(!test, 'Expected $value not to contain "$o" @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected $value to contain "$o"');
+			assert(test, 'Expected $value to contain "$o" @ ${p.fileName}:${p.lineNumber}');
 	}
 
 	/**
 	 * Test if iterable contains all of the following values.
 	 */
-	public function containAll(values : Iterable<T>)
+	public function containAll(values : Iterable<T>, ?p : PosInfos)
 	{
 		var test = true;
 
@@ -192,15 +193,15 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 		}
 
 		if(inverse)
-			assert(!test, 'Expected $value to not contain all of $values');
+			assert(!test, 'Expected $value to not contain all of $values @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected $value to contain all of $values');
+			assert(test, 'Expected $value to contain all of $values @ ${p.fileName}:${p.lineNumber}');
 	}
 
 	/**
 	 * Test if iterable contains exactly the following values and in the same iteration order.
 	 */
-	public function containExactly(values : Iterable<T>)
+	public function containExactly(values : Iterable<T>, ?p : PosInfos)
 	{
 		var a = value.iterator();
 		var b = values.iterator();
@@ -216,9 +217,9 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 		}
 
 		if(inverse)
-			assert(!test, 'Expected "$value" to not contain exactly "$values"');
+			assert(!test, 'Expected "$value" to not contain exactly "$values" @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected "$value" to contain exactly "$values"');
+			assert(test, 'Expected "$value" to contain exactly "$values" @ ${p.fileName}:${p.lineNumber}');
 	}
 }
 
@@ -247,7 +248,7 @@ class ShouldFunctions
 	/**
 	 * Will call the specified method and test if it throws a specific value.
 	 */
-	public function throwValue(v : Dynamic)
+	public function throwValue(v : Dynamic, ?p : PosInfos)
 	{
 		var test = false;
 		try { value(); }
@@ -257,15 +258,15 @@ class ShouldFunctions
 		}
 
 		if(inverse)
-			assert(!test, 'Expected $value not to throw "$v"');
+			assert(!test, 'Expected $value not to throw "$v" @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected $value to throw "$v"');
+			assert(test, 'Expected $value to throw "$v" @ ${p.fileName}:${p.lineNumber}');
 	}
 
 	/**
 	 * Will call the specified method and test if it throws a specific type.
 	 */
-	public function throwType(type : Class<Dynamic>)
+	public function throwType(type : Class<Dynamic>, ?p : PosInfos)
 	{
 		var test = false;
 		var name : String = null;
@@ -278,20 +279,20 @@ class ShouldFunctions
 		}
 
 		if(inverse)
-			assert(!test, 'Expected $value not to throw type $name');
+			assert(!test, 'Expected $value not to throw type $name @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(test, 'Expected $value to throw type $name');
+			assert(test, 'Expected $value to throw type $name @ ${p.fileName}:${p.lineNumber}');
 	}
 
 	/**
 	 * Test for equality between two value types (bool, int, float), or identity for reference types
 	 */
-	public function be(expected : Void -> Void) : Void
+	public function be(expected : Void -> Void, ?p : PosInfos) : Void
 	{
 		if(!inverse)
-			assert(value == expected, 'Expected ' + Std.string(expected) + ', was $value');
+			assert(value == expected, 'Expected ' + Std.string(expected) + ', was $value @ ${p.fileName}:${p.lineNumber}');
 		else
-			assert(value != expected, 'Expected not ' + Std.string(expected) + ' but was equal to that');
+			assert(value != expected, 'Expected not ' + Std.string(expected) + ' but was equal to that @ ${p.fileName}:${p.lineNumber}');
 	}
 }
 
@@ -313,21 +314,21 @@ class Should<T>
 	/**
 	 * Test for equality between two value types (bool, int, float), or identity for reference types
 	 */
-	public function be(expected : T) : Void
+	public function be(expected : T, ?p : PosInfos) : Void
 	{
 		if (Std.is(expected, String))
 		{
 			if(!inverse)
-				assert(value == expected, 'Expected "$expected", was "$value"');
+				assert(value == expected, 'Expected "$expected", was "$value" @ ${p.fileName}:${p.lineNumber}');
 			else
-				assert(value != expected, 'Expected not "$expected" but was equal to that');
+				assert(value != expected, 'Expected not "$expected" but was equal to that @ ${p.fileName}:${p.lineNumber}');
 		}
 		else
 		{
 			if(!inverse)
-				assert(value == expected, 'Expected ' + Std.string(expected) + ', was $value');
+				assert(value == expected, 'Expected ' + Std.string(expected) + ', was $value @ ${p.fileName}:${p.lineNumber}');
 			else
-				assert(value != expected, 'Expected not ' + Std.string(expected) + ' but was equal to that');
+				assert(value != expected, 'Expected not ' + Std.string(expected) + ' but was equal to that @ ${p.fileName}:${p.lineNumber}');
 		}
 	}
 }
