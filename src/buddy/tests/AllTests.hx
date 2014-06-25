@@ -82,6 +82,18 @@ class TestBasicFeatures extends BuddySuite
 				str.should().match(~/a\w+/);
 				str.should().not.match(~/\d+/);
 			});
+
+			it("should have a startWith() method", {
+				str.should().startWith("a");
+				str.should().startWith("abc");
+				str.should().not.startWith("b");
+			});
+
+			it("should have an endWith() method", {
+				str.should().endWith("c");
+				str.should().endWith("abc");
+				str.should().not.endWith("b");
+			});
 		});
 
 		describe("Testing ints", {
