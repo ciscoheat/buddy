@@ -28,7 +28,7 @@ before_install:
   - sh -c "if [ '$TARGET' = 'cpp' ]; then sudo apt-get install gcc-multilib g++-multilib -y; fi"
   - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get install mono-devel -y; fi"
   - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get install phantomjs -y; fi"
-  #- sh -c "if [ '$TARGET' = 'php' ]; then sudo apt-get install php5-cli -y; fi"
+  - sh -c "if [ '$TARGET' = 'php' ]; then sudo apt-get install php5 -y; fi"
 
   # haxelib dependencies for each target
   - sh -c "if [ '$TARGET' = 'cpp' ]; then haxelib install hxcpp; fi"
