@@ -25,7 +25,7 @@ before_install:
   - haxelib install utest
 
   # apt packages for each target
-  - apt-get update
+  - sudo apt-get update
   - sh -c "if [ '$TARGET' = 'cpp' ]; then sudo apt-get install gcc-multilib g++-multilib -y; fi"
   - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get install mono-devel -y; fi"
   - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get install phantomjs -y; fi"
