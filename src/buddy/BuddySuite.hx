@@ -2,6 +2,7 @@ package buddy ;
 import buddy.BuddySuite.Spec;
 import buddy.BuddySuite.Suite;
 import buddy.reporting.Reporter;
+import haxe.CallStack;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.Should;
@@ -57,6 +58,7 @@ class Spec
 	public var async(default, null) : Bool;
 	public var status(default, null) : TestStatus;
 	public var error(default, null) : String;
+	@:allow(buddy.internal.SuiteRunner) public var stack(default, null) : Null<Array<StackItem>>;
 	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
 
 	@:allow(buddy.internal.SuiteRunner) private var run : Action;

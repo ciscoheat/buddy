@@ -1,6 +1,7 @@
 package buddy.internal;
 import buddy.BuddySuite;
 import buddy.reporting.Reporter;
+import haxe.CallStack;
 import promhx.Deferred;
 import promhx.Promise;
 
@@ -78,10 +79,15 @@ class SuiteRunner
 			{
 				switch a {
 					case Success(_): hasStatus = true;
-					case Failure(e, _), Error(e, _), SetupError(e, _), TeardownError(e, _), AsyncError(e, _):
+					case Failure(e, _):
 						status(false, Std.string(e));
 						break;
-					case TimeoutError(e, _):
+					case Error(e, stack), SetupError(e, stack), TeardownError(e, stack), AsyncError(e, stack):
+						spec.stack = stack;
+						status(false, Std.string(e));
+						break;
+					case TimeoutError(e, stack):
+						spec.stack = stack;
 						status(false, Std.string(e));
 						break;
 					case Warning(_):
@@ -118,6 +124,7 @@ class SuiteRunner
 					if (!spec.async) done();
 				}
 				catch (e : Dynamic) {
+					spec.stack = CallStack.exceptionStack();
 					status(false, Std.string(e));
 				}
 

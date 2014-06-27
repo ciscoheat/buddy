@@ -226,6 +226,10 @@ The compiler seems to be a bit too good at optimizing sometimes, especially at t
 
 Yes, there is special support for [utest](http://code.google.com/p/utest/) and general support for all libraries that throws an exception on failure (like [mockatoo](https://github.com/misprintt/mockatoo) ). To use utest, just call any `utest.Assert` method inside a spec, no need to set up anything else.
 
+### There's an exception thrown in an asynchronous method, but Buddy won't catch it and fail the test?
+
+It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done()` in the spec.
+
 ## The story behind Buddy
 
 After my speech about Contracts at [WWX2014](wwx.silexlabs.org/2014/), I concluded that one does not simply bash unit testing without providing a nice alternative! Having used [Jasmine](http://jasmine.github.io/2.0/introduction.html) before, I borrowed some if its nice features, and found the perfect aid to implementing async support with the [promhx](https://github.com/jdonaldson/promhx) library.

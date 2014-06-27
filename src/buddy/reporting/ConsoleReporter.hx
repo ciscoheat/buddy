@@ -2,8 +2,10 @@ package buddy.reporting ;
 
 import buddy.BuddySuite;
 import buddy.reporting.Reporter;
+import haxe.CallStack;
 import promhx.Deferred;
 import promhx.Promise;
+using Lambda;
 
 #if nodejs
 import buddy.internal.sys.NodeJs;
@@ -69,7 +71,21 @@ class ConsoleReporter implements Reporter
 			for (sp in s.specs)
 			{
 				if (sp.status == TestStatus.Failed)
+				{
 					Sys.println("  " + sp.description + " (FAILED: " + sp.error + ")");
+
+					if (sp.stack == null || sp.stack.length == 0) continue;
+
+					// Display the exception stack
+					var stack = sp.stack.copy();
+					stack.reverse();
+
+					for (s in stack) switch s {
+						case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
+							Sys.println('    @ $file:$line');
+						case _:
+					}
+				}
 				else
 					Sys.println("  " + sp.description + " (" + sp.status + ")");
 			}
