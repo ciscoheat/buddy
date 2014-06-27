@@ -77,10 +77,7 @@ class ConsoleReporter implements Reporter
 					if (sp.stack == null || sp.stack.length == 0) continue;
 
 					// Display the exception stack
-					var stack = sp.stack.copy();
-					stack.reverse();
-
-					for (s in stack) switch s {
+					for (s in sp.stack) switch s {
 						case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
 							Sys.println('    @ $file:$line');
 						case _:
