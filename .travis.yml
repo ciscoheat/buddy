@@ -16,8 +16,7 @@ env:
 
 before_install:
   # Install Haxe
-  # Until it's fixed on the OpenFL site, use the patched script:
-  - wget https://gist.githubusercontent.com/ciscoheat/8884e80d6096fb3a211b/raw/a46a1566a9cbe49d9eed256477661eaf1856f0f5/install-haxe.sh
+  - wget http://www.openfl.org/builds/haxe/haxe-3.1.3-linux-installer.tar.gz -O - | tar -xz
   - sudo sh install-haxe.sh -y
 
   # haxelib dependencies for all targets
