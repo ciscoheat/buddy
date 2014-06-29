@@ -44,7 +44,7 @@ class SuiteRunner
 		var pr = def.promise();
 		var done = function() { def.resolve(b); };
 
-		b.run(done, function(s, err) {});
+		b.run(done, function(s, err, stack) {});
 		if (!b.async) done();
 
 		return pr;
@@ -67,16 +67,16 @@ class SuiteRunner
 		}
 
 		// It = The it part only
-		var itDone = new Deferred<{status : TestStatus, error : String}>();
+		var itDone = new Deferred<{status: TestStatus, error: String, stack: Array<StackItem>}>();
 		var itPromise = itDone.promise();
 
 		// The function that sets test status
 		var hasStatus = false;
-		var status = function(s, error)
+		var status = function(s, error, stack)
 		{
 			hasStatus = true;
 			if (!s && !itPromise.isResolved())
-				itDone.resolve( { status: TestStatus.Failed, error: error } );
+				itDone.resolve( { status: TestStatus.Failed, error: error, stack: stack } );
 		};
 
 		// The function that should be called when an async operation has completed.
@@ -86,17 +86,17 @@ class SuiteRunner
 			for (a in Assert.results)
 			{
 				switch a {
-					case Success(_): hasStatus = true;
-					case Failure(e, _):
-						status(false, Std.string(e));
+					case Success(_):
+						hasStatus = true;
+					case Failure(e, pos):
+						var stack = [StackItem.FilePos(null, pos.fileName, pos.lineNumber)];
+						status(false, Std.string(e), stack);
 						break;
 					case Error(e, stack), SetupError(e, stack), TeardownError(e, stack), AsyncError(e, stack):
-						spec.stack = stack;
-						status(false, Std.string(e));
+						status(false, Std.string(e), stack);
 						break;
 					case TimeoutError(e, stack):
-						spec.stack = stack;
-						status(false, Std.string(e));
+						status(false, Std.string(e), stack);
 						break;
 					case Warning(_):
 				}
@@ -104,7 +104,7 @@ class SuiteRunner
 			#end
 
 			if (!itPromise.isResolved())
-				itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null } );
+				itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null, stack: null } );
 		};
 
 		var errorTimeout : Promise<Bool> = null;
@@ -120,7 +120,7 @@ class SuiteRunner
 					errorTimeout
 						.catchError(function(e : Dynamic) if(e != null) throw e)
 						.then(function(_) {
-							status(false, 'Timeout after $timeout ms');
+							status(false, 'Timeout after $timeout ms', null);
 						});
 				}
 
@@ -132,8 +132,7 @@ class SuiteRunner
 					if (!spec.async) done();
 				}
 				catch (e : Dynamic) {
-					spec.stack = CallStack.exceptionStack();
-					status(false, Std.string(e));
+					status(false, Std.string(e), CallStack.exceptionStack());
 				}
 
 				return itPromise;
@@ -146,7 +145,7 @@ class SuiteRunner
 					errorTimeout = null;
 				}
 
-				spec.setStatus(result.status, result.error);
+				spec.setStatus(result.status, result.error, result.stack);
 				return suite.after.iterateAsyncBool(runBeforeAfter);
 			})
 			.then(function(_) { specDone.resolve(spec); } );

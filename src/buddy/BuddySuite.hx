@@ -66,10 +66,11 @@ class Spec
 
 	@:allow(buddy.internal.SuiteRunner) private var run : Action;
 
-	@:allow(buddy.internal.SuiteRunner) private function setStatus(s : TestStatus, err : String)
+	@:allow(buddy.internal.SuiteRunner) private function setStatus(s : TestStatus, err : String, stack : Array<StackItem>)
 	{
 		this.status = s;
 		this.error = err;
+		this.stack = stack;
 	}
 
 	public function new(suite : Suite, description : String, run : Action, async = false, pending = false)

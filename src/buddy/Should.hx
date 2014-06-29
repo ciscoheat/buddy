@@ -1,6 +1,7 @@
 package buddy;
 import buddy.Should.ShouldIterable;
 import haxe.PosInfos;
+import haxe.CallStack;
 using Lambda;
 using StringTools;
 
@@ -29,7 +30,7 @@ X toThrowError("quux");
 /**
  * A function that specifies the status for a spec with an optional error message.
  */
-typedef SpecAssertion = Bool -> String -> Void;
+typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 
 /**
  * This must be the first class in this package, since it overrides all other assertions otherwise.
@@ -323,17 +324,17 @@ class ShouldFunctions
 		return Std.is(v, String) ? '"$v"' : Std.string(v);
 	}
 
-	private function posInfo(p : PosInfos)
+	private function stackPos(p : PosInfos)
 	{
-		return ' @ ${p.fileName}:${p.lineNumber}';
+		return [StackItem.FilePos(null, p.fileName, p.lineNumber)];
 	}
 
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
 		if(!inverse)
-			assert(expr, error + posInfo(p));
+			assert(expr, error, stackPos(p));
 		else
-			assert(!expr, error + posInfo(p));
+			assert(!expr, errorInverted, stackPos(p));
 	}
 }
 
@@ -368,16 +369,16 @@ class Should<T>
 		return Std.is(v, String) ? '"$v"' : Std.string(v);
 	}
 
-	private function posInfo(p : PosInfos)
+	private function stackPos(p : PosInfos)
 	{
-		return ' @ ${p.fileName}:${p.lineNumber}';
+		return [StackItem.FilePos(null, p.fileName, p.lineNumber)];
 	}
 
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
 		if(!inverse)
-			assert(expr, error + posInfo(p));
+			assert(expr, error, stackPos(p));
 		else
-			assert(!expr, errorInverted + posInfo(p));
+			assert(!expr, errorInverted, stackPos(p));
 	}
 }
