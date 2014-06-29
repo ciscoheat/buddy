@@ -62,6 +62,7 @@ class Spec
 	public var status(default, null) : TestStatus;
 	public var error(default, null) : String;
 	@:allow(buddy.internal.SuiteRunner) public var stack(default, null) : Null<Array<StackItem>>;
+	@:allow(buddy.internal.SuiteRunner) public var traces(default, null) : List<String>;
 	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
 
 	@:allow(buddy.internal.SuiteRunner) private var run : Action;
@@ -79,6 +80,7 @@ class Spec
 		this.description = description;
 		this.run = run;
 		this.async = async;
+		this.traces = new List<String>();
 
 		if (run == null) this.status = TestStatus.Pending;
 		else this.status = pending ? TestStatus.Pending : TestStatus.Unknown;

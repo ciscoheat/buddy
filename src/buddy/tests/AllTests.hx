@@ -271,6 +271,18 @@ class TestBasicFeatures extends BuddySuite
 				this.suites.find(function(s) { return s.name == "Excluding suites with @exclude"; } ).should.be(null);
 			});
 		});
+
+		describe("Using trace() calls", {
+			it("should reroute the trace output to the reporter", {
+				trace("Test trace");
+			});
+
+			after( {
+				var test = this.suites.last().specs[0];
+				if (test.traces.first().startsWith("AllTests.hx") && test.traces.first().endsWith("Test trace"))
+					Reflect.setProperty(test, "status", TestStatus.Passed);
+			});
+		});
 	}
 }
 

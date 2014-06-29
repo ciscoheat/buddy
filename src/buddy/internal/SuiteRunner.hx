@@ -2,6 +2,8 @@ package buddy.internal;
 import buddy.BuddySuite;
 import buddy.reporting.Reporter;
 import haxe.CallStack;
+import haxe.Log;
+import haxe.PosInfos;
 import promhx.Deferred;
 import promhx.Promise;
 
@@ -27,13 +29,14 @@ class SuiteRunner
 
 	public function run() : Promise<Suite>
 	{
+		var traceFunc = Log.trace;
 		var def = new Deferred<Suite>();
 		var pr = def.promise();
 
 		buddySuite.befores.iterateAsyncBool(runBeforeAfter)
 			.pipe(function(_) return suite.specs.iterateAsyncBool(runSpec))
 			.pipe(function(_) return buddySuite.afters.iterateAsyncBool(runBeforeAfter))
-			.then(function(_) def.resolve(suite));
+			.then(function(_) { Log.trace = traceFunc; def.resolve(suite); });
 
 		return pr;
 	}
@@ -105,6 +108,10 @@ class SuiteRunner
 
 			if (!itPromise.isResolved())
 				itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null, stack: null } );
+		};
+
+		Log.trace = function(v, ?pos : PosInfos) {
+			spec.traces.add(pos.fileName + ":" + pos.lineNumber + ": " + Std.string(v));
 		};
 
 		var errorTimeout : Promise<Bool> = null;

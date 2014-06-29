@@ -74,6 +74,8 @@ class ConsoleReporter implements Reporter
 				{
 					Sys.println("  " + sp.description + " (FAILED: " + sp.error + ")");
 
+					printTraces(sp);
+
 					if (sp.stack == null || sp.stack.length == 0) continue;
 
 					// Display the exception stack
@@ -84,7 +86,10 @@ class ConsoleReporter implements Reporter
 					}
 				}
 				else
+				{
 					Sys.println("  " + sp.description + " (" + sp.status + ")");
+					printTraces(sp);
+				}
 			}
 		}
 
@@ -95,6 +100,12 @@ class ConsoleReporter implements Reporter
 		#end
 
 		return resolveImmediately(suites);
+	}
+
+	function printTraces(spec : Spec)
+	{
+		for (t in spec.traces)
+			Sys.println("    " + t);
 	}
 
 	private function resolveImmediately<T>(o : T) : Promise<T>
