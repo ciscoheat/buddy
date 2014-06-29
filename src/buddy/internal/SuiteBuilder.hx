@@ -137,7 +137,6 @@ class SuiteBuilder
 			switch(f.kind)
 			{
 				case FFun(f):
-					f.expr.iter(injectAsync);
 					switch(f.expr.expr)
 					{
 						case EBlock(exprs):
@@ -145,9 +144,29 @@ class SuiteBuilder
 							{
 								switch(e)
 								{
+									// Replace before/after outside describe with corresponding init functions.
+
+									case macro before(function($n) $f):
+										var change = macro beforeDescribe(function($n, __status) $f);
+										e.expr = change.expr;
+
+									case macro before(function() $f), macro before($f):
+										var change = macro syncBeforeDescribe(function(__asyncDone, __status) $f);
+										e.expr = change.expr;
+
+									case macro after(function($n) $f):
+										var change = macro afterDescribe(function($n, __status) $f);
+										e.expr = change.expr;
+
+									case macro after(function() $f), macro after($f):
+										var change = macro syncAfterDescribe(function(__asyncDone, __status) $f);
+										e.expr = change.expr;
+
+									// Test if a super call exists.
+
 									case macro super():
 										exists = true;
-										break;
+
 									case _:
 								}
 							}
@@ -157,6 +176,7 @@ class SuiteBuilder
 
 						case _:
 					}
+					f.expr.iter(injectAsync);
 
 				case _:
 			}

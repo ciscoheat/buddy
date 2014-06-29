@@ -42,6 +42,9 @@ class Suite
 
 	public function new(name : String, buddySuite : BuddySuite)
 	{
+		if (name == null) throw "Suite requires a name.";
+		if (buddySuite == null) throw "Suite requires a BuddySuite.";
+
 		this.name = name;
 		this.buddySuite = buddySuite;
 
@@ -86,6 +89,9 @@ class BuddySuite
 {
 	public var suites(default, null) : List<Suite>;
 
+	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var befores : List<BeforeAfter>;
+	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var afters : List<BeforeAfter>;
+
 	// If set, suites are only included if marked by @include or if one of its specs are marked with @include
 	public static var includeMode : Bool;
 
@@ -100,6 +106,9 @@ class BuddySuite
 	public function new()
 	{
 		this.suites = new List<Suite>();
+		this.befores = new List<BeforeAfter>();
+		this.afters = new List<BeforeAfter>();
+
 		this.timeoutMs = 5000;
 	}
 
@@ -173,7 +182,27 @@ class BuddySuite
 		syncIt(desc, test, false, true);
 	}
 
+	@:noCompletion private function beforeDescribe(init : Action)
+	{
+		syncBeforeDescribe(init, true);
+	}
+
+	@:noCompletion private function afterDescribe(init : Action)
+	{
+		syncAfterDescribe(init, true);
+	}
+
 	///// Hidden syncronous handlers /////
+
+	@:noCompletion private function syncBeforeDescribe(init : Action, async = false)
+	{
+		befores.add(new BeforeAfter(init, async));
+	}
+
+	@:noCompletion private function syncAfterDescribe(init : Action, async = false)
+	{
+		afters.add(new BeforeAfter(init, async));
+	}
 
 	@:noCompletion private function syncBefore(init : Action, async = false)
 	{

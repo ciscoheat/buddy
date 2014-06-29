@@ -32,6 +32,11 @@ class TestBasicFeatures extends BuddySuite
 
 			it("should set the variable a to 1 in the before function", {
 				a.should.be(1);
+				a = 2;
+			});
+
+			it("'before' should be run before every 'it' specification", {
+				a.should.be(1);
 			});
 		});
 
@@ -382,6 +387,59 @@ class UtestUsage extends BuddySuite
 				var test = this.suites.first().specs[1];
 				if (test.status == TestStatus.Failed && test.error == "expected true")
 					Reflect.setProperty(test, "status", TestStatus.Passed);
+			});
+		});
+	}
+}
+
+class BeforeAfterDescribe extends BuddySuite
+{
+	public function new()
+	{
+		var a = 0;
+
+		before({
+			a = 1;
+		});
+
+		describe("Using a 'before' and 'after' block outside describe", {
+			it("should run the blocks before each describe in the class.", {
+				a.should.be(1);
+			});
+		});
+
+		describe("Using a 'before' and 'after' block outside another describe", {
+			it("should run the blocks before and after that describe too.", {
+				a.should.be(1);
+			});
+		});
+
+		after({
+			a = 0;
+		});
+	}
+}
+
+class BeforeAfterDescribe2 extends BuddySuite
+{
+	public function new()
+	{
+		var a = 0;
+
+		after(function(done) {
+			a = 1;
+			done();
+		});
+
+		describe("Using an 'after' block outside describe", {
+			it("should not run the after block before the first describe.", {
+				a.should.be(0);
+			});
+		});
+
+		describe("Using an 'after' block outside another describe in the same class", {
+			it("should run the after blocks before and after the second describe.", {
+				a.should.be(1);
 			});
 		});
 	}

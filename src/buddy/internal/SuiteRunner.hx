@@ -27,7 +27,15 @@ class SuiteRunner
 
 	public function run() : Promise<Suite>
 	{
-		return suite.specs.iterateAsync(runSpec, suite);
+		var def = new Deferred<Suite>();
+		var pr = def.promise();
+
+		buddySuite.befores.iterateAsyncBool(runBeforeAfter)
+			.pipe(function(_) return suite.specs.iterateAsyncBool(runSpec))
+			.pipe(function(_) return buddySuite.afters.iterateAsyncBool(runBeforeAfter))
+			.then(function(_) def.resolve(suite));
+
+		return pr;
 	}
 
 	private function runBeforeAfter(b : BeforeAfter) : Promise<BeforeAfter>
@@ -36,7 +44,7 @@ class SuiteRunner
 		var pr = def.promise();
 		var done = function() { def.resolve(b); };
 
-		b.run(done, function(s : Bool, err : String) {});
+		b.run(done, function(s, err) {});
 		if (!b.async) done();
 
 		return pr;
