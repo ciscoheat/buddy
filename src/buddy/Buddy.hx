@@ -1,3 +1,3 @@
 package buddy;
 
-@:autoBuild(buddy.internal.GenerateMain.build()) interface Buddy {}
+@:autoBuild(buddy.GenerateMain.build()) interface Buddy {}

@@ -210,7 +210,7 @@ At this early point there is no ultra-convenient way of customizing how the test
 The build macro used will by default include all `.hx` files in the class path so it can find the relevant subclasses of `buddy.BuddySuite` without you having to import them manually. If you would prefer to control which packages are imported, you can call the build macro manually:
 
 ```haxe
-@:build(buddy.internal.GenerateMain.build(["pack1","pack2.subpack"]))
+@:build(buddy.GenerateMain.build(["pack1","pack2.subpack"]))
 class Tests extends BuddySuite {}
 ```
 
