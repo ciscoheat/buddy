@@ -113,8 +113,9 @@ class ShouldFloat extends Should<Float>
 		);
 	}
 
-	public function beCloseTo(expected : Float, precision : Int = 2, ?p : PosInfos)
+	public function beCloseTo(expected : Float, precision : Null<Float> = 2, ?p : PosInfos)
 	{
+		// For some reason, precision must be of a Nullable type in flash or it will be 0 sometimes?!
 		var expr = Math.abs(expected - value) < (Math.pow(10, -precision) / 2);
 
 		test(expr, p,

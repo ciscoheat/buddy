@@ -328,7 +328,8 @@ class TestAsync extends BuddySuite
 
 				timeoutErrorTest.status.should.be(TestStatus.Unknown);
 
-				AsyncTools.wait(20).then(function(_) {
+				// Wait long enough for all targets to fail properly. (Had problems on flash when wait = 20)
+				AsyncTools.wait(100).then(function(_) {
 					if (timeoutErrorTest.status == TestStatus.Failed)
 						Reflect.setProperty(timeoutErrorTest, "status", TestStatus.Passed);
 

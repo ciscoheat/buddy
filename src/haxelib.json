@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.10.0",
-  "releasenote": "Before/after allowed outside describe. Better failed assertion message output, trace calls routed to spec.",
+  "version": "0.10.1",
+  "releasenote": "Fixed some failing tests for Flash.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
