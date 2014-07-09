@@ -275,12 +275,18 @@ class TestBasicFeatures extends BuddySuite
 		describe("Using trace() calls", {
 			it("should reroute the trace output to the reporter", {
 				trace("Test trace");
+				trace("Test trace 2");
 			});
 
-			after( {
+			after({
 				var test = this.suites.last().specs[0];
-				if (test.traces.first().startsWith("AllTests.hx") && test.traces.first().endsWith("Test trace"))
+				if (test.traces.first().startsWith("AllTests.hx")
+					&& test.traces.length == 2
+					&& test.traces.first().endsWith("Test trace")
+					&& test.traces.last().endsWith("Test trace 2"))
+				{
 					Reflect.setProperty(test, "status", TestStatus.Passed);
+				}
 			});
 		});
 	}

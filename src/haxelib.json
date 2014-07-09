@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.10.1",
-  "releasenote": "Fixed some failing tests for Flash.",
+  "version": "0.10.2",
+  "releasenote": "Fixed dead code elimination problems.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
