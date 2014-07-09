@@ -50,10 +50,14 @@ class AutoIncluder
 			case _:
 		}
 
-		var classes = allowed(classTypes).map(function(c) { return toTypeStringExpr(c); } );
+		var classes = allowed(classTypes);
+
+		// Add :keep metadata to prevent dead code elimination
+		for (c in classes)
+			c.meta.add(":keep", [], c.pos);
 
 		//classes.push(toTypeStringExpr(t.get()));
-		onClass.meta.add(metaName, classes, onClass.pos);
+		onClass.meta.add(metaName, classes.map(function(c) return toTypeStringExpr(c)), onClass.pos);
 	}
 
 	public static function toTypeString(type : ClassType) : String

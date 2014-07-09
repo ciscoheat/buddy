@@ -141,7 +141,9 @@ class GenerateMain
 				}
 
 				var runner = new buddy.SuitesRunner(suites, reporter);
-				runner.run().then(function(_) { untyped __js__("process.exit(runner.statusCode())"); } );
+
+				// Windows bug doesn't flush stdout properly, need to wait: https://github.com/joyent/node/issues/3584
+				runner.run().then(function(_) { untyped __js__("if(process.platform == 'win32') { process.once('exit', function() { process.exit(runner.statusCode()); }); } else { process.exit(runner.statusCode()); }"); } );
 			};
 		}
 		else if(Context.defined("php") || Context.defined("java"))

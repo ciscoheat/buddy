@@ -7,6 +7,7 @@ import promhx.Promise;
 import buddy.BuddySuite;
 using buddy.tools.AsyncTools;
 
+@:keep // prevent dead code elimination
 class SuitesRunner
 {
 	private var suites : Iterable<Suite>;

@@ -37,7 +37,7 @@ before_install:
 
 # Run the test!
 script:
-  - haxe buddy.${TARGET}.hxml
+  - haxe buddy.${TARGET}.hxml && haxe -dce full buddy.${TARGET}.hxml
 
 branches:
       only:
