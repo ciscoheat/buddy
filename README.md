@@ -225,6 +225,8 @@ Sometimes, 3:rd party libraries included with `-cp` will have some issues that w
 class Tests extends BuddySuite {}
 ```
 
+This problem can sometimes be fixed by specifying packages instead (as in the previous question), so you can decide whether you want to use packages or classpaths to avoid getting 3:rd party library errors. Or perhaps the best solution: Tell the library author about the error. :)
+
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
 The compiler seems to be a bit too good at optimizing sometimes, especially at the beginning of functions, so if you get this problem add a parenthesis after "should" and wrap numbers in parenthesis too.
