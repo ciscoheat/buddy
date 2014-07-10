@@ -15,13 +15,18 @@ using Lambda;
 
 class GenerateMain
 {
-	macro public static function build( ?packages:Array<String> ) : Array<Field>
+	/**
+	 * Generates code for running all BuddySuite classes in the project automatically.
+	 * @param	packages Only include these packages
+	 * @param	classPaths Only include these classpaths (use if you experience strange compile errors)
+	 */
+	macro public static function build( ?packages : Array<String>, ?classPaths : Array<String> ) : Array<Field>
 	{
 		var cls = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
 		var found = false;
 
-		AutoIncluder.run(cls, packages, typeIsSuite);
+		AutoIncluder.run(cls, packages, classPaths, typeIsSuite);
 
 		for (f in fields)
 		{

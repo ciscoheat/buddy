@@ -11,7 +11,8 @@ using buddy.Should;
 using Lambda;
 using StringTools;
 
-class AllTests implements Buddy {}
+@:build(buddy.GenerateMain.build(null, ["src"]))
+class AllTests {} // implements Buddy {}
 
 class EmptyTestClass { public function new() {} }
 

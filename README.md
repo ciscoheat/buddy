@@ -207,10 +207,21 @@ Ok, you noticed that it was missing! Using some macro magic, you only need to im
 
 At this early point there is no ultra-convenient way of customizing how the tests are run, but if you really want to run your tests manually, use the `buddy.SuitesRunner` class together with a `buddy.reporting.ConsoleReporter`, or make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface.
 
+### Can I include only specific packages?
+
 The build macro used will by default include all `.hx` files in the class path so it can find the relevant subclasses of `buddy.BuddySuite` without you having to import them manually. If you would prefer to control which packages are imported, you can call the build macro manually:
 
 ```haxe
 @:build(buddy.GenerateMain.build(["pack1","pack2.subpack"]))
+class Tests extends BuddySuite {}
+```
+
+### Why do I get strange compilation errors not related to my project?
+
+Sometimes, 3:rd party libraries included with `-cp` will have some issues that won't show up unless a class is explicitly referenced, but when including all classpaths automatically like Buddy does, the compiler will detect those problems and fail compilation. The solution is to only specify the classpaths you want included, using a second parameter of the build macro:
+
+```haxe
+@:build(buddy.GenerateMain.build(null, ["src"]))
 class Tests extends BuddySuite {}
 ```
 

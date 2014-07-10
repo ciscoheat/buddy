@@ -12,34 +12,35 @@ using StringTools;
 class AutoIncluder
 {
 	#if macro
-	public static function run(onClass : ClassType, includePackages : Array<String>, allowed : Array<ClassType> -> Array<ClassType>, metaName = "autoIncluded")
+	public static function run(onClass : ClassType, includePackages : Array<String>, includePaths : Array<String>, allowed : Array<ClassType> -> Array<ClassType>, metaName = "autoIncluded")
 	{
-		if (includePackages == null) includePackages = [""];
-		var excludePaths = [];
-
-		for (p in Context.getClassPath())
+		if (includePackages == null || includePackages.length == 0) includePackages = [""];
+		if (includePaths == null || includePaths.length == 0)
 		{
-			p = p.replace("\\", "/");
+			var excludePaths = [];
 
-			var i = p.indexOf("/promhx/");
-			if (i > 0) excludePaths.push(p.substr(0, i));
+			for (p in Context.getClassPath())
+			{
+				p = p.replace("\\", "/");
 
-			i = p.indexOf("/extraLibs");
-			if (i > 0) excludePaths.push(p.substr(0, p.length - "/extraLibs".length));
-		}
+				var i = p.indexOf("/promhx/");
+				if (i > 0) excludePaths.push(p.substr(0, i));
 
-		//var haxePath = new Process("haxelib", ["config"]).stdout.readAll().toString().replace("\\", "/");
-		var paths = Context.getClassPath().filter(function(p) {
-			p = p.replace("\\", "/");
-			return !excludePaths.exists(function(p2) {
-				return p.indexOf(p2) >= 0;
+				i = p.indexOf("/extraLibs");
+				if (i > 0) excludePaths.push(p.substr(0, p.length - "/extraLibs".length));
+			}
+
+			//var haxePath = new Process("haxelib", ["config"]).stdout.readAll().toString().replace("\\", "/");
+			includePaths = Context.getClassPath().filter(function(p) {
+				p = p.replace("\\", "/");
+				return !excludePaths.exists(function(p2) return p.indexOf(p2) >= 0);
 			});
-		});
+		}
 
 		Context.onGenerate(getClasses.bind(_, onClass, allowed, metaName));
-		for (pack in includePackages) {
-			Compiler.include(pack, true, [], paths);
-		}
+
+		for (pack in includePackages)
+			Compiler.include(pack, true, [], includePaths);
 	}
 
 	private static function getClasses(types : Array<Type>, onClass : ClassType, allowed : Array<ClassType> -> Array<ClassType>, metaName : String) : Void

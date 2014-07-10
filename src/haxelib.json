@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.10.2",
-  "releasenote": "Fixed dead code elimination problems.",
+  "version": "0.10.3",
+  "releasenote": "Added option to include only specific classpaths.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
