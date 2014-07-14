@@ -464,3 +464,24 @@ class BeforeAfterDescribe2 extends BuddySuite
 		});
 	}
 }
+
+class BeforeAfterDescribe3 extends BuddySuite
+{
+	public function new()
+	{
+
+		describe('outer describe', function () {
+			var a = 0;
+			before({
+				a = 1;
+			});
+
+			describe('inner describe', function () {
+				it('should run the before function before this spec', function () {
+					a.should.be(1);
+				});
+			});
+		});
+	}
+}
+
