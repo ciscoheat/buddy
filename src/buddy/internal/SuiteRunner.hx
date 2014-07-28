@@ -34,7 +34,7 @@ class SuiteRunner
 		var pr = def.promise();
 
 		buddySuite.befores.iterateAsyncBool(runBeforeAfter)
-			.pipe(function(_) return suite.specs.iterateAsyncBool(runSpec))
+			.pipe(function(_) return suite.steps.iterateAsyncBool(runSteps))
 			.pipe(function(_) return buddySuite.afters.iterateAsyncBool(runBeforeAfter))
 			.then(function(_) { Log.trace = traceFunc; def.resolve(suite); });
 
@@ -51,6 +51,19 @@ class SuiteRunner
 		if (!b.async) done();
 
 		return pr;
+	}
+
+	private function runSteps(step : TestStep) : Promise<TestStep>
+	{
+		var stepDone = new Deferred<TestStep>();
+		var stepPr = stepDone.promise();
+
+		switch step {
+			case TSpec(spec): runSpec(spec).then(function(_) stepDone.resolve(step));
+			case TSuite(s): new SuiteRunner(s, reporter).run().then(function(_) stepDone.resolve(step));
+		}
+
+		return stepPr;
 	}
 
 	private function runSpec(spec : Spec) : Promise<Spec>

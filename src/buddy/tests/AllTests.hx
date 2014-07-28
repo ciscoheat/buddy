@@ -246,12 +246,6 @@ class TestBasicFeatures extends BuddySuite
 			xit("should mark this as pending too.", {
 				true.should.be(false); // Make it fail if it runs
 			});
-
-			it("should set specs marked with @exclude to Pending", {
-				var suite = this.suites.find(function(s) { return s.name == "Excluding specs with @exclude and xit()"; } );
-				suite.specs[0].status.should.be(TestStatus.Pending);
-				suite.specs[1].status.should.be(TestStatus.Pending);
-			});
 		});
 
 		xdescribe("Excluding suites with xdescribe()", {
@@ -280,7 +274,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 
 			after({
-				var test = this.suites.last().specs[0];
+				var test = this.suites.last().specs.first();
 				if (test.traces.first().startsWith("AllTests.hx")
 					&& test.traces.length == 2
 					&& test.traces.first().endsWith("Test trace")
@@ -369,7 +363,7 @@ class TestExceptionHandling extends BuddySuite
 			});
 
 			after({
-				var test = this.suites.first().specs[0];
+				var test = this.suites.first().specs.first();
 				if (test.status == TestStatus.Failed && test.error == "Test error!")
 					Reflect.setProperty(test, "status", TestStatus.Passed);
 			});
@@ -404,7 +398,7 @@ class UtestUsage extends BuddySuite
 			#end
 
 			after({
-				var test = this.suites.first().specs[1];
+				var test = this.suites.first().specs.array()[1];
 				if (test.status == TestStatus.Failed && test.error == "expected true")
 					Reflect.setProperty(test, "status", TestStatus.Passed);
 			});
@@ -469,17 +463,30 @@ class BeforeAfterDescribe3 extends BuddySuite
 {
 	public function new()
 	{
-
-		describe('outer describe', function () {
+		describe('Using nested describes', function () {
 			var a = 0;
+
 			before({
 				a = 1;
 			});
 
-			describe('inner describe', function () {
-				it('should run the before function before this spec', function () {
+			it('should not run the specs described after an "it"', function() {
+				this.suites.first().suites.first().specs.first().status.should.be(TestStatus.Unknown);
+			});
+
+			describe('When nesting describes', function () {
+				it('should run the inner "before" function before the spec', function () {
 					a.should.be(1);
 				});
+
+				it('should list the specs in the nested suite', function () {
+					var test = this.suites.first().suites.first().specs.first();
+					test.description.should.be('should list the specs in the nested suite');
+				});
+			});
+
+			it('should have run the specs described before an "it"', function() {
+				this.suites.first().suites.first().specs.first().status.should.be(TestStatus.Passed);
 			});
 		});
 	}

@@ -43,9 +43,18 @@ class SuitesRunner
 
 	public function failed() : Bool
 	{
-		for(s in suites) for (sp in s.specs)
-			if (sp.status == TestStatus.Failed) return true;
+		var testFail : Suite -> Bool = null;
 
+		testFail = function(s : Suite) {
+			var failed = false;
+			for (step in s.steps) switch step {
+				case TSpec(sp): if (sp.status == TestStatus.Failed) return true;
+				case TSuite(s2): return testFail(s2);
+			}
+			return false;
+		};
+
+		for (s in suites) if (testFail(s)) return true;
 		return false;
 	}
 
