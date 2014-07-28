@@ -18,6 +18,12 @@ enum TestStatus
 	Failed;
 }
 
+enum TestStep
+{
+	TSuite(s : Suite);
+	TSpec(s : Spec);
+}
+
 class BeforeAfter
 {
 	public var async(default, null) : Bool;
@@ -35,7 +41,27 @@ class Suite
 	public var name(default, null) : String;
 	public var buddySuite(default, null) : BuddySuite;
 	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
-	@:allow(buddy.BuddySuite) public var specs(default, null) : Array<Spec>;
+	@:allow(buddy.BuddySuite) public var steps(default, null) : List<TestStep>;
+
+	public var specs(get, never) : List<Spec>;
+	private function get_specs() {
+		var output = new List<Spec>();
+		for(step in steps) switch step {
+			case TSpec(s): output.push(s);
+			case _:
+		};
+		return output;
+	}
+
+	public var suites(get, never) : List<Suite>;
+	private function get_suites() {
+		var output = new List<Suite>();
+		for(step in steps) switch step {
+			case TSuite(s): output.push(s);
+			case _:
+		};
+		return output;
+	}
 
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
 	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
@@ -48,9 +74,9 @@ class Suite
 		this.name = name;
 		this.buddySuite = buddySuite;
 
-		this.specs = new Array<Spec>();
 		this.before = new List<BeforeAfter>();
 		this.after = new List<BeforeAfter>();
+		this.steps = new List<TestStep>();
 	}
 }
 
@@ -63,8 +89,8 @@ class Spec
 	public var error(default, null) : String;
 	@:allow(buddy.internal.SuiteRunner) public var stack(default, null) : Null<Array<StackItem>>;
 	@:allow(buddy.internal.SuiteRunner) public var traces(default, null) : List<String>;
-	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
 
+	@:allow(buddy.BuddySuite) private var include(default, null) : Bool;
 	@:allow(buddy.internal.SuiteRunner) private var run : Action;
 
 	@:allow(buddy.internal.SuiteRunner) private function setStatus(s : TestStatus, err : String, stack : Array<StackItem>)
@@ -83,7 +109,7 @@ class Spec
 		this.traces = new List<String>();
 
 		if (run == null) this.status = TestStatus.Pending;
-		else this.status = pending ? TestStatus.Pending : TestStatus.Unknown;
+		else this.status = (pending ? TestStatus.Pending : TestStatus.Unknown);
 	}
 }
 
@@ -101,6 +127,9 @@ class BuddySuite
 	public static var exclude(default, never) : String = "exclude";
 	public static var include(default, never) : String = "include";
 
+	// List of Suites that are currently created
+	private var suiteStack : List<Suite>;
+
 	/**
 	 * Milliseconds before an async spec timeout with an error. Default is 5000 (5 sec).
 	 */
@@ -111,6 +140,7 @@ class BuddySuite
 		this.suites = new List<Suite>();
 		this.befores = new List<BeforeAfter>();
 		this.afters = new List<BeforeAfter>();
+		this.suiteStack = new List<Suite>();
 
 		this.timeoutMs = 5000;
 	}
@@ -149,16 +179,25 @@ class BuddySuite
 
 	@:noCompletion private function addSuite(suite : Suite, addSpecs : Void -> Void)
 	{
-		suites.add(suite);
+		if(suiteStack.isEmpty())
+			suites.add(suite);
+		else
+			suiteStack.first().steps.add(TestStep.TSuite(suite));
+
+		suiteStack.push(suite);
 		addSpecs();
+		suiteStack.pop();
 
 		if (!includeMode) return;
 
 		if (!suite.include)
 		{
 			// If current suite has specs marked with @include, add them only.
-			suite.specs = suite.specs.filter(function(sp) return sp.include);
-			if (suite.specs.length > 0) suite.include = true;
+			suite.steps = suite.steps.filter(function(step) switch step {
+				case TSpec(s): return s.include;
+				case _: return true;
+			});
+			if (suite.steps.length > 0) suite.include = true;
 		}
 
 		suites = suites.filter(function(s) return s.include);
@@ -209,29 +248,29 @@ class BuddySuite
 
 	@:noCompletion private function syncBefore(init : Action, async = false)
 	{
-		suites.last().before.add(new BeforeAfter(init, async));
+		suiteStack.first().before.add(new BeforeAfter(init, async));
 	}
 
 	@:noCompletion private function syncAfter(deinit : Action, async = false)
 	{
-		suites.last().after.add(new BeforeAfter(deinit, async));
+		suiteStack.first().after.add(new BeforeAfter(deinit, async));
 	}
 
 	@:noCompletion private function syncIt(desc : String, test : Action, async = false, include = false)
 	{
-		var suite = suites.last();
+		var suite = suiteStack.first();
 		var spec = new Spec(suite, desc, test, async);
 
 		spec.include = include;
-		suite.specs.push(spec);
+		suite.steps.add(TestStep.TSpec(spec));
 	}
 
 	@:noCompletion private function syncXit(desc : String, test : Action, async = false)
 	{
-		var suite = suites.last();
+		var suite = suiteStack.first();
 		var spec = new Spec(suite, desc, test, async, true);
 
-		suite.specs.push(spec);
+		suite.steps.add(TestStep.TSpec(spec));
 	}
 }
 

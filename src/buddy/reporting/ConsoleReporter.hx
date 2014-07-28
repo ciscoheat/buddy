@@ -6,6 +6,7 @@ import haxe.CallStack;
 import promhx.Deferred;
 import promhx.Promise;
 using Lambda;
+using StringTools;
 
 #if nodejs
 import buddy.internal.sys.NodeJs;
@@ -55,43 +56,57 @@ class ConsoleReporter implements Reporter
 		var total = 0;
 		var failures = 0;
 		var pending = 0;
-		for (s in suites)
-		{
-			for (sp in s.specs)
-			{
-				total++;
-				if (sp.status == TestStatus.Failed) failures++;
-				else if (sp.status == TestStatus.Pending) pending++;
+
+		var countTests : Suite -> Void = null;
+		var printTests : Suite -> Int -> Void = null;
+
+		countTests = function(s : Suite) {
+			for (sp in s.steps) switch sp {
+				case TSpec(sp):
+					total++;
+					if (sp.status == TestStatus.Failed) failures++;
+					else if (sp.status == TestStatus.Pending) pending++;
+				case TSuite(s):
+					countTests(s);
 			}
-		}
+		};
 
-		for (s in suites)
+		suites.iter(countTests);
+
+		printTests = function(s : Suite, indentLevel : Int)
 		{
-			Sys.println(s.name);
-			for (sp in s.specs)
+			var print = function(str : String) Sys.println(str.lpad(" ", str.length + indentLevel * 2));
+
+			print(s.name);
+			for (step in s.steps) switch step
 			{
-				if (sp.status == TestStatus.Failed)
-				{
-					Sys.println("  " + sp.description + " (FAILED: " + sp.error + ")");
+				case TSpec(sp):
+					if (sp.status == TestStatus.Failed)
+					{
+						print("  " + sp.description + " (FAILED: " + sp.error + ")");
 
-					printTraces(sp);
+						printTraces(sp);
 
-					if (sp.stack == null || sp.stack.length == 0) continue;
+						if (sp.stack == null || sp.stack.length == 0) continue;
 
-					// Display the exception stack
-					for (s in sp.stack) switch s {
-						case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
-							Sys.println('    @ $file:$line');
-						case _:
+						// Display the exception stack
+						for (s in sp.stack) switch s {
+							case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
+								print('    @ $file:$line');
+							case _:
+						}
 					}
-				}
-				else
-				{
-					Sys.println("  " + sp.description + " (" + sp.status + ")");
-					printTraces(sp);
-				}
+					else
+					{
+						print("  " + sp.description + " (" + sp.status + ")");
+						printTraces(sp);
+					}
+				case TSuite(s):
+					printTests(s, indentLevel+1);
 			}
-		}
+		};
+
+		suites.iter(printTests.bind(_, 0));
 
 		Sys.println('$total specs, $failures failures, $pending pending');
 
