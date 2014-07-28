@@ -384,7 +384,8 @@ class UtestUsage extends BuddySuite
 				Assert.same(a, b);
 			});
 
-			it("should fail a test when using the Assert class.", {
+			var failTestDesc = "should fail a test when using the Assert class.";
+			it(failTestDesc, {
 				Assert.isTrue(false);
 			});
 
@@ -398,7 +399,7 @@ class UtestUsage extends BuddySuite
 			#end
 
 			after({
-				var test = this.suites.first().specs.array()[1];
+				var test = this.suites.first().specs.find(function(s) return s.description == failTestDesc);
 				if (test.status == TestStatus.Failed && test.error == "expected true")
 					Reflect.setProperty(test, "status", TestStatus.Passed);
 			});
