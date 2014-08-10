@@ -49,7 +49,7 @@ class SuitesRunner
 			var failed = false;
 			for (step in s.steps) switch step {
 				case TSpec(sp): if (sp.status == TestStatus.Failed) return true;
-				case TSuite(s2): return testFail(s2);
+				case TSuite(s2): if (testFail(s2)) return true;
 			}
 			return false;
 		};

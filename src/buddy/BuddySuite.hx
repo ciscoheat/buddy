@@ -190,9 +190,10 @@ class BuddySuite
 
 		if (!includeMode) return;
 
+		// Include mode is active. If suite hasn't @include set,
+		// then test if it has specs marked with @include.
 		if (!suite.include)
 		{
-			// If current suite has specs marked with @include, add them only.
 			suite.steps = suite.steps.filter(function(step) switch step {
 				case TSpec(s): return s.include;
 				case _: return true;
