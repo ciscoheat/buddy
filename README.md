@@ -70,7 +70,7 @@ package ;
 import buddy.*;
 using buddy.Should;
 
-class AsyncTest extends BuddySuite {
+class AsyncTest extends BuddySuite implements Buddy {
     public function new() {
         describe("Using Buddy asynchronously", {
             var mood = "?";
@@ -99,7 +99,7 @@ package ;
 import buddy.*;
 using buddy.Should;
 
-class AsyncTest extends BuddySuite {
+class AsyncTest extends BuddySuite implements Buddy {
     public function new() {
         describe("Using Buddy asynchronously", {
             this.timeoutMs = 100;
@@ -172,7 +172,7 @@ Since BDD is also made for non-programmers to use, a common development style is
 package ;
 import buddy.*;
 
-class Main extends BuddySuite
+class Main extends BuddySuite implements Buddy
 {
     public function new() {
         describe("Using Buddy", {
@@ -216,6 +216,8 @@ The build macro used will by default include all `.hx` files in the class path s
 class Tests extends BuddySuite {}
 ```
 
+Note that you should not let the class implement Buddy in this case, since you are basically doing that by adding the build macro yourself.
+
 ### Why do I get strange compilation errors not related to my project?
 
 Sometimes, 3:rd party libraries included with `-cp` will have some issues that won't show up unless a class is explicitly referenced, but when including all classpaths automatically like Buddy does, the compiler will detect those problems and fail compilation. The solution is to only specify the classpaths you want included, using a second parameter of the build macro:
@@ -226,6 +228,8 @@ class Tests extends BuddySuite {}
 ```
 
 This problem can sometimes be fixed by specifying packages instead (as in the previous question), so you can decide whether you want to use packages or classpaths to avoid getting 3:rd party library errors. Or perhaps the best solution: Tell the library author about the error. :)
+
+Note that you should not let the class implement Buddy in this case, since you are basically doing that by adding the build macro yourself.
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
