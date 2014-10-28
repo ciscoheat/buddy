@@ -13,6 +13,7 @@ import utest.Assertation;
 #end
 
 using buddy.tools.AsyncTools;
+using Lambda;
 
 class SuiteRunner
 {
@@ -33,12 +34,34 @@ class SuiteRunner
 		var def = new Deferred<Suite>();
 		var pr = def.promise();
 
-		buddySuite.befores.iterateAsyncBool(runBeforeAfter)
-			.pipe(function(_) return suite.steps.iterateAsyncBool(runSteps))
-			.pipe(function(_) return buddySuite.afters.iterateAsyncBool(runBeforeAfter))
-			.then(function(_) { Log.trace = traceFunc; def.resolve(suite); });
+		suite.steps.iterateAsyncBool(runSteps)
+		.then(function(_) { Log.trace = traceFunc; def.resolve(suite); });
 
 		return pr;
+	}
+
+	private function allBefores(suite : Suite, list : List<BeforeAfter>) : List<BeforeAfter>
+	{
+		list = suite.before.concat(list);
+
+		return suite.parent != null
+			? allBefores(suite.parent, list)
+			: buddySuite.befores.concat(list);
+	}
+
+	private function allAfters(suite : Suite, list : List<BeforeAfter>) : List<BeforeAfter>
+	{
+		list = suite.after.concat(list);
+
+		if (suite.parent != null)
+			return allAfters(suite.parent, list);
+
+		list = buddySuite.afters.concat(list);
+
+		var output = new List<BeforeAfter>();
+		for (a in list) output.push(a);
+
+		return output;
 	}
 
 	private function runBeforeAfter(b : BeforeAfter) : Promise<BeforeAfter>
@@ -127,8 +150,11 @@ class SuiteRunner
 			spec.traces.add(pos.fileName + ":" + pos.lineNumber + ": " + Std.string(v));
 		};
 
+		var befores = allBefores(suite, new List<BeforeAfter>());
+		var afters = allAfters(suite, new List<BeforeAfter>());
 		var errorTimeout : Promise<Bool> = null;
-		suite.before.iterateAsyncBool(runBeforeAfter)
+
+		befores.iterateAsyncBool(runBeforeAfter)
 			.pipe(function(_)
 			{
 				if (spec.async)
@@ -166,7 +192,7 @@ class SuiteRunner
 				}
 
 				spec.setStatus(result.status, result.error, result.stack);
-				return suite.after.iterateAsyncBool(runBeforeAfter);
+				return afters.iterateAsyncBool(runBeforeAfter);
 			})
 			.then(function(_) { specDone.resolve(spec); } );
 

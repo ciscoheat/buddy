@@ -46,10 +46,6 @@ class TestBasicFeatures extends BuddySuite
 				testAfter.should.be(null);
 			});
 
-			it("should run the after function before this spec, and set testAfter", {
-				testAfter.should.be("after executed");
-			});
-
 			after({
 				testAfter = "after executed";
 			});
@@ -490,19 +486,87 @@ class BeforeAfterDescribe3 extends BuddySuite
 			});
 
 			describe('When nesting describes', function () {
-				it('should run the inner "before" function before the spec', function () {
+				var desc = 'should run the inner "before" function before the spec';
+				it(desc, function() {
 					a.should.be(1);
 				});
 
 				it('should list the specs in the nested suite', function () {
 					var test = this.suites.first().suites.first().specs.first();
-					test.description.should.be('should list the specs in the nested suite');
+					test.description.should.be(desc);
 				});
 			});
 
 			it('should have run the specs described before an "it"', function() {
 				this.suites.first().suites.first().specs.first().status.should.be(TestStatus.Passed);
 			});
+		});
+	}
+}
+
+class NestedBeforeAfter extends BuddySuite
+{
+	public function new()
+	{
+		var a = 0;
+		var order = "";
+		var runAfterTest = false;
+
+		before({
+			a = 0; // Level 0
+			order = "0";
+			runAfterTest = false;
+		});
+
+		describe('Using nested describes with multiple befores', function () {
+			before({
+				a++; // Level 1
+				order += "1";
+			});
+
+			it('should run befores outwards and in, and after inwards and out', function() {
+				true.should.be(true); // Could change in after()
+			});
+
+			it('should run the befores defined up to this nested level', function() {
+				a.should.be(1);
+			});
+
+			describe('When nesting on another level', function () {
+				before({
+					a++; // Level 2
+					order += "2";
+				});
+
+				it('should run the before defined up to this level', function () {
+					runAfterTest = true;
+					a.should.be(2);
+				});
+
+				after({
+					a--;
+					order += "2";
+				});
+			});
+
+			after({
+				a--;
+				order += "1";
+			});
+		});
+
+		// The 'after' order is important here since they will be executed in reverse order.
+		after({
+			if (runAfterTest)
+			{
+				var test = this.suites.first().specs.first();
+				Reflect.setProperty(test, "status", a == -1 && order == "012210" ? TestStatus.Passed : TestStatus.Failed);
+			}
+		});
+
+		after({
+			a--;
+			order += "0";
 		});
 	}
 }

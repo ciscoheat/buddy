@@ -40,6 +40,7 @@ class Suite
 {
 	public var name(default, null) : String;
 	public var buddySuite(default, null) : BuddySuite;
+	@:allow(buddy.BuddySuite) public var parent(default, null) : Suite;
 	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
 	@:allow(buddy.BuddySuite) public var steps(default, null) : List<TestStep>;
 
@@ -47,7 +48,7 @@ class Suite
 	private function get_specs() {
 		var output = new List<Spec>();
 		for(step in steps) switch step {
-			case TSpec(s): output.push(s);
+			case TSpec(s): output.add(s);
 			case _:
 		};
 		return output;
@@ -57,7 +58,7 @@ class Suite
 	private function get_suites() {
 		var output = new List<Suite>();
 		for(step in steps) switch step {
-			case TSuite(s): output.push(s);
+			case TSuite(s): output.add(s);
 			case _:
 		};
 		return output;
@@ -182,7 +183,12 @@ class BuddySuite
 		if(suiteStack.isEmpty())
 			suites.add(suite);
 		else
-			suiteStack.first().steps.add(TestStep.TSuite(suite));
+		{
+			var current = suiteStack.first();
+
+			suite.parent = current;
+			current.steps.add(TestStep.TSuite(suite));
+		}
 
 		suiteStack.push(suite);
 		addSpecs();
