@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.11.1",
-  "releasenote": "Fixed failing test notifications.",
+  "version": "0.12.0",
+  "releasenote": "Befores and afters can now be stacked and will execute for every it.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
