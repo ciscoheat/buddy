@@ -91,7 +91,7 @@ class SuiteRunner
 		var status = function(s, error, stack)
 		{
 			hasStatus = true;
-			if (!s && !itPromise.isResolved())
+			if (!s && !itPromise.isResolved() && !itDone.isResolved())
 				itDone.resolve( { status: TestStatus.Failed, error: error, stack: stack } );
 		};
 
@@ -119,7 +119,7 @@ class SuiteRunner
 			}
 			#end
 
-			if (!itPromise.isResolved())
+			if (!itPromise.isResolved() && !itDone.isResolved())
 				itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null, stack: null } );
 		};
 

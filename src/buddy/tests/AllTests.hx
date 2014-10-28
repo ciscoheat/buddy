@@ -346,6 +346,20 @@ class TestAsync extends BuddySuite
 					done();
 			});
 		});
+
+		describe("An async failing assertion", {
+			it("should not throw an AlreadyResolved exception when done is called", function(done) {
+				// This test won't assert that the test passed, but it will throw an exception if it fails.
+				(1).should.be(2);
+				done();
+			});
+
+			after({
+				var test = this.suites.last().specs.first();
+				if (test.status == TestStatus.Failed && test.error == "Expected 2, was 1")
+					Reflect.setProperty(test, "status", TestStatus.Passed);
+			});
+		});
 	}
 }
 #end
@@ -492,4 +506,3 @@ class BeforeAfterDescribe3 extends BuddySuite
 		});
 	}
 }
-
