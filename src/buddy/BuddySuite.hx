@@ -190,24 +190,22 @@ class BuddySuite
 			current.steps.add(TestStep.TSuite(suite));
 		}
 
-		suiteStack.push(suite);
-		addSpecs();
-		suiteStack.pop();
-
-		if (!includeMode) return;
-
-		// Include mode is active. If suite hasn't @include set,
-		// then test if it has specs marked with @include.
-		if (!suite.include)
+		if (includeMode && !suite.include)
 		{
+			// If suite hasn't @include set then test if it has specs marked with @include.
+			// It should be done above addSpecs() so the child suites can be included if needed.
 			suite.steps = suite.steps.filter(function(step) switch step {
 				case TSpec(s): return s.include;
 				case _: return true;
 			});
-			if (suite.steps.length > 0) suite.include = true;
+
+			if (suite.steps.length > 0 || suite.parent.include)
+				suite.include = true;
 		}
 
-		suites = suites.filter(function(s) return s.include);
+		suiteStack.push(suite);
+		addSpecs();
+		suiteStack.pop();
 	}
 
 	@:noCompletion private function describeInclude(name : String, addSpecs : Void -> Void)
