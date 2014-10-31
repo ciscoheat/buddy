@@ -199,7 +199,7 @@ class BuddySuite
 				case _: return true;
 			});
 
-			if (suite.steps.length > 0 || suite.parent.include)
+			if (suite.steps.length > 0 || (suite.parent != null && suite.parent.include))
 				suite.include = true;
 		}
 
