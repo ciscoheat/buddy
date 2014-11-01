@@ -3,6 +3,7 @@ import buddy.BuddySuite.Spec;
 import buddy.BuddySuite.Suite;
 import buddy.reporting.Reporter;
 import haxe.CallStack;
+import haxe.PosInfos;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.Should;
@@ -176,7 +177,18 @@ class BuddySuite
 		syncXit(desc, test, true);
 	}
 
+	private function fail(desc : Dynamic = "Manually") : Void
+	{
+		// Will be replaced by failSync in SuiteBuilder.
+	}
+
 	///// Hidden "include" handlers /////
+
+	@:noCompletion private function failSync(test : SpecAssertion, desc : Dynamic = "Manually", ?p : PosInfos)
+	{
+		var stackItem = [StackItem.FilePos(null, p.fileName, p.lineNumber)];
+		test(false, Std.string(desc), stackItem);
+	}
 
 	@:noCompletion private function addSuite(suite : Suite, addSpecs : Void -> Void)
 	{

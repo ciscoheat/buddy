@@ -162,6 +162,29 @@ Every assertion can be negated using `not` which is present on all `should` fiel
 
 `a.should.not.contain("test")`
 
+## Failing tests
+
+A test can be failed using the `fail(o : Dynamic) : Void` method available in a `BuddySuite`. The test will fail with the string value of `o` as a message. If you're testing asynchronously you can pass the `fail` method to the error handler. Here are some examples:
+
+```haxe
+it("should fail manually when using fail()", {
+    fail("Totally on purpose.");
+});
+
+it("should fail if a promise fails", function(done) {
+	request.getJson("/some/url")
+	.then(function(r) {
+		r.statusCode.should.be(200);
+		done();
+	})
+	.catchError(fail);
+});
+
+it("should also fail when throwing an exception", {
+    throw "But only synchronously!";
+});
+```
+
 ## Pending tests
 
 Since BDD is also made for non-programmers to use, a common development style is to write empty, or *pending* tests, and let a programmer implement them later. To do this, just write the string in the `describe` and `it` methods. Our previous test class would then look like this:
@@ -245,7 +268,7 @@ Yes, there is special support for [utest](http://code.google.com/p/utest/) and g
 
 ### There's an exception thrown in an asynchronous method, but Buddy won't catch it and fail the test?
 
-It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done()` in the spec.
+It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done()` in the spec, or use the `fail` method as described in the section "Failing tests".
 
 ## The story behind Buddy
 

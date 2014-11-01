@@ -120,6 +120,20 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			/////
+
+			case macro fail():
+				var change = macro failSync(__status);
+				e.expr = change.expr;
+
+			case macro fail($s):
+				var change = macro failSync(__status, $s);
+				e.expr = change.expr;
+
+			case macro fail:
+				var change = macro function(d) { failSync(__status, d); };
+				e.expr = change.expr;
+
 			case _: e.iter(injectAsync);
 		}
 	}

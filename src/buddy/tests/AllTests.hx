@@ -2,6 +2,8 @@ package buddy.tests ;
 import buddy.BuddySuite;
 import buddy.Buddy;
 import buddy.tools.AsyncTools;
+import promhx.Deferred;
+import promhx.Promise;
 
 #if utest
 import utest.Assert;
@@ -570,3 +572,54 @@ class NestedBeforeAfter extends BuddySuite
 		});
 	}
 }
+
+class FailTest1 extends BuddySuite
+{
+	public function new()
+	{
+		describe("Failing a test manually", {
+			it('can be done by throwing an exception', {
+				throw "Exceptionally";
+			});
+
+			after({
+				var test = this.suites.first().specs.first();
+				Reflect.setProperty(test, "status", test.error == "Exceptionally" ? TestStatus.Passed : TestStatus.Failed);
+			});
+		});
+
+		describe("Failing a test manually", {
+			it('can be done with the fail() method', {
+				fail("fail()");
+			});
+
+			after({
+				var test = this.suites.last().specs.last();
+				Reflect.setProperty(test, "status", test.error == "fail()" ? TestStatus.Passed : TestStatus.Failed);
+			});
+		});
+	}
+}
+
+#if !php
+class FailTest3 extends BuddySuite
+{
+	public function new()
+	{
+		describe("Failing an async test manually", {
+			it('can be done by passing the fail method as a callback', function(done) {
+				var def = new Deferred();
+				var pr = def.promise();
+
+				pr.catchError(fail);
+				pr.reject("Rejected");
+			});
+		});
+
+		after({
+			var test = this.suites.first().specs.first();
+			Reflect.setProperty(test, "status", test.error == "Rejected" ? TestStatus.Passed : TestStatus.Failed);
+		});
+	}
+}
+#end

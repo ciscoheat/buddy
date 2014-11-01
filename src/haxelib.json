@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.12.1",
-  "releasenote": "Bugfix when no parent suite existed.",
+  "version": "0.13.0",
+  "releasenote": "Specs can now be failed manually.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
