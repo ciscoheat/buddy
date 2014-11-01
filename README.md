@@ -285,3 +285,5 @@ The [HaxeContracts](https://github.com/ciscoheat/HaxeContracts) library is a nic
 - [ ] Your choice! Send me a gmail (ciscoheat) or create an issue here.
 
 Have a good time and much productivity with your new Buddy! :)
+
+[![Build Status](https://travis-ci.org/ciscoheat/buddy.svg?branch=master)](https://travis-ci.org/ciscoheat/buddy)
