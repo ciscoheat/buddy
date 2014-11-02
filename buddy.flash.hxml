@@ -4,4 +4,7 @@
 -swf bin/buddy.swf
 -main buddy.tests.AllTests
 --times
+-D fdb-ci
 -D macro-times
+-cmd echo "---------- Flash (xvfb-run) ----------"
+-cmd xvfb-run ~/flashplayerdebugger bin/buddy.swf

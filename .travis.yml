@@ -13,6 +13,7 @@ env:
     - TARGET=neko
     - TARGET=nodejs
     - TARGET=php
+    - TARGET=flash
 
 before_install:
   # Install Haxe
@@ -29,6 +30,7 @@ before_install:
   - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get install mono-devel -y; fi"
   - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get install phantomjs -y; fi"
   - sh -c "if [ '$TARGET' = 'php' ]; then sudo apt-get install php5-cli -y; fi"
+  - sh -c "if [ '$TARGET' = 'flash' ]; then ./flash-travis-setup.sh; fi"
 
   # haxelib dependencies for each target
   - sh -c "if [ '$TARGET' = 'cpp' ]; then haxelib install hxcpp; fi"
