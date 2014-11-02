@@ -102,18 +102,20 @@ class GenerateMain
 		var e = AutoIncluder.toTypeStringExpr(cls);
 		var body : Expr;
 
+		var header = macro {
+			var reporter = new buddy.reporting.ConsoleReporter();
+			var suites = [];
+			for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
+				suites.push(Type.createInstance(Type.resolveClass(a), []));
+			}
+
+			var testsRunning = true;
+			var runner = new buddy.SuitesRunner(suites, reporter);
+		};
+
 		if (Context.defined("neko") || Context.defined("cpp"))
 		{
 			body = macro {
-				var reporter = new buddy.reporting.ConsoleReporter();
-				var suites = [];
-				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-					suites.push(Type.createInstance(Type.resolveClass(a), []));
-				}
-
-				var testsRunning = true;
-				var runner = new buddy.SuitesRunner(suites, reporter);
-
 				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) Sys.sleep(0.1);
 				Sys.exit(runner.statusCode());
@@ -122,15 +124,6 @@ class GenerateMain
 		else if(Context.defined("cs"))
 		{
 			body = macro {
-				var reporter = new buddy.reporting.ConsoleReporter();
-				var suites = [];
-				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-					suites.push(Type.createInstance(Type.resolveClass(a), []));
-				}
-
-				var testsRunning = true;
-				var runner = new buddy.SuitesRunner(suites, reporter);
-
 				runner.run().then(function(_) { testsRunning = false; } );
 				while (testsRunning) cs.system.threading.Thread.Sleep(10);
 				cs.system.Environment.Exit(runner.statusCode());
@@ -139,14 +132,6 @@ class GenerateMain
 		else if(Context.defined("nodejs"))
 		{
 			body = macro {
-				var reporter = new buddy.reporting.ConsoleReporter();
-				var suites = [];
-				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-					suites.push(Type.createInstance(Type.resolveClass(a), []));
-				}
-
-				var runner = new buddy.SuitesRunner(suites, reporter);
-
 				// Windows bug doesn't flush stdout properly, need to wait: https://github.com/joyent/node/issues/3584
 				runner.run().then(function(_) { untyped __js__("if(process.platform == 'win32') { process.once('exit', function() { process.exit(runner.statusCode()); }); } else { process.exit(runner.statusCode()); }"); } );
 			};
@@ -154,30 +139,22 @@ class GenerateMain
 		else if(Context.defined("php") || Context.defined("java"))
 		{
 			body = macro {
-				var reporter = new buddy.reporting.ConsoleReporter();
-				var suites = [];
-				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-					suites.push(Type.createInstance(Type.resolveClass(a), []));
-				}
-
-				var runner = new buddy.SuitesRunner(suites, reporter);
 				runner.run().then(function(_) { Sys.exit(runner.statusCode()); });
 			};
 		}
 		else
 		{
 			body = macro {
-				var reporter = new buddy.reporting.ConsoleReporter();
-				var suites = [];
-				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-					suites.push(Type.createInstance(Type.resolveClass(a), []));
-				}
-
 				new buddy.SuitesRunner(suites, reporter).run();
 			};
 		}
 
-		exprs.push(body);
+		// Merge the blocks
+		for(block in [header, body]) switch block.expr {
+			case EBlock(exprs2):
+				for (e in exprs2) exprs.push(e);
+			case _:
+		}
 	}
 }
 #end
