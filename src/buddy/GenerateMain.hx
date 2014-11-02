@@ -142,6 +142,15 @@ class GenerateMain
 				runner.run().then(function(_) { Sys.exit(runner.statusCode()); });
 			};
 		}
+		else if (Context.defined("fdb-ci"))
+		{
+			// If defined, flash will exit for use with CI
+			body = macro {
+				new buddy.SuitesRunner(suites, reporter).run().then(function(_) {
+					flash.system.System.exit(runner.statusCode());
+				});
+			}
+		}
 		else
 		{
 			body = macro {

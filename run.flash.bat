@@ -1,2 +1,2 @@
 @echo off
-start bin\buddy.swf
+start /WAIT bin\buddy.swf
