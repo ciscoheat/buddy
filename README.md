@@ -222,13 +222,32 @@ If good domain terms are used that matches the system architecture, the programm
 
 Classes, suites and specs can all be marked with `@include` and `@exclude`. `@include` will only run the tests that are marked, `@exclude` does the opposite, it prevents the marked ones from running. If you have a huge test suite, it can be convenient to mark the suite you're currently working on with `@include`. You can also use `xit()` and `xdescribe()` to exclude specs and suites from running.
 
+## Customizing reporting
+
+If the default console reporter isn't to your liking, you can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are two ways to use it:
+
+### Metadata
+
+```haxe
+@reporter("path.to.your.Reporter")
+class Main extends BuddySuite implements Buddy {
+    public function new() {
+        ...
+    }
+}
+```
+
+### Compilation flag
+
+`-D reporter=path.to.your.Reporter`
+
+The compilation flag will override the metadata, if both are set.
+
 ## FAQ
 
 ### Where's main() ?
 
-Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
-
-At this early point there is no ultra-convenient way of customizing how the tests are run, but if you really want to run your tests manually, use the `buddy.SuitesRunner` class together with a `buddy.reporting.ConsoleReporter`, or make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface.
+Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools. It even works for flash if you add `-D fdb-ci` and use `xvfb-run`. It's a bit tricky, but see the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
 
 ### Can I include only specific packages?
 

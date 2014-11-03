@@ -12,6 +12,7 @@ class SuitesRunner
 {
 	private var suites : Iterable<Suite>;
 	private var reporter : Reporter;
+	private var aborted : Bool;
 
 	public function new(buddySuites : Iterable<BuddySuite>, reporter : Reporter)
 	{
@@ -35,7 +36,10 @@ class SuitesRunner
 					.then(function(_) def.resolve(ok));
 			}
 			else
+			{
+				aborted = true;
 				def.resolve(ok);
+			}
 		});
 
 		return defPr;
@@ -60,6 +64,7 @@ class SuitesRunner
 
 	public function statusCode() : Int
 	{
+		if (aborted) return 1;
 		return failed() ? 1 : 0;
 	}
 

@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.13.1",
-  "releasenote": "-D fdb-ci added for flash CI",
+  "version": "0.14.0",
+  "releasenote": "Reporter customization added.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }

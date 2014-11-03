@@ -9,8 +9,10 @@ import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
 import haxe.rtti.Meta;
-using haxe.macro.ExprTools;
 import buddy.tools.AutoIncluder;
+import Type in HaxeType;
+
+using haxe.macro.ExprTools;
 using Lambda;
 
 class GenerateMain
@@ -25,6 +27,16 @@ class GenerateMain
 		var cls = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
 		var found = false;
+		var reporter = "buddy.reporting.ConsoleReporter";
+
+		if (Context.defined("reporter"))
+		{
+			reporter = Context.definedValue("reporter");
+		}
+		else if (cls.meta.has("reporter"))
+		{
+			reporter = cls.meta.get().find(function(m) return m.name == "reporter").params[0].getValue();
+		}
 
 		AutoIncluder.run(cls, packages, classPaths, typeIsSuite);
 
@@ -39,7 +51,7 @@ class GenerateMain
 						{
 							case EBlock(exprs):
 								found = true;
-								buildMain(exprs, cls);
+								buildMain(exprs, cls, reporter);
 							case _:
 						}
 					case _:
@@ -53,7 +65,7 @@ class GenerateMain
 			switch(body.expr)
 			{
 				case EBlock(exprs):
-					buildMain(exprs, cls);
+					buildMain(exprs, cls, reporter);
 				case _:
 			}
 
@@ -97,14 +109,25 @@ class GenerateMain
 		return include.length > 0 ? include : output;
 	}
 
-	private static function buildMain(exprs : Array<Expr>, cls : ClassType)
+	private static function buildMain(exprs : Array<Expr>, cls : ClassType, reporter : String)
 	{
 		var e = AutoIncluder.toTypeStringExpr(cls);
 		var body : Expr;
 
+		var pack = reporter.split(".");
+		var type = pack.pop();
+
+		var rep = {
+			sub: null,
+			params: null,
+			pack: pack,
+			name: type
+		}
+
 		var header = macro {
-			var reporter = new buddy.reporting.ConsoleReporter();
+			var reporter = new $rep();
 			var suites = [];
+
 			for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
 				suites.push(Type.createInstance(Type.resolveClass(a), []));
 			}
@@ -144,17 +167,15 @@ class GenerateMain
 		}
 		else if (Context.defined("fdb-ci"))
 		{
-			// If defined, flash will exit for use with CI
+			// If fdb-ci is defined, flash will exit. (For CI usage)
 			body = macro {
-				new buddy.SuitesRunner(suites, reporter).run().then(function(_) {
-					flash.system.System.exit(runner.statusCode());
-				});
+				runner.run().then(function(_) {	flash.system.System.exit(runner.statusCode()); });
 			}
 		}
 		else
 		{
 			body = macro {
-				new buddy.SuitesRunner(suites, reporter).run();
+				runner.run();
 			};
 		}
 
@@ -163,6 +184,7 @@ class GenerateMain
 			case EBlock(exprs2):
 				for (e in exprs2) exprs.push(e);
 			case _:
+				throw "header or body isn't a block expression.";
 		}
 	}
 }
