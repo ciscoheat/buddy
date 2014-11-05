@@ -417,6 +417,7 @@ class UtestUsage extends BuddySuite
 			});
 		});
 
+		#if !flash
 		describe("Using utest for maps", {
 			it ("should compare maps correctly", {
 				#if !java
@@ -426,6 +427,7 @@ class UtestUsage extends BuddySuite
 				Assert.same(["a" => 1], ["a" => 1]);
 			});
 		});
+		#end
 	}
 }
 
