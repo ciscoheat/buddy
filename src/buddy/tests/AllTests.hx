@@ -416,6 +416,13 @@ class UtestUsage extends BuddySuite
 					Reflect.setProperty(test, "status", TestStatus.Passed);
 			});
 		});
+
+		describe("Using utest for maps", {
+			it ("should compare maps correctly", {
+				Assert.same([1 => 2], [1 => 2]);
+				Assert.same(["a" => 1], ["a" => 1]);
+			});
+		});
 	}
 }
 
