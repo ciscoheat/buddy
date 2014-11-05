@@ -25,6 +25,13 @@ class SuitesRunner
 
 	public function run() : Promise<Bool>
 	{
+		#if utest
+		// Fix StringMap/IntMap DCE issue, according to
+		// https://github.com/fponticelli/utest/issues/9
+		new haxe.ds.StringMap();
+		new haxe.ds.IntMap();
+		#end
+
 		var def = new Deferred<Bool>();
 		var defPr = def.promise();
 
