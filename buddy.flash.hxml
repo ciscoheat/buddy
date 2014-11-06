@@ -7,4 +7,4 @@
 -D fdb-ci
 -D macro-times
 -cmd echo "---------- Flash (xvfb-run) ----------"
--cmd xvfb-run ~/flashplayerdebugger bin/buddy.swf
+-cmd chmod +x flash-travis-run.sh && ./flash-travis-run.sh
