@@ -417,17 +417,12 @@ class UtestUsage extends BuddySuite
 			});
 		});
 
-		#if !flash
 		describe("Using utest for maps", {
 			it ("should compare maps correctly", {
-				#if !java
-				// Java hangs on this Assertion. https://github.com/fponticelli/utest/issues/9
 				Assert.same([1 => 2], [1 => 2]);
-				#end
 				Assert.same(["a" => 1], ["a" => 1]);
 			});
 		});
-		#end
 	}
 }
 
