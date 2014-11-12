@@ -216,7 +216,7 @@ Using Buddy
 2 specs, 0 failures, 2 pending
 ```
 
-If good domain terms are used that matches the system architecture, the programmer should be able to implement system or integration tests that matches the users mental model of the system. (See [haxedci](https://github.com/ciscoheat/haxedci-example) for more details how to achieve this using the DCI architecture!)
+If domain terms are used that matches the system architecture, the programmer should be able to implement system or integration tests that matches the users mental model of the system. (See [haxedci](https://github.com/ciscoheat/haxedci-example) for more details how to achieve this using the DCI architecture!)
 
 ## Including and excluding tests
 
@@ -224,7 +224,7 @@ Classes, suites and specs can all be marked with `@include` and `@exclude`. `@in
 
 ## Customizing reporting
 
-If the default console reporter isn't to your liking, you can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are two ways to use it:
+If the default console reporter isn't to your liking, you can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are three ways to use it:
 
 ### Metadata
 
@@ -242,6 +242,28 @@ class Main extends BuddySuite implements Buddy {
 `-D reporter=path.to.your.Reporter`
 
 The compilation flag will override the metadata, if both are set.
+
+### Manually
+
+```haxe
+import buddy.reporting.ConsoleReporter;
+import buddy.SuitesRunner;
+
+class Main {
+    public static function main() {
+        var reporter = new ConsoleReporter();
+		
+        var runner = new SuitesRunner([
+            new FirstTestSuite(),
+            new AnotherTestSuite()
+        ], reporter);
+
+        runner.run();
+
+        return runner.statusCode();
+    }
+}
+```
 
 ## FAQ
 
