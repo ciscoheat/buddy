@@ -118,7 +118,7 @@ As you've seen in the examples, testing if the specifications are correct is as 
 
 ### All types
 
-`a.should.be(b)` - Tests for equality for value types (`Bool`, `Float`, `Int`) and identity for the other (reference) types.
+`a.should.be(b)` - Tests equality for value types (`Bool`, `Float`, `Int` and the special `String`) and identity for the other (reference) types.
 
 ### Int
 
