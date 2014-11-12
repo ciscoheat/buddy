@@ -246,12 +246,12 @@ The compilation flag will override the metadata, if both are set.
 ### Manually
 
 ```haxe
-import buddy.reporting.ConsoleReporter;
+import path.to.your.CustomReporter;
 import buddy.SuitesRunner;
 
 class Main {
     public static function main() {
-        var reporter = new ConsoleReporter();
+        var reporter = new CustomReporter();
 		
         var runner = new SuitesRunner([
             new FirstTestSuite(),
@@ -264,6 +264,8 @@ class Main {
     }
 }
 ```
+
+`buddy.reporting.ConsoleReporter` is the default reporter, if you need to run it manually similar to above.
 
 ## FAQ
 
