@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.14.3",
-  "releasenote": "utest patched, please upgrade it if you're using it together with Buddy.",
+  "version": "0.14.4",
+  "releasenote": "Added TravisHxReporter for usage together with travis-hx.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
