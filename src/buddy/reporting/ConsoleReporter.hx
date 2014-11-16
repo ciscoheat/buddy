@@ -10,13 +10,13 @@ using StringTools;
 
 #if nodejs
 import buddy.internal.sys.NodeJs;
-typedef Sys = NodeJs;
+private typedef Sys = NodeJs;
 #elseif js
 import buddy.internal.sys.Js;
-typedef Sys = Js;
+private typedef Sys = Js;
 #elseif flash
 import buddy.internal.sys.Flash;
-typedef Sys = Flash;
+private typedef Sys = Flash;
 #end
 
 class ConsoleReporter implements Reporter
