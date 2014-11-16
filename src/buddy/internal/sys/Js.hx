@@ -1,5 +1,19 @@
 package buddy.internal.sys;
 #if js
+#if console_js
+class Js
+{
+	public static function print(s : String)
+	{
+		trace(s);
+	}
+
+	public static function println(s : String)
+	{
+		trace(s);
+	}
+}
+#else
 import js.html.DivElement;
 import js.html.Text;
 import js.html.SpanElement;
@@ -28,4 +42,5 @@ class Js
 		Browser.document.body.appendChild(div);
 	}
 }
+#end
 #end
