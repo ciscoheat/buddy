@@ -26,7 +26,7 @@ class TestReporter implements Reporter
 		return new Deferred<Spec>().promise();
 	}
 
-	public function done(suites:Iterable<Suite>):Promise<Iterable<Suite>>
+	public function done(suites:Iterable<Suite>, status : Bool):Promise<Iterable<Suite>>
 	{
 		return new Deferred<Iterable<Suite>>().promise();
 	}

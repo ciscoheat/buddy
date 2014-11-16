@@ -10,13 +10,13 @@ using StringTools;
 
 #if nodejs
 import buddy.internal.sys.NodeJs;
-typedef Sys = NodeJs;
+private typedef Sys = NodeJs;
 #elseif js
 import buddy.internal.sys.Js;
-typedef Sys = Js;
+private typedef Sys = Js;
 #elseif flash
 import buddy.internal.sys.Flash;
-typedef Sys = Flash;
+private typedef Sys = Flash;
 #end
 
 class ConsoleReporter implements Reporter
@@ -29,9 +29,10 @@ class ConsoleReporter implements Reporter
 
 	public function start()
 	{
+		// A small convenience for PHP, to avoid creating a new reporter.
 		#if php
 		cli = (untyped __call__("php_sapi_name")) == 'cli';
-		if(!cli) Sys.println("<pre>");
+		if(!cli) println("<pre>");
 		#end
 
 		return resolveImmediately(true);
@@ -39,7 +40,7 @@ class ConsoleReporter implements Reporter
 
 	public function progress(spec : Spec)
 	{
-		Sys.print(switch(spec.status) {
+		print(switch(spec.status) {
 			case TestStatus.Failed: "X";
 			case TestStatus.Passed: ".";
 			case TestStatus.Pending: "P";
@@ -49,9 +50,9 @@ class ConsoleReporter implements Reporter
 		return resolveImmediately(spec);
 	}
 
-	public function done(suites : Iterable<Suite>)
+	public function done(suites : Iterable<Suite>, status : Bool)
 	{
-		Sys.println("");
+		println("");
 
 		var total = 0;
 		var failures = 0;
@@ -75,7 +76,7 @@ class ConsoleReporter implements Reporter
 
 		printTests = function(s : Suite, indentLevel : Int)
 		{
-			var print = function(str : String) Sys.println(str.lpad(" ", str.length + indentLevel * 2));
+			var print = function(str : String) println(str.lpad(" ", str.length + indentLevel * 2));
 
 			print(s.name);
 			for (step in s.steps) switch step
@@ -108,10 +109,10 @@ class ConsoleReporter implements Reporter
 
 		suites.iter(printTests.bind(_, 0));
 
-		Sys.println('$total specs, $failures failures, $pending pending');
+		println('$total specs, $failures failures, $pending pending');
 
 		#if php
-		if(!cli) Sys.println("</pre>");
+		if(!cli) println("</pre>");
 		#end
 
 		return resolveImmediately(suites);
@@ -120,7 +121,17 @@ class ConsoleReporter implements Reporter
 	function printTraces(spec : Spec)
 	{
 		for (t in spec.traces)
-			Sys.println("    " + t);
+			println("    " + t);
+	}
+
+	private function print(s : String)
+	{
+		Sys.print(s);
+	}
+
+	private function println(s : String)
+	{
+		Sys.println(s);
 	}
 
 	private function resolveImmediately<T>(o : T) : Promise<T>
@@ -131,4 +142,3 @@ class ConsoleReporter implements Reporter
 		return pr;
 	}
 }
-

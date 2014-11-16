@@ -1,9 +1,10 @@
--cp src 
+-cp src
 -lib promhx
 -lib utest
 -swf bin/buddy.swf
 -main buddy.tests.AllTests
 --times
+-D reporter=buddy.reporting.TraceReporter
 -D fdb-ci
 -D macro-times
 -cmd echo "---------- Flash (xvfb-run) ----------"

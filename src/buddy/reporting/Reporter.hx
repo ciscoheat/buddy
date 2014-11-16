@@ -19,6 +19,7 @@ interface Reporter
 	/**
 	 * Called after the last spec is run. Useful for displaying a test summary.
 	 * Resolve with the same iterable as the parameter.
+	 * Status is true if all tests passed, otherwise false.
 	 */
-	public function done(suites : Iterable<Suite>) : Promise<Iterable<Suite>>;
+	public function done(suites : Iterable<Suite>, status : Bool) : Promise<Iterable<Suite>>;
 }

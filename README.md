@@ -252,7 +252,7 @@ import buddy.SuitesRunner;
 class Main {
     public static function main() {
         var reporter = new CustomReporter();
-		
+
         var runner = new SuitesRunner([
             new FirstTestSuite(),
             new AnotherTestSuite()
@@ -265,13 +265,19 @@ class Main {
 }
 ```
 
+### List of built-in Reporters
+
 `buddy.reporting.ConsoleReporter` is the default reporter, if you need to run it manually similar to above.
+
+`buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI in Flash together with the `-D fdb-ci` compiler flag. See the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
+
+`buddy.reporting.TravisHxReporter` is made for [travis-hx](https://github.com/waneck/travis-hx) which is a standardized solution for using [Travis](https://travis-ci.org/) with Haxe. Very nice!
 
 ## FAQ
 
 ### Where's main() ?
 
-Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools. It even works for flash if you add `-D fdb-ci` and use `xvfb-run`. It's a bit tricky, but see the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
+Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
 
 ### Can I include only specific packages?
 

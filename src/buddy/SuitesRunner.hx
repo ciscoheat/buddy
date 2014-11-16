@@ -32,7 +32,7 @@ class SuitesRunner
 			if(ok)
 			{
 				suites.iterateAsyncBool(runSuite)
-					.pipe(function(_) return reporter.done(suites))
+					.pipe(function(_) return reporter.done(suites, !failed()))
 					.then(function(_) def.resolve(ok));
 			}
 			else
