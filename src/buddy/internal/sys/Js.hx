@@ -1,6 +1,6 @@
 package buddy.internal.sys;
 #if js
-#if console_js
+#if console_log
 class Js
 {
 	public static function print(s : String)

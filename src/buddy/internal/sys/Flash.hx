@@ -1,5 +1,19 @@
 package buddy.internal.sys;
 #if flash
+#if console_log
+class Flash
+{
+	public static function print(s : String)
+	{
+		trace(s);
+	}
+
+	public static function println(s : String)
+	{
+		trace(s);
+	}
+}
+#else
 import flash.events.Event;
 import flash.text.TextField;
 import flash.Lib;
@@ -41,4 +55,5 @@ class Flash
 		#end
 	}
 }
+#end
 #end
