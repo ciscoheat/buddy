@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.15.0",
-  "releasenote": "Added TraceReporter to solve trace issues. Note: The Reporter interface has changed!",
+  "version": "0.15.1",
+  "releasenote": "Removed Sys dependency in TraceReporter and TravisHxReporter.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }
