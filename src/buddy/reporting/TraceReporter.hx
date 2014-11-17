@@ -86,10 +86,6 @@ class TraceReporter implements Reporter
 
 		println('$total specs, $failures failures, $pending pending');
 
-		#if php
-		if(!cli) println("</pre>");
-		#end
-
 		return resolveImmediately(suites);
 	}
 
