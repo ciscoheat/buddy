@@ -25,20 +25,14 @@ class Flash
 
 	public static function print(s : String)
 	{
-		#if !fdb_ci
 		if (tf == null) init();
 		tf.text += s;
-		#end
 	}
 
 	public static function println(s : String)
 	{
-		#if fdb_ci
-		trace(s);
-		#else
 		if (tf == null) init();
 		tf.text += s + "\n";
-		#end
 	}
 }
 #end
