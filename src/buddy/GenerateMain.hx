@@ -159,7 +159,7 @@ class GenerateMain
 				runner.run().then(function(_) { untyped __js__("if(process.platform == 'win32') { process.once('exit', function() { process.exit(runner.statusCode()); }); } else { process.exit(runner.statusCode()); }"); } );
 			};
 		}
-		else if(Context.defined("php") || Context.defined("java"))
+		else if(Context.defined("sys"))
 		{
 			body = macro {
 				runner.run().then(function(_) { Sys.exit(runner.statusCode()); });
