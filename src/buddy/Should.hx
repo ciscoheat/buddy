@@ -28,7 +28,7 @@ X toThrowError("quux");
 */
 
 /**
- * A function that specifies the status for a spec with an optional error message.
+ * A function that specifies the status for a spec with an optional error message and stack.
  */
 typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 

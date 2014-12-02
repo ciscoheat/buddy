@@ -9,7 +9,17 @@ import promhx.Promise;
 import buddy.Should;
 using buddy.tools.AsyncTools;
 
-private typedef Action = (Void -> Void) -> SpecAssertion -> Void;
+/**
+ * A bit messy typedef. It is injected in specs by macro
+ * To determine what happens with a test.
+ * 1. ?Bool -> Void is the "done" function passed to the specs.
+ *    If bool is true (default) it is assumed that the user called
+ *    done() from the spec. Otherwise it will be false and pending.
+ * 2. SpecAssertion. A function that specifies the status for a spec
+ *    with an optional error message and stack.
+ *    Bool -> String -> Array<StackItem> -> Void
+ */
+private typedef Action = (?Bool -> Void) -> SpecAssertion -> Void;
 
 enum TestStatus
 {

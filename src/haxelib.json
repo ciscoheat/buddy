@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.15.1",
-  "releasenote": "Removed Sys dependency in TraceReporter and TravisHxReporter.",
+  "version": "0.15.2",
+  "releasenote": "Tests now pass if done() is called from the spec.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }

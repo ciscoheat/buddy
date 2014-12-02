@@ -244,6 +244,9 @@ class TestBasicFeatures extends BuddySuite
 			xit("should mark this as pending too.", {
 				true.should.be(false); // Make it fail if it runs
 			});
+
+			it("should mark a spec with no body as pending too.");
+			it("should mark a spec with an empty body as pending too.", {});
 		});
 
 		xdescribe("Excluding suites with xdescribe()", {
@@ -306,7 +309,7 @@ class TestAsync extends BuddySuite
 		describe("Testing async", {
 			var a;
 			var timeoutErrorTest : Spec;
-			var timeoutErrorTestDone : Void -> Void = null;
+			var timeoutErrorTestDone : ?Bool -> Void = null;
 
 			before(function(done) {
 				a = 0;
@@ -630,3 +633,15 @@ class FailTest3 extends BuddySuite
 	}
 }
 #end
+
+class CallDoneTest extends BuddySuite
+{
+	public function new()
+	{
+		describe("A test with no assertions and a call to done()", {
+			it('should pass, not be marked as pending', function(done) {
+				done();
+			});
+		});
+	}
+}

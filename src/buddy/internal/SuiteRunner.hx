@@ -68,7 +68,7 @@ class SuiteRunner
 	{
 		var def = new Deferred<BeforeAfter>();
 		var pr = def.promise();
-		var done = function() { def.resolve(b); };
+		var done = function(calledFromSpec = false) { def.resolve(b); };
 
 		b.run(done, function(s, err, stack) {});
 		if (!b.async) done();
@@ -119,7 +119,7 @@ class SuiteRunner
 		};
 
 		// The function that should be called when an async operation has completed.
-		var done = function()
+		var done = function(calledFromSpec = true)
 		{
 			#if utest
 			for (a in Assert.results)
@@ -142,8 +142,10 @@ class SuiteRunner
 			}
 			#end
 
-			if (!itPromise.isResolved() && !itDone.isResolved())
+			if (!itPromise.isResolved() && !itDone.isResolved()) {
+				if (calledFromSpec) hasStatus = true;
 				itDone.resolve( { status: hasStatus ? TestStatus.Passed : TestStatus.Pending, error: null, stack: null } );
+			}
 		};
 
 		Log.trace = function(v, ?pos : PosInfos) {
@@ -175,7 +177,7 @@ class SuiteRunner
 					Assert.results = new List<Assertation>();
 					#end
 					spec.run(done, status);
-					if (!spec.async) done();
+					if (!spec.async) done(false);
 				}
 				catch (e : Dynamic) {
 					status(false, Std.string(e), CallStack.exceptionStack());
