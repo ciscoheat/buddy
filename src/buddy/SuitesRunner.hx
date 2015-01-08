@@ -14,13 +14,13 @@ class SuitesRunner
 	private var reporter : Reporter;
 	private var aborted : Bool;
 
-	public function new(buddySuites : Iterable<BuddySuite>, reporter : Reporter)
+	public function new(buddySuites : Iterable<BuddySuite>, ?reporter : Reporter)
 	{
 		// Cannot use Lambda here, Java problem in Linux.
 		var includeMode = [for (b in buddySuites) for (s in b.suites) if (s.include) s].length > 0;
 
 		this.suites = [for (b in buddySuites) for (s in b.suites) if(!includeMode || s.include) s];
-		this.reporter = reporter;
+		this.reporter = reporter == null ? new buddy.reporting.ConsoleReporter() : reporter;
 	}
 
 	public function run() : Promise<Bool>

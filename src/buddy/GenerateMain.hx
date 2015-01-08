@@ -17,6 +17,16 @@ using Lambda;
 
 class GenerateMain
 {
+	macro public static function withSuites(suites : ExprOf<Array<BuddySuite>>) : Array<Field>
+	{
+		var cls = Context.getLocalClass().get();
+		var fields = Context.getBuildFields();
+
+		buildMain(currentMain(fields), cls, reporter(), suites);
+
+		return fields;
+	}
+
 	/**
 	 * Generates code for running all BuddySuite classes in the project automatically.
 	 * @param	packages Only include these packages
@@ -26,7 +36,58 @@ class GenerateMain
 	{
 		var cls = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
-		var found = false;
+
+		AutoIncluder.run(cls, packages, classPaths, typeIsSuite);
+
+		buildMain(currentMain(fields), cls, reporter());
+
+		return fields;
+	}
+
+	private static function currentMain(fields : Array<Field>) : Array<Expr>
+	{
+		for (f in fields)
+		{
+			if (f.name == "main" && f.access.exists(function(a) { return a == Access.AStatic; } ))
+			{
+				switch(f.kind)
+				{
+					case FFun(f2):
+						switch(f2.expr.expr)
+						{
+							case EBlock(exprs): return exprs;
+							case _:
+						}
+					case _:
+				}
+			}
+		}
+
+		var exprs = new Array<Expr>();
+
+		var func = {
+			ret: null,
+			params: [],
+			expr: {pos: Context.currentPos(), expr: EBlock(exprs)},
+			args: []
+		};
+
+		var main = {
+			pos: Context.currentPos(),
+			name: "main",
+			meta: [],
+			kind: FFun(func),
+			doc: null,
+			access: [Access.AStatic, Access.APublic]
+		};
+
+		fields.push(main);
+		return exprs;
+	}
+
+	private static function reporter() : String
+	{
+		var cls = Context.getLocalClass().get();
 		var reporter = "buddy.reporting.ConsoleReporter";
 
 		if (Context.defined("reporter"))
@@ -38,57 +99,7 @@ class GenerateMain
 			reporter = cls.meta.get().find(function(m) return m.name == "reporter").params[0].getValue();
 		}
 
-		AutoIncluder.run(cls, packages, classPaths, typeIsSuite);
-
-		for (f in fields)
-		{
-			if (f.name == "main" && f.access.exists(function(a) { return a == Access.AStatic; } ))
-			{
-				switch(f.kind)
-				{
-					case FFun(f2):
-						switch(f2.expr.expr)
-						{
-							case EBlock(exprs):
-								found = true;
-								buildMain(exprs, cls, reporter);
-							case _:
-						}
-					case _:
-				}
-			}
-		}
-
-		if (!found)
-		{
-			var body = macro {};
-			switch(body.expr)
-			{
-				case EBlock(exprs):
-					buildMain(exprs, cls, reporter);
-				case _:
-			}
-
-			var func = {
-				ret: null,
-				params: [],
-				expr: body,
-				args: []
-			};
-
-			var main = {
-				pos: Context.currentPos(),
-				name: "main",
-				meta: [],
-				kind: FFun(func),
-				doc: null,
-				access: [Access.AStatic, Access.APublic]
-			};
-
-			fields.push(main);
-		}
-
-		return fields;
+		return reporter;
 	}
 
 	private static function typeIsSuite(classes : Array<ClassType>) : Array<ClassType>
@@ -109,7 +120,7 @@ class GenerateMain
 		return include.length > 0 ? include : output;
 	}
 
-	private static function buildMain(exprs : Array<Expr>, cls : ClassType, reporter : String)
+	private static function buildMain(exprs : Array<Expr>, cls : ClassType, reporter : String, ?allSuites : ExprOf<Array<BuddySuite>>)
 	{
 		var e = AutoIncluder.toTypeStringExpr(cls);
 		var body : Expr;
@@ -124,17 +135,27 @@ class GenerateMain
 			name: type
 		}
 
-		var header = macro {
-			var reporter = new $rep();
-			var suites = [];
+		var header;
 
-			for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-				suites.push(Type.createInstance(Type.resolveClass(a), []));
-			}
+		if (allSuites == null) {
+			header = macro {
+				var reporter = new $rep();
+				var suites = [];
 
-			var testsRunning = true;
-			var runner = new buddy.SuitesRunner(suites, reporter);
-		};
+				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
+					suites.push(Type.createInstance(Type.resolveClass(a), []));
+				}
+
+				var testsRunning = true;
+				var runner = new buddy.SuitesRunner(suites, reporter);
+			};
+		} else {
+			header = macro {
+				var reporter = new $rep();
+				var testsRunning = true;
+				var runner = new buddy.SuitesRunner($allSuites, reporter);
+			};
+		}
 
 		if (Context.defined("neko") || Context.defined("cpp"))
 		{

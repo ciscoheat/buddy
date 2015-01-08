@@ -303,6 +303,23 @@ This problem can sometimes be fixed by specifying packages instead (as in the pr
 
 Note that you should not let the class implement Buddy in this case, since you are basically doing that by adding the build macro yourself.
 
+### It still doesn't work!
+
+All right, you can run the test suites without any auto-detection like this:
+
+```haxe
+package ;
+
+import buddy.*;
+
+@:build(buddy.GenerateMain.withSuites([
+	new YourBuddySuite(), new AnotherTestSuite()
+]))
+class Main {}
+```
+
+The platform-specific code for waiting until the tests are finished will still be generated, saving you some headache probably.
+
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
 The compiler seems to be a bit too good at optimizing sometimes, especially at the beginning of functions, so if you get this problem add a parenthesis after "should" and wrap numbers in parenthesis too.
