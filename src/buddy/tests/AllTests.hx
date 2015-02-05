@@ -236,6 +236,13 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
+		describe("Testing null", {
+			it("should pass even if the var is null", {
+				var s : EmptyTestClass = null;
+				s.should.be(null);
+			});
+		});
+
 		describe("Excluding specs with @exclude and xit()", {
 			@exclude it("should mark this spec as pending.", {
 				true.should.be(false); // Make it fail if it runs
