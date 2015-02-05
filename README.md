@@ -59,7 +59,7 @@ Using Buddy
 2 specs, 0 failures, 0 pending
 ```
 
-But of course you shouldn't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js, and `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (that one seems to vary between Linux and Win though).
+But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js, and `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (that one seems to vary between Linux and Win though).
 
 ## Asynchronous support
 
@@ -84,7 +84,7 @@ class AsyncTest extends BuddySuite implements Buddy {
             });
 
 			// Can be added to "it" and "after" as well if needed.
-            it("cannot really be described in one sentence", {
+            it("cannot be described in one sentence", {
                 mood.should.be("thrilled");
             });
         });
@@ -114,7 +114,7 @@ class AsyncTest extends BuddySuite implements Buddy {
 
 ## Should assertions
 
-As you've seen in the examples, testing if the specifications are correct is as simple as adding `using Buddy.should` to the package and then use the `should` extension for the identifier you want to test. The following assertions are supported:
+As you've seen in the examples, testing if specifications are correct is as simple as adding `using Buddy.should` to the package and then use the `should` extension for the identifier you want to test. The following assertions are supported:
 
 ### All types
 
@@ -259,11 +259,11 @@ class Main {
         ], reporter);
 
         runner.run();
-
-        return runner.statusCode();
     }
 }
 ```
+
+Note that running tests manually like this is rare, you should use the `Buddy` or `BuddySuites` interface as specified in the first FAQ question below.
 
 ### List of built-in Reporters
 
@@ -275,9 +275,23 @@ class Main {
 
 ## FAQ
 
-### Where's main() ?
+### Where's main()?
 
-Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. Static entrypoints are so 2013, don't you think? :) On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
+Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
+
+This may cause some problems with 3:rd party libraries however (see the following questions), so if you want to provide a list of your test suites you can do that too, as long as they have a parameterless constructor or constant parameters:
+
+```haxe
+package ;
+
+class Main implements buddy.BuddySuites<[
+	path.to.YourBuddySuite,
+	AnotherTestSuite,
+	new SpecialSuite("Constant value", 123)
+]> {}
+```
+
+The advantage with implementing `Buddy` or `BuddySuites` is that platform-specific code for waiting until the tests are finished will be generated, including returning 0 or 1 depending on test status afterwards on server platforms.
 
 ### Can I include only specific packages?
 
@@ -305,20 +319,7 @@ Note that you should not let the class implement Buddy in this case, since you a
 
 ### It still doesn't work!
 
-All right, you can run the test suites without any auto-detection like this:
-
-```haxe
-package ;
-
-import buddy.*;
-
-@:build(buddy.GenerateMain.withSuites([
-	new YourBuddySuite(), new AnotherTestSuite()
-]))
-class Main {}
-```
-
-The platform-specific code for waiting until the tests are finished will still be generated, saving you some headache probably.
+Use the `BuddySuites` implementation as specified in the "Where's main()?" question above.
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 

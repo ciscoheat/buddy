@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.15.3",
-  "releasenote": "Added build macro without auto-detection of test suites. SuitesRunner uses ConsoleReporter as default.",
+  "version": "0.16.0",
+  "releasenote": "Much easier to use a custom list of suites now.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }

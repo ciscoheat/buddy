@@ -1,6 +1,7 @@
 package buddy.tests ;
 import buddy.BuddySuite;
 import buddy.Buddy;
+import buddy.BuddySuites;
 import buddy.tools.AsyncTools;
 import promhx.Deferred;
 import promhx.Promise;
@@ -15,6 +16,19 @@ using StringTools;
 
 @:build(buddy.GenerateMain.build(null, ["src"]))
 class AllTests {} // implements Buddy {}
+
+/*
+@:build(buddy.GenerateMain.withSuites([
+	new buddy.tests.AllTests(), new BeforeAfterDescribe()
+]))
+class AllTests {}
+
+class AllTests implements BuddySuites<[
+	buddy.tests.TestBasicFeatures,
+	BeforeAfterDescribe,
+	new NestedBeforeAfter()
+]> {}
+*/
 
 class EmptyTestClass { public function new() {} }
 
