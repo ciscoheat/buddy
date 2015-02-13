@@ -79,6 +79,14 @@ class TestBasicFeatures extends BuddySuite
 				Red.should.be( Red );
 				Red.should.not.be( Green );
 			});
+			
+			it("should compare types with beType()", {
+				"str".should.beType(String);
+				[1, 2, 3].should.beType(Array);
+				new EmptyTestClass().should.beType(EmptyTestClass);
+				color1.should.beType(Color);
+				color2.should.not.beType(Int);
+			});
 		});
 
 		describe("Testing strings", {

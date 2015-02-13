@@ -365,6 +365,14 @@ class Should<T>
 		);
 	}
 
+	public function beType(type : Dynamic, ?p : PosInfos)
+	{
+		test(Std.is(value, type), p,
+			'Expected ${quote(value)} to be type ${quote(type)}',
+			'Expected ${quote(value)} not to be type ${quote(type)}'
+		);
+	}
+	
 	private function quote(v : Dynamic)
 	{
 		return Std.is(v, String) ? '"$v"' : Std.string(v);
