@@ -85,7 +85,9 @@ class TestBasicFeatures extends BuddySuite
 				[1, 2, 3].should.beType(Array);
 				new EmptyTestClass().should.beType(EmptyTestClass);
 				color1.should.beType(Color);
-				color2.should.not.beType(Int);
+				#if !cs
+				color2.should.not.beType(Int); 
+				#end
 			});
 		});
 
