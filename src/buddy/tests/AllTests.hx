@@ -89,6 +89,14 @@ class TestBasicFeatures extends BuddySuite
 				color2.should.not.beType(Int); 
 				#end
 			});
+
+			it("should compare objects correctly when cast to Dynamic", {
+				var arr : Dynamic = new Array<String>();
+				var fn = function() return arr;
+				
+				arr.should.be(fn());
+				// fn().should.be(arr); // Will fail because it's Unknown<0>, cast to fix.
+			});
 		});
 
 		describe("Testing strings", {
@@ -218,7 +226,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		describe("Testing functions", {
+		@include describe("Testing functions", {
 			var f = function() { throw "a"; };
 			var g = function() { throw new EmptyTestClass(); };
 
@@ -230,9 +238,12 @@ class TestBasicFeatures extends BuddySuite
 
 			it("should have a be method", {
 				f.should().be(f);
-				f.should().not.be(function(){});
+				j.should().be(j);
+				
+				f.should().not.be(function() { throw "a"; });
+				j.should().not.be(k);
 			});
-
+			
 			it("should have a throwValue() method", {
 				f.should().throwValue("a");
 				f.should().not.throwValue("b");

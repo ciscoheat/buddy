@@ -37,7 +37,7 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
  */
 class ShouldDynamic extends Should<Dynamic>
 {
-	static public function should<T>(d : T, assert : SpecAssertion)
+	static public function should(d : Dynamic, assert : SpecAssertion)
 	{
 		return new ShouldDynamic(d, assert);
 	}
