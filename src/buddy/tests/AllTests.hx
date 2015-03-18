@@ -226,7 +226,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		@include describe("Testing functions", {
+		describe("Testing functions", {
 			var f = function() { throw "a"; };
 			var g = function() { throw new EmptyTestClass(); };
 
