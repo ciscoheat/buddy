@@ -13,12 +13,14 @@ Your friendly BDD testing library for Haxe!
 **Main.hx**
 
 ```haxe
-package ;
 import buddy.*;
 using buddy.Should;
 
-// "implements Buddy" is only required for the Main class.
-class Main extends BuddySuite implements Buddy {
+// Add test suites within the brackets
+class Main implements Buddy<[Tests]> {}
+
+// Test suites should extend BuddySuite
+class Tests extends BuddySuite {
     public function new() {
         // A test suite:
         describe("Using Buddy", {
@@ -66,11 +68,12 @@ But please don't stop there. Try using it on other targets than Neko, Buddy supp
 Buddy was built from the ground up to have great support for async testing, so it's fully compatible with Node.js and handles ajax requests with ease. To use it, just create the specification with a function that takes one argument (targeting javascript now):
 
 ```haxe
-package ;
 import buddy.*;
 using buddy.Should;
 
-class AsyncTest extends BuddySuite implements Buddy {
+class Main implements Buddy<[AsyncTest]> {}
+
+class AsyncTest extends BuddySuite {
     public function new() {
         describe("Using Buddy asynchronously", {
             var mood = "?";
@@ -95,11 +98,12 @@ class AsyncTest extends BuddySuite implements Buddy {
 The default timeout is 5000 ms, after which the spec will automatically fail if `done()` hasn't been called. If you want to change the timeout, set the property `timeoutMs` in the `BuddySuite` **before** the actual `it()` specification, or in the before/after block. Here's an example:
 
 ```haxe
-package ;
 import buddy.*;
 using buddy.Should;
 
-class AsyncTest extends BuddySuite implements Buddy {
+class Main implements Buddy<[AsyncTest]> {}
+
+class AsyncTest extends BuddySuite {
     public function new() {
         describe("Using Buddy asynchronously", {
             this.timeoutMs = 100;
@@ -194,10 +198,10 @@ Since BDD is also made for non-programmers to use, a common development style is
 **Main.hx**
 
 ```haxe
-package ;
 import buddy.*;
 
-class Main extends BuddySuite implements Buddy
+// Combining extends and implements this time
+class Main extends BuddySuite implements Buddy<[Main]>
 {
     public function new() {
         describe("Using Buddy", {
@@ -232,11 +236,7 @@ If the default console reporter isn't to your liking, you can make your own repo
 
 ```haxe
 @reporter("path.to.your.Reporter")
-class Main extends BuddySuite implements Buddy {
-    public function new() {
-        ...
-    }
-}
+class Main implements Buddy<[Tests]> {}
 ```
 
 ### Compilation flag
@@ -265,7 +265,7 @@ class Main {
 }
 ```
 
-Note that running tests manually like this is rare, you should use the `Buddy` or `BuddySuites` interface as specified in the first FAQ question below.
+Note that running tests manually like this is rare, usually you will use the `Buddy` interface. See the first FAQ question for an explanation.
 
 ### List of built-in Reporters
 
@@ -279,13 +279,9 @@ Note that running tests manually like this is rare, you should use the `Buddy` o
 
 ### Where's main()?
 
-Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and it will create a `main()` method, autodetect all existing subclasses of `buddy.BuddySuite` and run them automatically at startup. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
-
-This may cause some problems with 3:rd party libraries however (see the following questions), so if you want to provide a list of your test suites you can do that too, as long as they have a parameterless constructor or constant parameters:
+Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and specify an array of test suites within the type brackets like so: 
 
 ```haxe
-package ;
-
 class Main implements buddy.BuddySuites<[
 	path.to.YourBuddySuite,
 	AnotherTestSuite,
@@ -293,35 +289,7 @@ class Main implements buddy.BuddySuites<[
 ]> {}
 ```
 
-The advantage with implementing `Buddy` or `BuddySuites` is that platform-specific code for waiting until the tests are finished will be generated, including returning 0 or 1 depending on test status afterwards on server platforms.
-
-### Can I include only specific packages?
-
-The build macro used will by default include all `.hx` files in the class path so it can find the relevant subclasses of `buddy.BuddySuite` without you having to import them manually. If you would prefer to control which packages are imported, you can call the build macro manually:
-
-```haxe
-@:build(buddy.GenerateMain.build(["pack1","pack2.subpack"]))
-class Tests extends BuddySuite {}
-```
-
-Note that you should not let the class implement Buddy in this case, since you are basically doing that by adding the build macro yourself.
-
-### Why do I get strange compilation errors not related to my project?
-
-Sometimes, 3:rd party libraries included with `-cp` will have some issues that won't show up unless a class is explicitly referenced, but when including all classpaths automatically like Buddy does, the compiler will detect those problems and fail compilation. The solution is to only specify the classpaths you want included, using a second parameter of the build macro:
-
-```haxe
-@:build(buddy.GenerateMain.build(null, ["src"]))
-class Tests extends BuddySuite {}
-```
-
-This problem can sometimes be fixed by specifying packages instead (as in the previous question), so you can decide whether you want to use packages or classpaths to avoid getting 3:rd party library errors. Or perhaps the best solution: Tell the library author about the error. :)
-
-Note that you should not let the class implement Buddy in this case, since you are basically doing that by adding the build macro yourself.
-
-### It still doesn't work!
-
-Use the `BuddySuites` implementation as specified in the "Where's main()?" question above.
+The advantage with implementing `Buddy` is that platform-specific code for waiting until the tests are finished will be generated. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 

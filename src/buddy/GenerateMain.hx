@@ -9,7 +9,6 @@ import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
 import haxe.rtti.Meta;
-import buddy.tools.AutoIncluder;
 import Type in HaxeType;
 
 using haxe.macro.ExprTools;
@@ -21,75 +20,51 @@ class GenerateMain
 	{
 		var cls = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
-		var error = function() Context.error("BuddySuites must use an array of type paths or objects as parameter.", cls.pos);
+		
+		var buddySuites = cls.interfaces.find(function(f) return f.t.get().name == 'Buddy');
+		var addedSuites = [];
 
-		var usingBuddySuites = false;
-		try {
-			usingBuddySuites = suites.getValue() == null;
-		} catch (e : Dynamic) {}
+		function error() Context.error("Buddy must use an array of type paths as parameter.", cls.pos);
 
-		if (usingBuddySuites)
+		function addSuite(type) switch type {
+			case TInst(t, params):
+				var type = t.get();
+				if (type.meta.has('exclude')) return;
+				
+				addedSuites.push({expr: ENew({
+					name: type.name,
+					pack: type.pack,
+					params: []
+				}, []), pos: cls.pos});
+			case _: error();
+		};
+		
+		switch(buddySuites.params[0])
 		{
-			var buddySuites = cls.interfaces.find(function(f) return f.t.get().name == 'BuddySuites');
-			var addedSuites = [];
-
-			var addSuite = function(type) switch type {
-				case TInst(t, params):
-					var type = t.get();
-					addedSuites.push({expr: ENew({
-						name: type.name,
-						pack: type.pack,
-						params: []
-					}, []), pos: cls.pos});
-				case _: error();
-			};
-
-			switch(buddySuites.params[0])
-			{
-				case TInst(t, p):
-					switch(t.get().kind)
-					{
-						case KExpr(e): switch e.expr {
-							case EArrayDecl(values): for (c in values) switch c.expr {
-								case EField(e, field):
-									addSuite(Context.getType(e.toString() + '.$field'));
-								case EConst(c): switch c {
-									case CString(s), CIdent(s):
-										addSuite(Context.getType(s));
-									case _: error();
-								}
-								case ENew(t, params):
-									addedSuites.push(c);
+			case TInst(t, p):
+				switch(t.get().kind)
+				{
+					case KExpr(e): switch e.expr {
+						case EArrayDecl(values): for (c in values) switch c.expr {
+							case EField(e, field):
+								addSuite(Context.getType(e.toString() + '.' + field));
+							case EConst(c): switch c {
+								case CString(s), CIdent(s):
+									addSuite(Context.getType(s));
 								case _: error();
 							}
+							case ENew(t, params):
+								addedSuites.push(c);
 							case _: error();
 						}
 						case _: error();
 					}
-				case _: error();
-			}
-
-			suites = { expr: EArrayDecl(addedSuites), pos: cls.pos };
+					case _: error();
+				}
+			case _: error();
 		}
 
-		buildMain(currentMain(fields), cls, reporter(), suites);
-
-		return fields;
-	}
-
-	/**
-	 * Generates code for running all BuddySuite classes in the project automatically.
-	 * @param	packages Only include these packages
-	 * @param	classPaths Only include these classpaths (use if you experience strange compile errors)
-	 */
-	macro public static function build( ?packages : Array<String>, ?classPaths : Array<String> ) : Array<Field>
-	{
-		var cls = Context.getLocalClass().get();
-		var fields = Context.getBuildFields();
-
-		AutoIncluder.run(cls, packages, classPaths, typeIsSuite);
-
-		buildMain(currentMain(fields), cls, reporter());
+		buildMain(currentMain(fields), cls, reporter(), { expr: EArrayDecl(addedSuites), pos: cls.pos });
 
 		return fields;
 	}
@@ -172,7 +147,11 @@ class GenerateMain
 
 	private static function buildMain(exprs : Array<Expr>, cls : ClassType, reporter : String, ?allSuites : ExprOf<Array<BuddySuite>>)
 	{
-		var e = AutoIncluder.toTypeStringExpr(cls);
+		function toTypeStringExpr(type : ClassType) : Expr {
+			return {expr: EConst(CString(type.pack.concat([type.name]).join("."))), pos: Context.currentPos()};
+		}
+		
+		var e = toTypeStringExpr(cls);
 		var body : Expr;
 
 		var pack = reporter.split(".");

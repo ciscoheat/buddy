@@ -1,7 +1,7 @@
 package buddy.tests ;
+
 import buddy.BuddySuite;
 import buddy.Buddy;
-import buddy.BuddySuites;
 import buddy.tools.AsyncTools;
 import promhx.Deferred;
 import promhx.Promise;
@@ -14,21 +14,24 @@ using buddy.Should;
 using Lambda;
 using StringTools;
 
-@:build(buddy.GenerateMain.build(null, ["src"]))
-class AllTests {} // implements Buddy {}
-
-/*
-@:build(buddy.GenerateMain.withSuites([
-	new buddy.tests.AllTests(), new BeforeAfterDescribe()
-]))
-class AllTests {}
-
-class AllTests implements BuddySuites<[
-	buddy.tests.TestBasicFeatures,
+class AllTests implements Buddy<[
+	TestBasicFeatures,
+	TestExclude,
+	FailTest,
+	#if !php
+	TestAsync,
+	FailTestAsync,
+	#end
+	#if utest
+	UtestUsage,
+	#end
+	TestExceptionHandling,
 	BeforeAfterDescribe,
-	new NestedBeforeAfter()
+	BeforeAfterDescribe2,
+	BeforeAfterDescribe3,
+	NestedBeforeAfter,
+	CallDoneTest
 ]> {}
-*/
 
 class EmptyTestClass { public function new() {} }
 
@@ -428,6 +431,7 @@ class TestExceptionHandling extends BuddySuite
 	}
 }
 
+#if utest
 class UtestUsage extends BuddySuite
 {
 	public function new()
@@ -470,6 +474,7 @@ class UtestUsage extends BuddySuite
 		});
 	}
 }
+#end
 
 class BeforeAfterDescribe extends BuddySuite
 {
@@ -625,7 +630,7 @@ class NestedBeforeAfter extends BuddySuite
 	}
 }
 
-class FailTest1 extends BuddySuite
+class FailTest extends BuddySuite
 {
 	public function new()
 	{
@@ -654,7 +659,7 @@ class FailTest1 extends BuddySuite
 }
 
 #if !php
-class FailTest3 extends BuddySuite
+class FailTestAsync extends BuddySuite
 {
 	public function new()
 	{
