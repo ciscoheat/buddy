@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.17.1",
-  "releasenote": "Fixed should for variables cast to Dynamic.",
+  "version": "0.17.2",
+  "releasenote": "Fixed should autocompletion.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }

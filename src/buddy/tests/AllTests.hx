@@ -136,22 +136,22 @@ class TestBasicFeatures extends BuddySuite
 		});
 
 		describe("Testing ints", {
-			var number = 3;
+			var int = 3;
 
 			it("should have a beLessThan() method", {
-				number.should.beLessThan(4);
+				int.should.beLessThan(4);
 			});
 
 			it("beLessThan should compare against float", {
-				number.should.beLessThan(3.1);
+				int.should.beLessThan(3.1);
 			});
 
 			it("should have a beMoreThan() method", {
-				number.should.beGreaterThan(2);
+				int.should.beGreaterThan(2);
 			});
 
 			it("beMoreThan should compare against float", {
-				number.should.beGreaterThan(2.9);
+				int.should.beGreaterThan(2.9);
 			});
 		});
 

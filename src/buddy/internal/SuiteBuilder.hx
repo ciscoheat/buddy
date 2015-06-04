@@ -27,7 +27,7 @@ class SuiteBuilder
 				switch(e2)
 				{
 					case macro $a.should:
-						var change = macro $a.should();
+						var change = macro $a.should(untyped __status);
 						e2.expr = change.expr;
 
 					case _:
