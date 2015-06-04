@@ -16,7 +16,7 @@ using Lambda;
 
 class GenerateMain
 {
-	macro public static function withSuites(suites : ExprOf<Array<BuddySuite>>) : Array<Field>
+	macro public static function withSuites() : Array<Field>
 	{
 		var cls = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();

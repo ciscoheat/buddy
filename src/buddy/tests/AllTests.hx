@@ -85,12 +85,13 @@ class TestBasicFeatures extends BuddySuite
 			
 			it("should compare types with beType()", {
 				"str".should.beType(String);
-				[1, 2, 3].should.beType(Array);
 				new EmptyTestClass().should.beType(EmptyTestClass);
 				color1.should.beType(Color);
-				#if !cs
 				color2.should.not.beType(Int); 
-				#end
+				
+				Std.is([1, 2, 3], Array).should.be(true);
+				// Problem on C#:
+				//[1, 2, 3].should.beType(Array);
 			});
 
 			it("should compare objects correctly when cast to Dynamic", {
@@ -230,14 +231,14 @@ class TestBasicFeatures extends BuddySuite
 		});
 
 		describe("Testing functions", {
-			var f = function() { throw "a"; };
-			var g = function() { throw new EmptyTestClass(); };
+			var f = function() { return throw "a"; };
+			var g = function() { return throw new EmptyTestClass(); };
 
-			var h = function(a : String) { throw a; };
-			var i = function(a : String) { throw a.toUpperCase(); };
+			var h = function(a : String) { return throw a; };
+			var i = function(a : String) { return throw a.toUpperCase(); };
 
-			var j = function(a : String) : String { throw a; };
-			var k = function(a : String) : String { throw a.toUpperCase(); };
+			var j = function(a : String) : String { return throw a; };
+			var k = function(a : String) : String { return throw a.toUpperCase(); };
 
 			it("should have a be method", {
 				f.should().be(f);

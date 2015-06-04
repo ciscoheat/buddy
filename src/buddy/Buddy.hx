@@ -1,3 +1,3 @@
 package buddy;
 
-@:autoBuild(buddy.GenerateMain.withSuites(null)) interface Buddy<Const> {}
+@:autoBuild(buddy.GenerateMain.withSuites()) interface Buddy<Const> {}
