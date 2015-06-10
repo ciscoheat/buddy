@@ -1,6 +1,7 @@
 -cp src 
 -lib promhx
 -lib utest
+-lib slambda
 -main buddy.tests.AllTests
 -cmd echo "---------- Neko -----------"
 -x bin/buddy.n

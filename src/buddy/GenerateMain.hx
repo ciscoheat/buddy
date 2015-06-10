@@ -16,15 +16,27 @@ using Lambda;
 
 class GenerateMain
 {
-	macro public static function withSuites() : Array<Field>
+	macro public static function withSuites(?buddySuites : Expr) : Array<Field>
 	{
 		var cls = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
 		
-		var buddySuites = cls.interfaces.find(function(f) return f.t.get().name == 'Buddy');
-		var addedSuites = [];
+		function error() Context.error("Buddy must use an array of type paths as parameter.", cls.pos);		
 
-		function error() Context.error("Buddy must use an array of type paths as parameter.", cls.pos);
+		if (buddySuites == null || buddySuites.expr.equals(EConst(CIdent(null)))) {
+			var buddyInterface = cls.interfaces.find(function(f) return f.t.get().name == 'Buddy');
+			if (buddyInterface == null) error();		
+			
+			switch buddyInterface.params[0] {
+				case TInst(t, _): switch t.get().kind {
+					case KExpr(e): buddySuites = e;
+					case _: error();
+				}
+				case _: error();
+			}
+		}
+			
+		var addedSuites = [];
 
 		function addSuite(type) switch type {
 			case TInst(t, params):
@@ -39,28 +51,19 @@ class GenerateMain
 			case _: error();
 		};
 		
-		switch(buddySuites.params[0])
-		{
-			case TInst(t, p):
-				switch(t.get().kind)
-				{
-					case KExpr(e): switch e.expr {
-						case EArrayDecl(values): for (c in values) switch c.expr {
-							case EField(e, field):
-								addSuite(Context.getType(e.toString() + '.' + field));
-							case EConst(c): switch c {
-								case CString(s), CIdent(s):
-									addSuite(Context.getType(s));
-								case _: error();
-							}
-							case ENew(t, params):
-								addedSuites.push(c);
-							case _: error();
-						}
-						case _: error();
-					}
+		switch buddySuites.expr {
+			case EArrayDecl(values): for (c in values) switch c.expr {
+				case EField(e, field):
+					addSuite(Context.getType(e.toString() + '.' + field));
+				case EConst(c): switch c {
+					case CString(s), CIdent(s):
+						addSuite(Context.getType(s));
 					case _: error();
 				}
+				case ENew(t, params):
+					addedSuites.push(c);
+				case _: error();
+			}
 			case _: error();
 		}
 

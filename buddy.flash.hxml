@@ -1,6 +1,7 @@
 -cp src
 -lib promhx
 -lib utest
+-lib slambda
 -swf bin/buddy.swf
 -main buddy.tests.AllTests
 --times

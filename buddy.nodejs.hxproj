@@ -8,7 +8,7 @@
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
-    <movie version="1" />
+    <movie version="0" />
     <movie minorVersion="0" />
     <movie platform="JavaScript" />
     <movie background="#FFFFFF" />
@@ -30,6 +30,7 @@
   <haxelib>
     <library name="promhx" />
     <library name="utest" />
+    <library name="slambda" />    
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>

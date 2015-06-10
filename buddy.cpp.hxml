@@ -1,6 +1,7 @@
 -cp src 
 -lib promhx
 -lib utest
+-lib slambda
 -cpp bin
 -main buddy.tests.AllTests
 -cmd echo "---------- CPP ----------"

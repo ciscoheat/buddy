@@ -6,15 +6,19 @@ import buddy.tools.AsyncTools;
 import promhx.Deferred;
 import promhx.Promise;
 
+import Slambda.fn;
+
 #if utest
 import utest.Assert;
 #end
 
 using buddy.Should;
-using Lambda;
+using Slambda;
 using StringTools;
 
-class AllTests implements Buddy<[
+// Cannot use interface syntax for Java until
+// https://github.com/HaxeFoundation/haxe/issues/4286 is fixed
+@:build(buddy.GenerateMain.withSuites([
 	TestBasicFeatures,
 	TestExclude,
 	FailTest,
@@ -31,7 +35,7 @@ class AllTests implements Buddy<[
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
 	CallDoneTest
-]> {}
+])) class AllTests {}
 
 class EmptyTestClass { public function new() {} }
 
@@ -265,6 +269,25 @@ class TestBasicFeatures extends BuddySuite
 				j.bind("a").should().throwValue("a");
 				k.bind("a").should().not.throwValue("a");
 			});
+
+			it("should work with Slambda", {
+				[1, 2, 3].filter.fn(_ > 2).should.containExactly([3]);
+				[1, 2, 3].filter.fn(x => x > 1).should.containExactly([2, 3]);
+				[1, 1, 1].mapi.fn([i, a] => i + a).should.containExactly([1, 2, 3]);
+				[1, 2, 3].filter(fn(_ > 2)).should.containExactly([3]);
+				
+				["1", "1", "1"].fold.fn(_2 + Std.parseInt(_1), 10).should.be(13);
+
+				fn('$$_1')().should.be("$_1");
+
+				var attr = function(name : String, cb : String -> Int -> Dynamic) {
+					name.should.be("test");
+					cb("a", 1).should.be("a-1");
+				}
+				
+				attr.fn("test", _1 + "-" + _2);
+				attr.fn("test", [a,b] => a + "-" + b);
+			});			
 		});
 
 		describe("Testing should.not", {

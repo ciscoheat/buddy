@@ -31,6 +31,7 @@
   <haxelib>
     <library name="promhx" />
     <library name="utest" />
+    <library name="slambda" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>

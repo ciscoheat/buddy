@@ -25,6 +25,7 @@ before_install:
   # haxelib dependencies for all targets
   - haxelib install promhx
   - haxelib install utest
+  - haxelib install slambda
 
   # apt packages for each target
   - sudo apt-get update

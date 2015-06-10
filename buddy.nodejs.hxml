@@ -1,6 +1,7 @@
 -cp src 
 -lib promhx
 -lib utest
+-lib slambda
 -D nodejs
 -js bin/buddy.nodejs.js
 -main buddy.tests.AllTests
