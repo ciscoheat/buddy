@@ -22,10 +22,10 @@ class GenerateMain
 		var fields = Context.getBuildFields();
 		
 		function error() Context.error("Buddy must use an array of type paths as parameter.", cls.pos);		
-
-		if (buddySuites == null || buddySuites.expr.equals(EConst(CIdent(null)))) {
+		
+		if (buddySuites == null || buddySuites.expr.equals(EConst(CIdent("null")))) {
 			var buddyInterface = cls.interfaces.find(function(f) return f.t.get().name == 'Buddy');
-			if (buddyInterface == null) error();		
+			if (buddyInterface == null) error();
 			
 			switch buddyInterface.params[0] {
 				case TInst(t, _): switch t.get().kind {
