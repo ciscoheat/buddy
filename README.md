@@ -162,6 +162,8 @@ If the function signature is `String -> Void` then apply the string argument lik
 
 `a.bind("test").should.throwType(String)`
 
+`throwValue` and `throwType` will return the exception object, so it can be tested further. This works synchonously only.
+
 ### Inverting assertions
 
 Every assertion can be negated using `not` which is present on all `should` fields:
@@ -282,7 +284,7 @@ Note that running tests manually like this is rare, usually you will use the `Bu
 Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and specify an array of test suites within the type brackets like so: 
 
 ```haxe
-class Main implements buddy.BuddySuites<[
+class Main implements buddy.Buddy<[
 	path.to.YourBuddySuite,
 	AnotherTestSuite,
 	new SpecialSuite("Constant value", 123)
@@ -293,7 +295,7 @@ The advantage with implementing `Buddy` is that platform-specific code for waiti
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
-The compiler seems to be a bit too good at optimizing sometimes, especially at the beginning of functions, so if you get this problem add a parenthesis after "should" and wrap numbers in parenthesis too.
+The compiler seems to be a bit too good at optimizing sometimes, especially at the beginning of functions, though this seems to have improved greatly in 3.2. If you have this problem, add a parenthesis after "should", and wrap numbers in parenthesis too.
 
 `x.should.be("ok")` -> `x.should().be("ok")`
 

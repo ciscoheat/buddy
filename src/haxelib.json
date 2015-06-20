@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
   "description": "Your friendly BDD testing library for Haxe!",
-  "version": "0.17.2",
-  "releasenote": "Fixed should autocompletion.",
+  "version": "0.17.3",
+  "releasenote": "Exception tests now return the exception for further testing.",
   "contributors": ["ciscoheat", "jason"],
   "dependencies": { "promhx": "" }
 }

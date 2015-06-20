@@ -254,12 +254,17 @@ class TestBasicFeatures extends BuddySuite
 			
 			it("should have a throwValue() method", {
 				f.should().throwValue("a");
-				f.should().not.throwValue("b");
+				var value = f.should().not.throwValue("b");
+				
+				value.length.should.be(1);
+				value.charCodeAt(0).should.be(97);
 			});
 
 			it("should have a throwType() method", {
-				g.should().throwType(EmptyTestClass);
+				var obj = g.should().throwType(EmptyTestClass);
+				
 				g.should().not.throwType(String);
+				obj.should.beType(EmptyTestClass);
 			});
 
 			it("should have a throwType() method that can be used with bind", {

@@ -273,40 +273,49 @@ class ShouldFunctions
 	/**
 	 * Will call the specified method and test if it throws a specific value.
 	 */
-	public function throwValue(v : Dynamic, ?p : PosInfos)
+	public function throwValue<T>(v : T, ?p : PosInfos) : Null<T>
 	{
-		var expr = false;
+		var caught = false;
+		var exception : T = null;
+		
 		try { value(); }
 		catch (e : Dynamic)
 		{
-			expr = e == v;
+			exception = e;
+			caught = e == v;
 		}
 
-		test(expr, p,
+		test(caught, p,
 			'Expected ${quote(value)} to throw ${quote(v)}',
 			'Expected ${quote(value)} not to throw ${quote(v)}'
 		);
+		
+		return exception;
 	}
 
 	/**
 	 * Will call the specified method and test if it throws a specific type.
 	 */
-	public function throwType(type : Class<Dynamic>, ?p : PosInfos)
+	public function throwType<T>(type : Class<T>, ?p : PosInfos) : Null<T>
 	{
-		var expr = false;
+		var caught = false;
 		var name : String = null;
+		var exception : T = null;
 
 		try { value(); }
 		catch (e : Dynamic)
 		{
+			exception = e;
 			name = Type.getClassName(type);
-			expr = Std.is(e, type);
+			caught = Std.is(e, type);
 		}
 
-		test(expr, p,
+		test(caught, p,
 			'Expected ${quote(value)} to throw type $name',
 			'Expected ${quote(value)} not to throw type $name'
 		);
+		
+		return exception;
 	}
 
 	/**
