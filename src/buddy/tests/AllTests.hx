@@ -194,6 +194,38 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
+		describe("Testing dates", {
+			var date : Date;
+			
+			before({
+				date = Date.fromString("2015-01-02 12:13:14");
+			});
+
+			it("should have a beOn() method", {
+				date.should.beOn(Date.fromString("2015-01-02 12:13:14"));
+			});
+			
+			it("should have a beOnStr() method", {
+				date.should.beOnStr("2015-01-02 12:13:14");
+			});
+
+			it("should have a beAfter() method", {
+				date.should.beAfter(Date.fromString("2015-01-01 12:13:14"));
+			});
+			
+			it("should have a beAfterStr() method", {
+				date.should.beAfterStr("2015-01-02 12:13:13");
+			});
+
+			it("should have a beBefore() method", {
+				date.should.beBefore(Date.fromString("2016-01-01 12:13:14"));
+			});
+			
+			it("should have a beBeforeStr() method", {
+				date.should.beBeforeStr("2015-01-02 12:13:15");
+			});						
+		});
+
 		describe("Testing Iterable", {
 			var a = [1,2,3];
 			var b = [1, 2, 3];

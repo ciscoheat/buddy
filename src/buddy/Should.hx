@@ -125,6 +125,57 @@ class ShouldFloat extends Should<Float>
 	}
 }
 
+class ShouldDate extends Should<Date>
+{
+	static public function should(i : Date, assert : SpecAssertion)
+	{
+		return new ShouldDate(i, assert);
+	}
+
+	public function new(value : Date, assert : SpecAssertion, inverse = false)
+	{
+		super(value, assert, inverse);
+	}
+
+	public var not(get, never) : ShouldDate;
+	private function get_not() { return new ShouldDate(value, assert, !inverse); }
+
+	//////////
+
+	public function beOn(expected : Date, ?p : PosInfos)
+	{
+		test(value.getTime() == expected.getTime(), p,
+			'Expected date equal to ${quote(expected)}, was ${quote(value)}',
+			'Expected date not equal to ${quote(expected)}'
+		);
+	}
+
+	public function beBefore(expected : Date, ?p : PosInfos)
+	{
+		test(value.getTime() < expected.getTime(), p,
+			'Expected date before ${quote(expected)}, was ${quote(value)}',
+			'Expected date not before ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
+	public function beAfter(expected : Date, ?p : PosInfos)
+	{
+		test(value.getTime() > expected.getTime(), p,
+			'Expected date after ${quote(expected)}, was ${quote(value)}',
+			'Expected date not after ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
+	public function beOnStr(expected : String, ?p : PosInfos)
+		return beOn(Date.fromString(expected), p);
+
+	public function beBeforeStr(expected : String, ?p : PosInfos)
+		return beBefore(Date.fromString(expected), p);
+		
+	public function beAfterStr(expected : String, ?p : PosInfos)
+		return beAfter(Date.fromString(expected), p);
+}
+
 class ShouldString extends Should<String>
 {
 	static public function should(str : String, assert : SpecAssertion)

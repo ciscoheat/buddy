@@ -144,6 +144,20 @@ Same as Int plus
 
 `a.should.match(regexp)` - Test if `a` matches a regular expression (`EReg`).
 
+### Date
+
+`a.should.beOn(date)` - Test if `a` is on a given date
+
+`a.should.beOnStr(string)` - Test if `a` is on a date specified by a string in the [Date.fromString](http://api.haxe.org/Date.html#fromString) accepted formats.
+
+`a.should.beBefore(date)` - Test if `a` is before a given date.
+
+`a.should.beBeforeStr(string)` - Same as above, but specified by a string.
+
+`a.should.beAfter(date)` - Test if `a` is after a given date.
+
+`a.should.beAfterStr(string)` - Same as above, but specified by a string.
+	
 ### Iterable<T>
 
 `a.should.contain(b)` - Test if an Iterable contains `b`.
