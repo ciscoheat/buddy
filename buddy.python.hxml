@@ -1,0 +1,8 @@
+-cp src 
+-lib promhx
+-lib utest
+-lib slambda
+-python bin/buddy.python.py
+-main buddy.tests.AllTests
+-cmd echo "---------- Python ----------"
+-cmd python3 bin/buddy.python.py

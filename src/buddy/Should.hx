@@ -350,19 +350,20 @@ class ShouldFunctions
 	public function throwType<T>(type : Class<T>, ?p : PosInfos) : Null<T>
 	{
 		var caught = false;
-		var name : String = null;
+		var name : String = Type.getClassName(type);
+		var exceptionName : String = null;
 		var exception : T = null;
 
 		try { value(); }
 		catch (e : Dynamic)
 		{
 			exception = e;
-			name = Type.getClassName(type);
+			exceptionName = Type.getClassName(Type.getClass(e));
 			caught = Std.is(e, type);
 		}
 
 		test(caught, p,
-			'Expected ${quote(value)} to throw type $name',
+			'Expected ${quote(value)} to throw type $name, $exceptionName was thrown instead',
 			'Expected ${quote(value)} not to throw type $name'
 		);
 		

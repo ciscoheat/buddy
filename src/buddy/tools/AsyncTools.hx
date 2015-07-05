@@ -45,7 +45,7 @@ class AsyncTools
 			Sys.sleep(ms / 1000);
 			done();
 		});
-		#elseif (js || flash)
+		#elseif (js || flash || python)
 		Timer.delay(function() { done(); }, ms);
 		#elseif cs
 		var t = new Timer(ms);
