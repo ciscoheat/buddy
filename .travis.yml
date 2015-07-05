@@ -33,6 +33,7 @@ before_install:
   - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get install phantomjs -y; fi"
   - sh -c "if [ '$TARGET' = 'php' ]; then sudo apt-get install php5-cli -y; fi"
   - sh -c "if [ '$TARGET' = 'flash' ]; then chmod +x ./flash-travis-setup.sh && ./flash-travis-setup.sh; fi"
+  - sh -c "if [ '$TARGET' = 'python' ]; then sudo apt-get install python3 -y; fi"
 
   # haxelib dependencies for each target
   - sh -c "if [ '$TARGET' = 'cpp' ]; then haxelib install hxcpp; fi"
