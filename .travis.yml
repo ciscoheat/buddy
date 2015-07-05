@@ -14,7 +14,7 @@ env:
     - TARGET=nodejs
     - TARGET=php
     - TARGET=flash
-	- TARGET=python
+    - TARGET=python
 
 before_install:
   # Install Haxe
