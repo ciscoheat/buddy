@@ -15,6 +15,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 #elseif cpp
 import cpp.vm.Thread;
+#elseif python
+@:pythonImport("threading", "Timer")
+extern class Timer {
+	public function new(delayS : Float, callback : Void -> Void);
+	public function start() : Void;
+	public function cancel() : Void;
+}
 #else
 import haxe.Timer;
 #end
@@ -45,7 +52,9 @@ class AsyncTools
 			Sys.sleep(ms / 1000);
 			done();
 		});
-		#elseif (js || flash || python)
+		#elseif python
+		new Timer(ms / 1000, done).start();
+		#elseif (js || flash)
 		Timer.delay(function() { done(); }, ms);
 		#elseif cs
 		var t = new Timer(ms);
