@@ -3,14 +3,12 @@ package buddy.tests ;
 import buddy.BuddySuite;
 import buddy.Buddy;
 import buddy.tools.AsyncTools;
+import haxe.Timer;
 import promhx.Deferred;
 import promhx.Promise;
 
 import Slambda.fn;
-
-#if utest
 import utest.Assert;
-#end
 
 using buddy.Should;
 using Slambda;
@@ -20,21 +18,21 @@ using StringTools;
 // https://github.com/HaxeFoundation/haxe/issues/4286 is fixed
 @:build(buddy.GenerateMain.withSuites([
 	TestBasicFeatures,
+	/*
 	TestExclude,
 	FailTest,
 	#if !php
 	TestAsync,
 	FailTestAsync,
 	#end
-	#if utest
 	UtestUsage,
-	#end
 	TestExceptionHandling,
 	BeforeAfterDescribe,
 	BeforeAfterDescribe2,
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
 	CallDoneTest
+	*/
 ])) class AllTests {}
 
 class EmptyTestClass { public function new() {} }
@@ -74,7 +72,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		describe("Testing dynamics", {
+		describe("Testing dynamics", function(done) {
 			var obj1 = { id: 1 };
 			var obj2 = { id: 2 };
 			var color1 = Red;
@@ -105,6 +103,8 @@ class TestBasicFeatures extends BuddySuite
 				arr.should.be(fn());
 				// fn().should.be(arr); // Will fail because it's Unknown<0>, cast to fix.
 			});
+			
+			Timer.delay(done, 10);
 		});
 
 		describe("Testing strings", {
@@ -367,6 +367,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
+		/*
 		describe("Excluding suites with @exclude and xdescribe()", {
 			it("should not display suites or their specs at all.", {
 				this.suites.find(function(s) { return s.name == "Excluding suites with xdescribe()"; } ).should.be(null);
@@ -391,9 +392,11 @@ class TestBasicFeatures extends BuddySuite
 				}
 			});
 		});
+		*/
 	}
 }
 
+/*
 @exclude
 class TestExclude extends BuddySuite
 {
@@ -753,3 +756,4 @@ class CallDoneTest extends BuddySuite
 		});
 	}
 }
+*/

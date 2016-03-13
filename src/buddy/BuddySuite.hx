@@ -1,9 +1,11 @@
 package buddy ;
-import buddy.BuddySuite.Spec;
-import buddy.BuddySuite.Suite;
 import buddy.reporting.Reporter;
 import haxe.CallStack;
 import haxe.PosInfos;
+import haxe.ds.GenericStack;
+import haxe.rtti.Meta;
+import haxecontracts.Contract;
+import haxecontracts.HaxeContracts;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.Should;
@@ -29,27 +31,30 @@ enum TestStatus
 	Failed;
 }
 
+enum TestFunc
+{
+	Async(f : (Void -> Void) -> Void);
+	Sync(f : Void -> Void);
+}
+
+enum TestSpec
+{
+	Describe(suite : TestSuite);
+	It(description : String, test : Null<TestFunc>);
+}
+
+typedef BeforeAfter = Dynamic;
+
 enum TestStep
 {
 	TSuite(s : Suite);
 	TSpec(s : Spec);
 }
 
-class BeforeAfter
-{
-	public var async(default, null) : Bool;
-	@:allow(buddy.internal.SuiteRunner) private var run : Action;
-
-	public function new(run : Action, async = false)
-	{
-		this.run = run;
-		this.async = async;
-	}
-}
-
 class Suite
 {
-	public var name(default, null) : String;
+	public var name(default, null): String;
+	public var description(default, null) : String;
 	public var buddySuite(default, null) : BuddySuite;
 	@:allow(buddy.BuddySuite) public var parent(default, null) : Suite;
 	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
@@ -58,20 +63,24 @@ class Suite
 	public var specs(get, never) : List<Spec>;
 	private function get_specs() {
 		var output = new List<Spec>();
+		/*
 		for(step in steps) switch step {
 			case TSpec(s): output.add(s);
 			case _:
 		};
+		*/
 		return output;
 	}
 
 	public var suites(get, never) : List<Suite>;
 	private function get_suites() {
 		var output = new List<Suite>();
+		/*
 		for(step in steps) switch step {
 			case TSuite(s): output.add(s);
 			case _:
 		};
+		*/
 		return output;
 	}
 
@@ -125,66 +134,87 @@ class Spec
 	}
 }
 
+class TestSuite
+{
+	public var description(default, null) : String;
+	
+	public var beforeAll = new List<TestFunc>();
+	public var beforeEach = new List<TestFunc>();
+	
+	public var specs = new List<TestSpec>();
+	
+	public var afterEach = new List<TestFunc>();
+	public var afterAll = new List<TestFunc>();	
+	
+	public function new(description : String) {
+		if(description == null) throw "TestSuite must have a description. Can be empty.";
+		this.description = description;
+	}
+}
+
 @:autoBuild(buddy.internal.SuiteBuilder.build())
 class BuddySuite
 {
-	public var suites(default, null) : List<Suite>;
-
-	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var befores : List<BeforeAfter>;
-	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var afters : List<BeforeAfter>;
-
 	// If set, suites are only included if marked by @include or if one of its specs are marked with @include
-	public static var includeMode : Bool;
+	public static var includeMode = false;
 
-	public static var exclude(default, never) : String = "exclude";
-	public static var include(default, never) : String = "include";
-
-	// List of Suites that are currently created
-	private var suiteStack : List<Suite>;
+	public static var exclude(default, never) = "exclude";
+	public static var include(default, never) = "include";
 
 	/**
 	 * Milliseconds before an async spec timeout with an error. Default is 5000 (5 sec).
 	 */
-	public var timeoutMs(default, default) : Int;
+	public var timeoutMs(default, default) = 5000;
 
-	public function new()
-	{
-		this.suites = new List<Suite>();
-		this.befores = new List<BeforeAfter>();
-		this.afters = new List<BeforeAfter>();
-		this.suiteStack = new List<Suite>();
+	/**
+	 * Top-level test suite
+	 */
+	public var suite : TestSuite;	
+	
+	// For building the test suite structure. Used in SuitesRunner
+	@:allow(buddy.SuitesRunner) var currentSuite(default, default) : TestSuite;
+	
+	@:allow(buddy.SuitesRunner) var describeQueue(default, null) 
+		= new List<{ suite: TestSuite, spec: TestFunc }>();
 
-		this.timeoutMs = 5000;
+	//public var include(default, default) = false;
+	
+	public function new() {
+		suite = currentSuite = new TestSuite("");
 	}
 
 	///// Private API /////
 
-	private function describe(name : String, addSpecs : Void -> Void)
-	{
-		addSuite(new Suite(name, this), addSpecs);
+	private function describe(description : String, spec : TestFunc) {
+		var suite = new TestSuite(description);
+		
+		currentSuite.specs.add(TestSpec.Describe(suite));
+		// Will be looped through in SuitesRunner:
+		describeQueue.add({ suite: suite, spec: spec });
+	}
+		
+	private function xdescribe(description : String, spec : TestFunc) {
+		// Do nothing, suite is excluded.
 	}
 
-	private function xdescribe(name : String, addSpecs : Void -> Void)
-	{}
+	@:deprecated("Use beforeEach instead.")
+	private function before(init : TestFunc) beforeEach(init);
 
-	private function before(init : Action)
-	{
-		syncBefore(init, true);
+	@:deprecated("Use afterEach instead.")
+	private function after(init : TestFunc) afterEach(init);
+
+	private function beforeEach(init : TestFunc) currentSuite.beforeEach.add(init);
+	private function afterEach(init : TestFunc) currentSuite.beforeEach.add(init);
+	private function beforeAll(init : TestFunc) currentSuite.beforeAll.add(init);
+	private function afterAll(init : TestFunc) currentSuite.afterAll.add(init);
+	
+	private function it(desc : String, ?spec : TestFunc) {
+		currentSuite.specs.add(TestSpec.It(desc, spec));
+		trace(desc + " -> " + currentSuite.description);
 	}
 
-	private function after(deinit : Action)
-	{
-		syncAfter(deinit, true);
-	}
-
-	private function it(desc : String, test : Action = null)
-	{
-		syncIt(desc, test, true);
-	}
-
-	private function xit(desc : String, test : Action = null)
-	{
-		syncXit(desc, test, true);
+	private function xit(desc : String, ?spec : TestFunc) {
+		currentSuite.specs.add(TestSpec.It(desc, null));
 	}
 
 	private function fail(desc : Dynamic = "Manually") : Void
@@ -192,6 +222,7 @@ class BuddySuite
 		// Will be replaced by failSync in SuiteBuilder.
 	}
 
+	/*
 	///// Hidden "include" handlers /////
 
 	@:noCompletion private function failSync(test : SpecAssertion, desc : Dynamic = "Manually", ?p : PosInfos)
@@ -299,5 +330,6 @@ class BuddySuite
 
 		suite.steps.add(TestStep.TSpec(spec));
 	}
+	*/
 }
 

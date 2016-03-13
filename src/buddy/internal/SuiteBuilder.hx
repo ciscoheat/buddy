@@ -5,6 +5,7 @@ import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Context;
+
 using haxe.macro.ExprTools;
 
 class SuiteBuilder
@@ -35,7 +36,7 @@ class SuiteBuilder
 
 			case _:
 		}
-
+		
 		switch(e)
 		{
 			case macro $a.should().$b, macro $a.should.$b:
@@ -43,96 +44,68 @@ class SuiteBuilder
 				var change = macro $a.should(untyped __status).$b;
 				e.expr = change.expr;
 
-			/////
+			///// Describe
 
-			case macro @include describe($s, function() $f), macro @include describe($s, $f):
-				var change = macro describeInclude($s, function() $f);
+			case macro describe($s, function($n) $f):
+				var change = macro describe($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
 			case macro describe($s, function() $f), macro describe($s, $f):
-				var change = macro describe($s, function() $f);
+				var change = macro describe($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro xdescribe($s, function() $f), macro xdescribe($s, $f), macro @exclude describe($s, function() $f), macro @exclude describe($s, $f):
-				var change = macro xdescribe($s, function() $f);
+			case macro xdescribe($s, function() $f), macro xdescribe($s, $f), macro @exclude describe($s, $f):
+				var change = macro xdescribe($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			/////
+			///// Before/After
 
-			case macro before(function($n) $f):
-				var change = macro before(function($n, __status) $f);
+			case macro before(function($n) $f), macro beforeEach(function($n) $f):
+				var change = macro beforeEach(buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro before(function() $f), macro before($f):
-				var change = macro syncBefore(function(__asyncDone, __status) $f);
+			case macro before(function() $f), macro before($f), macro beforeEach(function() $f), macro beforeEach($f):
+				var change = macro beforeEach(buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			/////
-
-			case macro after(function($n) $f):
-				var change = macro after(function($n, __status) $f);
+			case macro after(function($n) $f), macro afterEach(function($n) $f):
+				var change = macro afterEach(buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro after(function() $f), macro after($f):
-				var change = macro syncAfter(function(__asyncDone, __status) $f);
+			case macro after(function() $f), macro after($f), macro afterEach(function() $f), macro afterEach($f):
+				var change = macro afterEach(buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			/////
-
-			case macro @include it($s, function($n) $f):
-				var change = macro itInclude($s, function($n, __status) $f);
-				e.expr = change.expr;
-				f.iter(injectAsync);
+			///// It
 
 			case macro it($s, function($n) $f):
-				var change = macro it($s, function($n, __status) $f);
-				e.expr = change.expr;
-				f.iter(injectAsync);
-
-			/////
-
-			case macro @include it($s, function() $f), macro @include it($s, $f):
-				var change = macro syncItInclude($s, function(__asyncDone, __status) $f);
+				var change = macro it($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
 			case macro it($s, function() $f), macro it($s, $f):
-				var change = macro syncIt($s, function(__asyncDone, __status) $f);
+				var change = macro it($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
-
-			/////
 
 			case macro xit($s, function($n) $f):
-				var change = macro xit($s, function($n, __status) $f);
+				var change = macro xit($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro xit($s, function() $f), macro xit($s, $f), macro @exclude it($s, function() $f), macro @exclude it($s, $f):
-				var change = macro syncXit($s, function(__asyncDone, __status) $f);
+			case macro xit($s, function() $f), macro xit($s, $f), macro @exclude it($s, $f):
+				var change = macro xit($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
 			/////
-
-			case macro fail():
-				var change = macro failSync(__status);
-				e.expr = change.expr;
-
-			case macro fail($s):
-				var change = macro failSync(__status, $s);
-				e.expr = change.expr;
-
-			case macro fail:
-				var change = macro function(d) { failSync(__status, d); };
-				e.expr = change.expr;
 
 			case _: e.iter(injectAsync);
 		}
@@ -154,39 +127,14 @@ class SuiteBuilder
 					switch(f.expr.expr)
 					{
 						case EBlock(exprs):
-							for (e in exprs)
-							{
-								switch(e)
-								{
-									// Replace before/after outside describe with corresponding init functions.
-
-									case macro before(function($n) $f):
-										var change = macro beforeDescribe(function($n, __status) $f);
-										e.expr = change.expr;
-
-									case macro before(function() $f), macro before($f):
-										var change = macro syncBeforeDescribe(function(__asyncDone, __status) $f);
-										e.expr = change.expr;
-
-									case macro after(function($n) $f):
-										var change = macro afterDescribe(function($n, __status) $f);
-										e.expr = change.expr;
-
-									case macro after(function() $f), macro after($f):
-										var change = macro syncAfterDescribe(function(__asyncDone, __status) $f);
-										e.expr = change.expr;
-
-									// Test if a super call exists.
-
-									case macro super():
-										exists = true;
-
-									case _:
-								}
+							for (e in exprs) switch e {
+								case macro super():	
+									exists = true;
+									break;
+								case _:
 							}
 
-							if(!exists)
-								exprs.unshift(macro super());
+							if(!exists) exprs.unshift(macro super());
 
 						case _:
 					}
