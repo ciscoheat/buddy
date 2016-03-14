@@ -20,28 +20,23 @@ class SuiteBuilder
 
 	private static function injectAsync(e : Expr)
 	{
-		switch(e.expr)
-		{
+		switch(e.expr) {
 			// Fix autocomplete for should without parenthesis
-			case EDisplay(e2, isCall):
+			case EDisplay(e2, isCall): switch e2 {
+				case macro $a.should:
+					var change = macro $a.should();
+					e2.expr = change.expr;
 
-				switch(e2)
-				{
-					case macro $a.should:
-						var change = macro $a.should(untyped __status);
-						e2.expr = change.expr;
-
-					case _:
-				}
+				case _:
+			}
 
 			case _:
 		}
 		
-		switch(e)
-		{
+		switch(e) {
 			case macro $a.should().$b, macro $a.should.$b:
 				// Need to use untyped here for some unknown macro reason...
-				var change = macro $a.should(untyped __status).$b;
+				var change = macro $a.should().$b;
 				e.expr = change.expr;
 
 			///// Describe
@@ -85,23 +80,27 @@ class SuiteBuilder
 
 			///// It
 
+			case macro it($s), macro it($s, {}), macro it($s, function() {}):
+				var change = macro xit($s, null);
+				e.expr = change.expr;
+
 			case macro it($s, function($n) $f):
 				var change = macro it($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
-
+				
 			case macro it($s, function() $f), macro it($s, $f):
 				var change = macro it($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
 			case macro xit($s, function($n) $f):
-				var change = macro xit($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
+				var change = macro xit($s, null);
 				e.expr = change.expr;
 				f.iter(injectAsync);
-
+			
 			case macro xit($s, function() $f), macro xit($s, $f), macro @exclude it($s, $f):
-				var change = macro xit($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
+				var change = macro xit($s, null);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 

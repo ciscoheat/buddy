@@ -9,7 +9,9 @@ import haxecontracts.HaxeContracts;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.Should;
+
 using buddy.tools.AsyncTools;
+using Lambda;
 
 /**
  * A bit messy typedef. It is injected in specs by macro
@@ -51,86 +53,57 @@ enum TestStep
 	TSpec(s : Spec);
 }
 
+typedef TestResult = Dynamic;
+
 class Suite
 {
-	public var name(default, null): String;
 	public var description(default, null) : String;
-	public var buddySuite(default, null) : BuddySuite;
-	@:allow(buddy.BuddySuite) public var parent(default, null) : Suite;
-	@:allow(buddy.BuddySuite) public var include(default, null) : Bool;
-	@:allow(buddy.BuddySuite) public var steps(default, null) : List<TestStep>;
 
-	public var specs(get, never) : List<Spec>;
+	//@:allow(buddy.SuitesRunner) public var parent(default, null) : Suite;
+	@:allow(buddy.SuitesRunner) public var steps(default, null) = new Array<TestStep>();
+
+	public var specs(get, never) : Array<Spec>;
 	private function get_specs() {
-		var output = new List<Spec>();
-		/*
+		var output = [];
 		for(step in steps) switch step {
-			case TSpec(s): output.add(s);
+			case TSpec(s): output.push(s);
 			case _:
-		};
-		*/
+		}
 		return output;
 	}
 
-	public var suites(get, never) : List<Suite>;
+	public var suites(get, never) : Array<Suite>;
 	private function get_suites() {
-		var output = new List<Suite>();
-		/*
+		var output = [];
 		for(step in steps) switch step {
-			case TSuite(s): output.add(s);
+			case TSuite(s): output.push(s);
 			case _:
-		};
-		*/
+		}
 		return output;
 	}
 
-	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var before : List<BeforeAfter>;
-	@:allow(buddy.internal.SuiteRunner) @:allow(buddy.BuddySuite) private var after : List<BeforeAfter>;
-
-	public function new(name : String, buddySuite : BuddySuite)
-	{
-		if (name == null) throw "Suite requires a name.";
-		if (buddySuite == null) throw "Suite requires a BuddySuite.";
-
-		this.name = name;
-		this.buddySuite = buddySuite;
-
-		this.before = new List<BeforeAfter>();
-		this.after = new List<BeforeAfter>();
-		this.steps = new List<TestStep>();
+	public function new(description : String, steps : Iterable<TestStep>) {
+		if (description == null) throw "Suite requires a description.";
+		if (steps == null) throw "Suite steps cannot be null.";
+		
+		this.description = description;
+		this.steps = steps.array();
 	}
 }
 
 class Spec
 {
-	public var suite(default, null) : Suite;
 	public var description(default, null) : String;
-	public var async(default, null) : Bool;
-	public var status(default, null) : TestStatus;
-	public var error(default, null) : String;
-	@:allow(buddy.internal.SuiteRunner) public var stack(default, null) : Null<Array<StackItem>>;
-	@:allow(buddy.internal.SuiteRunner) public var traces(default, null) : List<String>;
+	@:allow(buddy.SuitesRunner) public var status(default, null) : TestStatus = Unknown;
+	@:allow(buddy.SuitesRunner) public var error(default, null) : String;
+	@:allow(buddy.SuitesRunner) public var stack(default, null) = new Array<StackItem>();
+	@:allow(buddy.SuitesRunner) public var traces(default, null) = new Array<String>();
 
-	@:allow(buddy.BuddySuite) private var include(default, null) : Bool;
-	@:allow(buddy.internal.SuiteRunner) private var run : Action;
+	//@:allow(buddy.BuddySuite) private var include(default, null) : Bool;
 
-	@:allow(buddy.internal.SuiteRunner) private function setStatus(s : TestStatus, err : String, stack : Array<StackItem>)
-	{
-		this.status = s;
-		this.error = err;
-		this.stack = stack;
-	}
-
-	public function new(suite : Suite, description : String, run : Action, async = false, pending = false)
-	{
-		this.suite = suite;
+	public function new(description : String) {
+		if(description == null) throw "Spec must have a description.";
 		this.description = description;
-		this.run = run;
-		this.async = async;
-		this.traces = new List<String>();
-
-		if (run == null) this.status = TestStatus.Pending;
-		else this.status = (pending ? TestStatus.Pending : TestStatus.Unknown);
 	}
 }
 
@@ -169,7 +142,7 @@ class BuddySuite
 	/**
 	 * Top-level test suite
 	 */
-	public var suite : TestSuite;	
+	public var suite : TestSuite;
 	
 	// For building the test suite structure. Used in SuitesRunner
 	@:allow(buddy.SuitesRunner) var currentSuite(default, default) : TestSuite;
@@ -204,15 +177,18 @@ class BuddySuite
 	private function after(init : TestFunc) afterEach(init);
 
 	private function beforeEach(init : TestFunc) currentSuite.beforeEach.add(init);
-	private function afterEach(init : TestFunc) currentSuite.beforeEach.add(init);
 	private function beforeAll(init : TestFunc) currentSuite.beforeAll.add(init);
+	private function afterEach(init : TestFunc) currentSuite.afterEach.add(init);
 	private function afterAll(init : TestFunc) currentSuite.afterAll.add(init);
 	
-	private function it(desc : String, ?spec : TestFunc) {
+	private function it(desc : String, spec : TestFunc) {
+		//trace(currentSuite.description + ": " + desc);
 		currentSuite.specs.add(TestSpec.It(desc, spec));
-		trace(desc + " -> " + currentSuite.description);
 	}
 
+	/**
+	 * Creates a pending Spec.
+	 */
 	private function xit(desc : String, ?spec : TestFunc) {
 		currentSuite.specs.add(TestSpec.It(desc, null));
 	}

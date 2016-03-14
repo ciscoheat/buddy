@@ -374,6 +374,7 @@ class TestBasicFeatures extends BuddySuite
 				this.suites.find(function(s) { return s.name == "Excluding suites with @exclude"; } ).should.be(null);
 			});
 		});
+		*/
 
 		describe("Using trace() calls", {
 			it("should reroute the trace output to the reporter", {
@@ -381,6 +382,7 @@ class TestBasicFeatures extends BuddySuite
 				trace("Test trace 2");
 			});
 
+			/*
 			after({
 				var test = this.suites.last().specs.first();
 				if (test.traces.first().startsWith("AllTests.hx")
@@ -391,8 +393,8 @@ class TestBasicFeatures extends BuddySuite
 					Reflect.setProperty(test, "status", TestStatus.Passed);
 				}
 			});
+			*/
 		});
-		*/
 	}
 }
 

@@ -37,29 +37,29 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
  */
 class ShouldDynamic extends Should<Dynamic>
 {
-	static public function should(d : Dynamic, assert : SpecAssertion)
+	static public function should(d : Dynamic)
 	{
-		return new ShouldDynamic(d, assert);
+		return new ShouldDynamic(d);
 	}
 
 	public var not(get, never) : ShouldDynamic;
-	private function get_not() { return new ShouldDynamic(value, assert, !inverse); }
+	private function get_not() { return new ShouldDynamic(value, !inverse); }
 }
 
 class ShouldInt extends Should<Int>
 {
-	static public function should(i : Int, assert : SpecAssertion)
+	static public function should(i : Int)
 	{
-		return new ShouldInt(i, assert);
+		return new ShouldInt(i);
 	}
 
-	public function new(value : Int, assert : SpecAssertion, inverse = false)
+	public function new(value : Int, inverse = false)
 	{
-		super(value, assert, inverse);
+		super(value, inverse);
 	}
 
 	public var not(get, never) : ShouldInt;
-	private function get_not() { return new ShouldInt(value, assert, !inverse); }
+	private function get_not() { return new ShouldInt(value, !inverse); }
 
 	//////////
 
@@ -82,18 +82,18 @@ class ShouldInt extends Should<Int>
 
 class ShouldFloat extends Should<Float>
 {
-	static public function should(i : Float, assert : SpecAssertion)
+	static public function should(i : Float)
 	{
-		return new ShouldFloat(i, assert);
+		return new ShouldFloat(i);
 	}
 
-	public function new(value : Float, assert : SpecAssertion, inverse = false)
+	public function new(value : Float, inverse = false)
 	{
-		super(value, assert, inverse);
+		super(value, inverse);
 	}
 
 	public var not(get, never) : ShouldFloat;
-	private function get_not() { return new ShouldFloat(value, assert, !inverse); }
+	private function get_not() { return new ShouldFloat(value, !inverse); }
 
 	//////////
 
@@ -127,18 +127,18 @@ class ShouldFloat extends Should<Float>
 
 class ShouldDate extends Should<Date>
 {
-	static public function should(i : Date, assert : SpecAssertion)
+	static public function should(i : Date)
 	{
-		return new ShouldDate(i, assert);
+		return new ShouldDate(i);
 	}
 
-	public function new(value : Date, assert : SpecAssertion, inverse = false)
+	public function new(value : Date, inverse = false)
 	{
-		super(value, assert, inverse);
+		super(value, inverse);
 	}
 
 	public var not(get, never) : ShouldDate;
-	private function get_not() { return new ShouldDate(value, assert, !inverse); }
+	private function get_not() { return new ShouldDate(value, !inverse); }
 
 	//////////
 
@@ -178,18 +178,18 @@ class ShouldDate extends Should<Date>
 
 class ShouldString extends Should<String>
 {
-	static public function should(str : String, assert : SpecAssertion)
+	static public function should(str : String)
 	{
-		return new ShouldString(str, assert);
+		return new ShouldString(str);
 	}
 
-	public function new(value : String, assert : SpecAssertion, inverse = false)
+	public function new(value : String, inverse = false)
 	{
-		super(value, assert, inverse);
+		super(value, inverse);
 	}
 
 	public var not(get, never) : ShouldString;
-	private function get_not() { return new ShouldString(value, assert, !inverse); }
+	private function get_not() { return new ShouldString(value, !inverse); }
 
 	//////////
 
@@ -228,18 +228,18 @@ class ShouldString extends Should<String>
 
 class ShouldIterable<T> extends Should<Iterable<T>>
 {
-	static public function should<T>(value : Iterable<T>, assert : SpecAssertion)
+	static public function should<T>(value : Iterable<T>)
 	{
-		return new ShouldIterable<T>(value, assert);
+		return new ShouldIterable<T>(value);
 	}
 
-	public function new(value : Iterable<T>, assert : SpecAssertion, inverse = false)
+	public function new(value : Iterable<T>, inverse = false)
 	{
-		super(value, assert, inverse);
+		super(value, inverse);
 	}
 
 	public var not(get, never) : ShouldIterable<T>;
-	private function get_not() { return new ShouldIterable<T>(value, assert, !inverse); }
+	private function get_not() { return new ShouldIterable<T>(value, !inverse); }
 
 	//////////
 
@@ -303,22 +303,20 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 class ShouldFunctions
 {
 	var value : Void -> Void;
-	var assert : SpecAssertion;
 	var inverse : Bool;
 
-	public function new(value : Void -> Void, assert : SpecAssertion, inverse = false)
+	public function new(value : Void -> Void, inverse = false)
 	{
 		this.value = value;
-		this.assert = assert;
 		this.inverse = inverse;
 	}
 
 	public var not(get, never) : ShouldFunctions;
-	private function get_not() { return new ShouldFunctions(value, assert, !inverse); }
+	private function get_not() { return new ShouldFunctions(value, !inverse); }
 
-	static public function should(value : Void -> Void, assert : SpecAssertion)
+	static public function should(value : Void -> Void)
 	{
-		return new ShouldFunctions(value, assert);
+		return new ShouldFunctions(value);
 	}
 
 	/**
@@ -393,10 +391,12 @@ class ShouldFunctions
 
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
+		if (SuitesRunner.currentTest == null) throw "SuitesRunner.currentTest was null";
+		
 		if(!inverse)
-			assert(expr, error, stackPos(p));
+			SuitesRunner.currentTest(expr, error, stackPos(p));
 		else
-			assert(!expr, errorInverted, stackPos(p));
+			SuitesRunner.currentTest(!expr, errorInverted, stackPos(p));
 	}
 }
 
@@ -405,13 +405,11 @@ class ShouldFunctions
 class Should<T>
 {
 	var value : T;
-	var assert : SpecAssertion;
 	var inverse : Bool;
 
-	public function new(value : T, assert : SpecAssertion, inverse = false)
+	public function new(value : T, inverse = false)
 	{
 		this.value = value;
-		this.assert = assert;
 		this.inverse = inverse;
 	}
 
@@ -446,9 +444,11 @@ class Should<T>
 
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
+		if (SuitesRunner.currentTest == null) throw "SuitesRunner.currentTest was null";
+		
 		if(!inverse)
-			assert(expr, error, stackPos(p));
+			SuitesRunner.currentTest(expr, error, stackPos(p));
 		else
-			assert(!expr, errorInverted, stackPos(p));
+			SuitesRunner.currentTest(!expr, errorInverted, stackPos(p));
 	}
 }
