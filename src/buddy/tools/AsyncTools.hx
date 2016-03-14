@@ -87,22 +87,11 @@ class AsyncTools
 
 	private static function next<T, T2>(it : Iterator<T>, action : T -> Promise<T>, def : Deferred<T2>, resolveWith : T2)
 	{
-		/*
-		trace("Next");
-		trace(Type.getClassName(Type.getClass(resolveWith)));
-		trace(resolveWith);
-		trace("==============");
-		*/
-
-		if (!it.hasNext())
-		{
-			//trace("Iterator empty");
+		if (!it.hasNext()) {
 			def.resolve(resolveWith);
 		}
-		else
-		{
+		else {
 			var n = it.next();
-			//trace("Iterating " + Type.getClassName(Type.getClass(n)));
 			action(n).then(function(_) { next(it, action, def, resolveWith); } );
 		}
 	}

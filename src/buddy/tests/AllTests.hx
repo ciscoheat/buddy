@@ -362,7 +362,8 @@ class TestBasicFeatures extends BuddySuite
 			});
 
 			it("should mark a spec with no body as pending too.");
-			it("should mark a spec with an empty body as pending too.", {});
+			it("should mark a spec with an empty block as pending too.", {});
+			it("should mark a spec with an empty function as pending too.", function() {});
 		});
 
 		xdescribe("Excluding suites with xdescribe()", {
@@ -742,11 +743,11 @@ class FailTestAsync extends BuddySuite
 				pr.catchError(fail);
 				pr.reject("Rejected");
 			});
-		});
-
-		afterEach({
-			var test = SelfTest.lastSpec;
-			SelfTest.passLastSpecIf(test.error == "Rejected", "Didn't fail when using fail as a callback");
+			
+			afterEach({
+				var test = SelfTest.lastSpec;
+				SelfTest.passLastSpecIf(test.error == "Rejected", "Didn't fail when using fail as a callback");
+			});
 		});
 	}
 }

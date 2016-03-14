@@ -8,6 +8,11 @@ import promhx.Deferred;
 import promhx.Promise;
 import buddy.Should;
 
+#if cpp
+import hxcpp.StaticStd;
+import hxcpp.StaticRegexp;
+#end
+
 using buddy.tools.AsyncTools;
 using Lambda;
 
@@ -53,6 +58,14 @@ class Suite
 			case _:
 		}
 		return output;
+	}
+	
+	/**
+	 * Returns true if this suite and all below it passed.
+	 */
+	public function passed() : Bool {
+		if (specs.exists(function(spec) return spec.status == Failed)) return false;
+		return !suites.exists(function(suite) return !suite.passed());
 	}
 
 	public function new(description : String, steps : Iterable<Step>) {

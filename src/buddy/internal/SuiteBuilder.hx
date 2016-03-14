@@ -10,15 +10,11 @@ using haxe.macro.ExprTools;
 
 class SuiteBuilder
 {
-	private static var superClass : ClassType;
-	private static var includeMode = false;
+	private static var buddySuiteClass : ClassType;
 
 	private static function setIncludeMode() {
-		if (includeMode) return;
-		includeMode = true;
-		
-		if (!superClass.meta.has("includeMode"))
-			superClass.meta.add("includeMode", [], Context.currentPos());
+		if (!buddySuiteClass.meta.has("includeMode"))
+			buddySuiteClass.meta.add("includeMode", [], Context.currentPos());
 	}
 	
 	private static function injectAsync(e : Expr)
@@ -300,7 +296,7 @@ class SuiteBuilder
 		var cls = Context.getLocalClass();
 		if (cls == null || cls.get().superClass == null) return null;
 		
-		superClass = cls.get().superClass.t.get();		
+		buddySuiteClass = cls.get().superClass.t.get();		
 		if (cls.get().meta.has("include")) setIncludeMode();
 		
 		var fields = Context.getBuildFields();

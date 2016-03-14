@@ -22,10 +22,10 @@ class SuitesRunner
 {
 	public static var currentTest : Should.SpecAssertion;
 	
+	private var allTestsPassed : Bool;
 	private var buddySuites : Iterable<BuddySuite>;
 	private var reporter : Reporter;
 	private var aborted : Bool;
-	private var allTestsPassed = true;
 
 	public function new(buddySuites : Iterable<BuddySuite>, ?reporter : Reporter) {
 		// Cannot use Lambda here, Java problem in Linux.
@@ -204,9 +204,7 @@ class SuitesRunner
 							// Create a test function that will be used in Should
 							// note that multiple successfull tests doesn't mean the Spec is completed.
 							SuitesRunner.currentTest = function(testStatus : Bool, error : String, stack : Array<StackItem>) {
-								if (hasCompleted || testStatus == true) return;
-								
-								allTestsPassed = false;
+								if (hasCompleted || testStatus == true) return;								
 								specCompleted(Failed, error, stack);
 							}
 							
@@ -265,6 +263,7 @@ class SuitesRunner
 				mapTestSuite(buddySuite, buddySuite.suite, done);
 			}, function(err, suites) {
 				// TODO: Error handling
+				allTestsPassed = !suites.exists(function(suite) return !suite.passed());
 				reporter.done(suites, allTestsPassed).then(function(_) def.resolve(allTestsPassed));
 			});
 		});
