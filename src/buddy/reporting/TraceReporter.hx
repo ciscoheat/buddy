@@ -53,7 +53,7 @@ class TraceReporter implements Reporter
 		{
 			var print = function(str : String) println(str.lpad(" ", str.length + indentLevel * 2));
 
-			print(s.description);
+			if(s.description.length > 0) print(s.description);
 			for (step in s.steps) switch step
 			{
 				case TSpec(sp):

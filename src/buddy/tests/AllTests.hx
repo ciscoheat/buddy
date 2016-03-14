@@ -19,20 +19,18 @@ using StringTools;
 @:build(buddy.GenerateMain.withSuites([
 	TestBasicFeatures,
 	TestExclude,
-	//FailTest,
+	FailTest,
 	#if !php
 	TestAsync,
-	//FailTestAsync,
+	FailTestAsync,
 	#end
 	UtestUsage,
 	TestExceptionHandling,
-	/*
 	BeforeAfterDescribe,
 	BeforeAfterDescribe2,
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
 	CallDoneTest
-	*/
 ])) class AllTests {}
 
 class EmptyTestClass { public function new() {} }
@@ -523,7 +521,6 @@ class UtestUsage extends BuddySuite
 }
 #end
 
-/*
 class BeforeAfterDescribe extends BuddySuite
 {
 	public function new()
@@ -583,29 +580,26 @@ class BeforeAfterDescribe3 extends BuddySuite
 	{
 		describe('Using nested describes', function () {
 			var a = 0;
+			var b = 0;
 
 			before({
 				a = 1;
 			});
 
 			it('should not run the specs described after an "it"', function() {
-				this.suites.first().suites.first().specs.first().status.should.be(TestStatus.Unknown);
+				a = 0;
+				b.should.be(0);
 			});
 
 			describe('When nesting describes', function () {
-				var desc = 'should run the inner "before" function before the spec';
-				it(desc, function() {
+				it('should run the inner "before" function before the spec', function() {
+					b = 1;
 					a.should.be(1);
-				});
-
-				it('should list the specs in the nested suite', function () {
-					var test = this.suites.first().suites.first().specs.first();
-					test.description.should.be(desc);
 				});
 			});
 
 			it('should have run the specs described before an "it"', function() {
-				this.suites.first().suites.first().specs.first().status.should.be(TestStatus.Passed);
+				b.should.be(1);
 			});
 		});
 	}
@@ -615,65 +609,83 @@ class NestedBeforeAfter extends BuddySuite
 {
 	public function new()
 	{
-		var a = 0;
-		var order = "";
-		var runAfterTest = false;
-
-		before({
+		var a = -1000;
+		var order = [];
+		
+		beforeAll({
 			a = 0; // Level 0
-			order = "0";
-			runAfterTest = false;
+			order.push("BA0");
+		});
+
+		beforeEach({
+			order.push("BE0");
 		});
 
 		describe('Using nested describes with multiple befores', function () {
-			before({
-				a++; // Level 1
-				order += "1";
+			beforeAll({ 
+				order.push("BA1");
+				a++; 				
+			});
+			
+			beforeEach({
+				order.push("BE1");
 			});
 
 			it('should run befores outwards and in, and after inwards and out', function() {
+				order.push("IT1");
 				true.should.be(true); // Could change in after()
 			});
 
 			it('should run the befores defined up to this nested level', function() {
+				order.push("IT2");
 				a.should.be(1);
 			});
 
 			describe('When nesting on another level', function () {
-				before({
-					a++; // Level 2
-					order += "2";
+				beforeAll( { 
+					order.push("BA2");
+					a++; 					
+				});
+				
+				beforeEach({
+					order.push("BE2");
 				});
 
 				it('should run the before defined up to this level', function () {
-					runAfterTest = true;
+					order.push("IT3");
 					a.should.be(2);
 				});
 
-				after({
+				afterEach({
+					order.push("AE2");
+				});
+				
+				afterAll( { 
+					order.push("AA2");
 					a--;
-					order += "2";
 				});
 			});
 
-			after({
+			afterEach({
+				order.push("AE1");
+			});
+			
+			afterAll({
 				a--;
-				order += "1";
+				order.push("AA1");
 			});
 		});
 
-		// The 'after' order is important here since they will be executed in reverse order.
-		after({
-			if (runAfterTest)
-			{
-				var test = this.suites.first().specs.first();
-				Reflect.setProperty(test, "status", a == -1 && order == "012210" ? TestStatus.Passed : TestStatus.Failed);
-			}
+		afterEach({
+			order.push("AE0");
 		});
-
-		after({
-			a--;
-			order += "0";
+		
+		afterAll({
+			order.push("AA1");			
+			SelfTest.passLastSpecIf(a == 0 && 
+				order.join(",") == "BA0,BE0,BA1,BE1,IT1,AE1,BE1,IT2,AE1,BE1,BA2,BE2,IT3,AE2,AA2,AE1,AA1,AE0,AA1", 
+				"Incorrect nested order: " + order
+			);
 		});
 	}
 }
@@ -687,9 +699,9 @@ class FailTest extends BuddySuite
 				throw "Exceptionally";
 			});
 
-			after({
-				var test = this.suites.first().specs.first();
-				Reflect.setProperty(test, "status", test.error == "Exceptionally" ? TestStatus.Passed : TestStatus.Failed);
+			after( {
+				var	test = SelfTest.lastSpec;
+				SelfTest.passLastSpecIf(test.error == "Exceptionally", "Didn't fail when exception was thrown");
 			});
 		});
 
@@ -699,8 +711,8 @@ class FailTest extends BuddySuite
 			});
 
 			after({
-				var test = this.suites.last().specs.last();
-				Reflect.setProperty(test, "status", test.error == "fail()" ? TestStatus.Passed : TestStatus.Failed);
+				var	test = SelfTest.lastSpec;
+				SelfTest.passLastSpecIf(test.error == "fail()", "Didn't fail when fail() was called");
 			});
 		});
 	}
@@ -722,8 +734,8 @@ class FailTestAsync extends BuddySuite
 		});
 
 		after({
-			var test = this.suites.first().specs.first();
-			Reflect.setProperty(test, "status", test.error == "Rejected" ? TestStatus.Passed : TestStatus.Failed);
+			var test = SelfTest.lastSpec;
+			SelfTest.passLastSpecIf(test.error == "Rejected", "Didn't fail when using fail as a callback");
 		});
 	}
 }
@@ -740,4 +752,3 @@ class CallDoneTest extends BuddySuite
 		});
 	}
 }
-*/

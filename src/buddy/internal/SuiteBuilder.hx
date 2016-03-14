@@ -30,10 +30,22 @@ class SuiteBuilder
 				case _:
 			}
 
+			// Fix fail calls, so PosInfos works.
+			// Skip calls to fail, they will work
+			case ECall({expr: EConst(CIdent("fail")), pos: _}, params):
+				return;
+				
+			// Callbacks however, have to be wrapped.
+			case EConst(CIdent("fail")):
+				var change = macro function(?err : Dynamic) fail(err);
+				e.expr = change.expr;
+				return;
+
 			case _:
 		}
 		
 		switch(e) {
+				
 			case macro $a.should().$b, macro $a.should.$b:
 				// Need to use untyped here for some unknown macro reason...
 				var change = macro $a.should().$b;
@@ -56,7 +68,7 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			///// Before/After
+			///// BeforeEach/AfterEach
 
 			// TODO: Deprecate before/after
 			
@@ -80,6 +92,28 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			///// BeforeAll/AfterAll
+
+			case macro beforeAll(function($n) $f):
+				var change = macro beforeAll(buddy.BuddySuite.TestFunc.Async(function($n) $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro beforeAll(function() $f), macro beforeAll($f):
+				var change = macro beforeAll(buddy.BuddySuite.TestFunc.Sync(function() $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro afterAll(function($n) $f):
+				var change = macro afterAll(buddy.BuddySuite.TestFunc.Async(function($n) $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro afterAll(function() $f), macro afterAll($f):
+				var change = macro afterAll(buddy.BuddySuite.TestFunc.Sync(function() $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);			
+				
 			///// It
 
 			case macro it($s), macro it($s, {}), macro it($s, function() {}):

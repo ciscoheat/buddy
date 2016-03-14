@@ -182,7 +182,6 @@ class BuddySuite
 	private function afterAll(init : TestFunc) currentSuite.afterAll.add(init);
 	
 	private function it(desc : String, spec : TestFunc) {
-		//trace(currentSuite.description + ": " + desc);
 		currentSuite.specs.add(TestSpec.It(desc, spec));
 	}
 
@@ -193,18 +192,17 @@ class BuddySuite
 		currentSuite.specs.add(TestSpec.It(desc, null));
 	}
 
-	private function fail(desc : Dynamic = "Manually") : Void
-	{
-		// Will be replaced by failSync in SuiteBuilder.
-	}
+	/**
+	 * Fails the current Spec.
+	 */
+	@:allow(buddy.SuitesRunner) private var fail : ?Dynamic -> ?PosInfos -> Void;
 
-	/*
 	///// Hidden "include" handlers /////
 
-	@:noCompletion private function failSync(test : SpecAssertion, desc : Dynamic = "Manually", ?p : PosInfos)
-	{
+	/*
+	@:noCompletion private function fail(desc : Dynamic = "Manually", ?p : PosInfos) {
 		var stackItem = [StackItem.FilePos(null, p.fileName, p.lineNumber)];
-		test(false, Std.string(desc), stackItem);
+		_fail(desc, stackItem);
 	}
 
 	@:noCompletion private function addSuite(suite : Suite, addSpecs : Void -> Void)

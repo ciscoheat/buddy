@@ -71,18 +71,20 @@ class SuitesRunner
 
 	private function runDescribes(cb : Dynamic -> Void) {
 		forEachSeries(buddySuites, function(suite, cb) {
-			forEachSeries(suite.describeQueue, function(current, cb) {
+			(function processQueue() {
+				if (suite.describeQueue.isEmpty()) return cb(null);
+				
+				var current = suite.describeQueue.pop();
 				suite.currentSuite = current.suite;
-						
+				
 				// TODO: Errors when in describe phase?
 				switch current.spec {
-					case Async(f): f(function() cb(null));
-					case Sync(f): f(); cb(null);
+					case Async(f): f(processQueue);
+					case Sync(f): f(); processQueue();
 				}
-			}, cb);
+			})();
 		}, cb);
-	}
-	
+	}	
 	
 	public function run() : Promise<Bool>
 	{
@@ -120,6 +122,8 @@ class SuitesRunner
 
 				function runAfterEach(err : Dynamic, result : TestStep) {
 					Log.trace = oldLog;
+					buddySuite.fail = null;
+					
 					forEachSeries(testSuite.afterEach, runTestFunc, function(err) 
 						if (spec != null) reporter.progress(spec).then(function(_) done(err, result))
 						else done(err, result)
@@ -193,6 +197,12 @@ class SuitesRunner
 								.catchError(function(e : Dynamic) if (e != null) throw e)
 								.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
 							
+							// Set up fail function
+							buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
+								var stackItem = [StackItem.FilePos(null, p.fileName, p.lineNumber)];
+								specCompleted(Failed, Std.string(err), stackItem);
+							}
+								
 							try {
 								runTestFunc(test, function(err) {
 									// TODO: Error handling
