@@ -165,7 +165,7 @@ class SuitesRunner
 							SuitesRunner.currentTest = function(testStatus : Bool, error : String, stack : Array<StackItem>) {
 								if (hasCompleted || testStatus == true) return;
 								
-								allTestsPassed = false;								
+								allTestsPassed = false;
 								specCompleted(Failed, error, stack);
 							}
 							

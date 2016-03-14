@@ -71,23 +71,43 @@ class SuiteBuilder
 			///// BeforeEach/AfterEach
 
 			// TODO: Deprecate before/after
-			
-			case macro before(function($n) $f), macro beforeEach(function($n) $f):
+
+			case macro before(function($n) $f):
+				var change = macro @:pos(e.pos) before(buddy.BuddySuite.TestFunc.Async(function($n) $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro beforeEach(function($n) $f):
 				var change = macro beforeEach(buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro before(function() $f), macro before($f), macro beforeEach(function() $f), macro beforeEach($f):
+			case macro before(function() $f), macro before($f):
+				var change = macro @:pos(e.pos) before(buddy.BuddySuite.TestFunc.Sync(function() $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro beforeEach(function() $f), macro beforeEach($f):
 				var change = macro beforeEach(buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro after(function($n) $f), macro afterEach(function($n) $f):
-				var change = macro afterEach(buddy.BuddySuite.TestFunc.Async(function($n) $f));
+			case macro after(function($n) $f):
+				var change = macro @:pos(e.pos) after(buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro after(function() $f), macro after($f), macro afterEach(function() $f), macro afterEach($f):
+			case macro afterEach(function($n) $f):
+				var change = macro afterEach(buddy.BuddySuite.TestFunc.Async(function($n) $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
+				
+			case macro after(function() $f), macro after($f):
+				var change = macro @:pos(e.pos) after(buddy.BuddySuite.TestFunc.Sync(function() $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro afterEach(function() $f), macro afterEach($f):
 				var change = macro afterEach(buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);

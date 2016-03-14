@@ -46,7 +46,7 @@ class TestBasicFeatures extends BuddySuite
 		describe("Testing before", {
 			var a = 0;
 
-			before({
+			beforeEach({
 				a = 1;
 			});
 
@@ -65,7 +65,7 @@ class TestBasicFeatures extends BuddySuite
 				testAfter.should.be(null);
 			});
 
-			after({
+			afterEach({
 				testAfter = "after executed";
 			});
 		});
@@ -195,7 +195,7 @@ class TestBasicFeatures extends BuddySuite
 		describe("Testing dates", {
 			var date : Date;
 			
-			before({
+			beforeEach({
 				date = Date.fromString("2015-01-02 12:13:14");
 			});
 
@@ -371,7 +371,7 @@ class TestBasicFeatures extends BuddySuite
 				trace("Test trace 2");
 			});
 
-			after({
+			afterEach({
 				var test = SelfTest.lastSpec;
 				if (test.traces[0].startsWith("AllTests.hx")
 					&& test.traces.length == 2
@@ -410,7 +410,7 @@ class TestAsync extends BuddySuite
 			var timeoutErrorTest : Spec;
 			var timeoutErrorTestDone : ?Bool -> Void = null;
 
-			before(function(done) {
+			beforeEach(function(done) {
 				a = 0;
 				timeoutMs = 10;
 				AsyncTools.wait(1).then(function(_) { a = 1; done(); } );
@@ -429,7 +429,7 @@ class TestAsync extends BuddySuite
 				});
 			});
 
-			after({
+			afterEach({
 				var test = SelfTest.lastSpec;
 				if(test.description == timeoutTestDescription)
 					SelfTest.passLastSpecIf(test.status == Failed, "Didn't timeout");
@@ -443,7 +443,7 @@ class TestAsync extends BuddySuite
 				done();
 			});
 
-			after({
+			afterEach({
 				var test = SelfTest.lastSpec;
 				if (test.status == TestStatus.Failed && test.error == "Expected 2, was 1")
 					SelfTest.setLastSpec(Passed);
@@ -465,7 +465,7 @@ class TestExceptionHandling extends BuddySuite
 				throwError();
 			});
 
-			after({
+			afterEach({
 				var test = SelfTest.lastSpec;
 				SelfTest.passLastSpecIf(test.status == Failed && test.error == "Test error!", "Exception wasn't caught");
 			});
@@ -501,7 +501,7 @@ class UtestUsage extends BuddySuite
 			});
 			#end
 
-			after({
+			afterEach({
 				var test = SelfTest.lastSpec;
 				if(test.description == failTestDesc) {
 					SelfTest.passLastSpecIf(
@@ -527,7 +527,7 @@ class BeforeAfterDescribe extends BuddySuite
 	{
 		var a = 0;
 
-		before({
+		beforeEach({
 			a = 1;
 		});
 
@@ -543,7 +543,7 @@ class BeforeAfterDescribe extends BuddySuite
 			});
 		});
 
-		after({
+		afterEach({
 			a = 0;
 		});
 	}
@@ -555,7 +555,7 @@ class BeforeAfterDescribe2 extends BuddySuite
 	{
 		var a = 0;
 
-		after(function(done) {
+		afterEach(function(done) {
 			a = 1;
 			done();
 		});
@@ -582,7 +582,7 @@ class BeforeAfterDescribe3 extends BuddySuite
 			var a = 0;
 			var b = 0;
 
-			before({
+			beforeEach({
 				a = 1;
 			});
 
@@ -699,7 +699,7 @@ class FailTest extends BuddySuite
 				throw "Exceptionally";
 			});
 
-			after( {
+			afterEach({
 				var	test = SelfTest.lastSpec;
 				SelfTest.passLastSpecIf(test.error == "Exceptionally", "Didn't fail when exception was thrown");
 			});
@@ -710,7 +710,7 @@ class FailTest extends BuddySuite
 				fail("fail()");
 			});
 
-			after({
+			afterEach({
 				var	test = SelfTest.lastSpec;
 				SelfTest.passLastSpecIf(test.error == "fail()", "Didn't fail when fail() was called");
 			});
@@ -733,7 +733,7 @@ class FailTestAsync extends BuddySuite
 			});
 		});
 
-		after({
+		afterEach({
 			var test = SelfTest.lastSpec;
 			SelfTest.passLastSpecIf(test.error == "Rejected", "Didn't fail when using fail as a callback");
 		});
