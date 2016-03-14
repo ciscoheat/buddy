@@ -13,54 +13,29 @@ import buddy.Should;
 using buddy.tools.AsyncTools;
 using Lambda;
 
-/**
- * A bit messy typedef. It is injected in specs by macro
- * To determine what happens with a test.
- * 1. ?Bool -> Void is the "done" function passed to the specs.
- *    If bool is true (default) it is assumed that the user called
- *    done() from the spec. Otherwise it will be false and pending.
- * 2. SpecAssertion. A function that specifies the status for a spec
- *    with an optional error message and stack.
- *    Bool -> String -> Array<StackItem> -> Void
- */
-private typedef Action = (?Bool -> Void) -> SpecAssertion -> Void;
-
-enum TestStatus
-{
+// Final status of a Spec
+enum SpecStatus {
 	Unknown;
 	Passed;
 	Pending;
 	Failed;
 }
 
-enum TestFunc
-{
-	Async(f : (Void -> Void) -> Void);
-	Sync(f : Void -> Void);
-}
+// An alias for backwards compatibility
+@:deprecated("TestStatus is deprecated, please rename to SpecStatus")
+typedef TestStatus = SpecStatus;
 
-enum TestSpec
-{
-	Describe(suite : TestSuite);
-	It(description : String, test : Null<TestFunc>);
-}
-
-typedef BeforeAfter = Dynamic;
-
-enum TestStep
-{
+// A completed test step inside a Describe (Either a Suite or a Spec)
+enum Step {
 	TSuite(s : Suite);
 	TSpec(s : Spec);
 }
 
-typedef TestResult = Dynamic;
-
+// A completed test suite ("Describe")
 class Suite
 {
 	public var description(default, null) : String;
-
-	//@:allow(buddy.SuitesRunner) public var parent(default, null) : Suite;
-	@:allow(buddy.SuitesRunner) public var steps(default, null) = new Array<TestStep>();
+	@:allow(buddy.SuitesRunner) public var steps(default, null) = new Array<Step>();
 
 	public var specs(get, never) : Array<Spec>;
 	private function get_specs() {
@@ -82,7 +57,7 @@ class Suite
 		return output;
 	}
 
-	public function new(description : String, steps : Iterable<TestStep>) {
+	public function new(description : String, steps : Iterable<Step>) {
 		if (description == null) throw "Suite requires a description.";
 		if (steps == null) throw "Suite steps cannot be null.";
 		
@@ -91,10 +66,11 @@ class Suite
 	}
 }
 
+// A completed spec ("It")
 class Spec
 {
 	public var description(default, null) : String;
-	@:allow(buddy.SuitesRunner) public var status(default, null) : TestStatus = Unknown;
+	@:allow(buddy.SuitesRunner) public var status(default, null) : SpecStatus = Unknown;
 	@:allow(buddy.SuitesRunner) public var error(default, null) : String;
 	@:allow(buddy.SuitesRunner) public var stack(default, null) = new Array<StackItem>();
 	@:allow(buddy.SuitesRunner) public var traces(default, null) = new Array<String>();
@@ -105,6 +81,19 @@ class Spec
 		if(description == null) throw "Spec must have a description.";
 		this.description = description;
 	}
+}
+
+///// Classes and enums starting with "Test" represents the system before testing is completed.
+///// While testing, they are transformed into Spec and Suite.
+
+enum TestFunc {
+	Async(f : (Void -> Void) -> Void);
+	Sync(f : Void -> Void);
+}
+
+enum TestSpec {
+	Describe(suite : TestSuite);
+	It(description : String, test : Null<TestFunc>);
 }
 
 class TestSuite

@@ -2,7 +2,7 @@ package buddy.tests;
 
 import buddy.BuddySuite.Spec;
 import buddy.BuddySuite.Suite;
-import buddy.BuddySuite.TestStatus;
+import buddy.BuddySuite.SpecStatus;
 
 /**
  * Used for Buddy to test itself
@@ -23,7 +23,7 @@ class SelfTest {
 		Reflect.setProperty(lastSpec, "error", failReason);
 	}
 	
-	public static function setLastSpec(status : TestStatus) {
+	public static function setLastSpec(status : SpecStatus) {
 		Reflect.setProperty(lastSpec, "status", status);
 	}
 }

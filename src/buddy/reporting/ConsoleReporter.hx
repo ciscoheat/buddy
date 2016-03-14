@@ -41,10 +41,10 @@ class ConsoleReporter extends TraceReporter
 	override public function progress(spec : Spec)
 	{
 		print(switch(spec.status) {
-			case TestStatus.Failed: "X";
-			case TestStatus.Passed: ".";
-			case TestStatus.Pending: "P";
-			case TestStatus.Unknown: "?";
+			case Failed: "X";
+			case Passed: ".";
+			case Pending: "P";
+			case Unknown: "?";
 		});
 
 		return resolveImmediately(spec);

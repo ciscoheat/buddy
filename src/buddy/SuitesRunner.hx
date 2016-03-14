@@ -101,7 +101,7 @@ class SuitesRunner
 				}
 			}
 			
-			var mapTestSpec : BuddySuite -> TestSuite -> TestSpec -> (Dynamic -> TestStep -> Void) -> Void = null;
+			var mapTestSpec : BuddySuite -> TestSuite -> TestSpec -> (Dynamic -> Step -> Void) -> Void = null;
 
 			function mapTestSuite(buddySuite : BuddySuite, testSuite : TestSuite, done : Dynamic -> Suite -> Void) {				
 				// Run beforeAll
@@ -116,11 +116,11 @@ class SuitesRunner
 				});
 			}
 
-			mapTestSpec = function(buddySuite : BuddySuite, testSuite : TestSuite, testSpec : TestSpec, done : Dynamic -> TestStep -> Void) {
+			mapTestSpec = function(buddySuite : BuddySuite, testSuite : TestSuite, testSpec : TestSpec, done : Dynamic -> Step -> Void) {
 				var oldLog = Log.trace;
 				var spec : Spec = null;
 
-				function runAfterEach(err : Dynamic, result : TestStep) {
+				function runAfterEach(err : Dynamic, result : Step) {
 					Log.trace = oldLog;
 					buddySuite.fail = null;
 					
@@ -145,7 +145,7 @@ class SuitesRunner
 								spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + Std.string(v));
 							};
 
-							function specCompleted(status : TestStatus, error : String, stack : Array<StackItem>) {
+							function specCompleted(status : SpecStatus, error : String, stack : Array<StackItem>) {
 								if (hasCompleted) return;
 								hasCompleted = true;
 								

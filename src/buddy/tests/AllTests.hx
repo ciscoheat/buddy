@@ -445,8 +445,7 @@ class TestAsync extends BuddySuite
 
 			afterEach({
 				var test = SelfTest.lastSpec;
-				if (test.status == TestStatus.Failed && test.error == "Expected 2, was 1")
-					SelfTest.setLastSpec(Passed);
+				SelfTest.passLastSpecIf(test.status == Failed && test.error == "Expected 2, was 1", "Threw an exception when done called after fail");
 			});
 		});
 	}

@@ -5,7 +5,7 @@ import promhx.Promise;
 
 import buddy.BuddySuite.Spec;
 import buddy.BuddySuite.Suite;
-import buddy.BuddySuite.TestStatus;
+import buddy.BuddySuite.SpecStatus;
 
 using Lambda;
 using StringTools;
@@ -40,8 +40,8 @@ class TraceReporter implements Reporter
 			for (sp in s.steps) switch sp {
 				case TSpec(sp):
 					total++;
-					if (sp.status == TestStatus.Failed) failures++;
-					else if (sp.status == TestStatus.Pending) pending++;
+					if (sp.status == Failed) failures++;
+					else if (sp.status == Pending) pending++;
 				case TSuite(s):
 					countTests(s);
 			}
@@ -57,7 +57,7 @@ class TraceReporter implements Reporter
 			for (step in s.steps) switch step
 			{
 				case TSpec(sp):
-					if (sp.status == TestStatus.Failed)
+					if (sp.status == Failed)
 					{
 						print("  " + sp.description + " (FAILED: " + sp.error + ")");
 
