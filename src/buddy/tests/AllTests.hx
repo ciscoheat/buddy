@@ -18,15 +18,15 @@ using StringTools;
 // https://github.com/HaxeFoundation/haxe/issues/4286 is fixed
 @:build(buddy.GenerateMain.withSuites([
 	TestBasicFeatures,
-	/*
 	TestExclude,
-	FailTest,
+	//FailTest,
 	#if !php
 	TestAsync,
-	FailTestAsync,
+	//FailTestAsync,
 	#end
 	UtestUsage,
 	TestExceptionHandling,
+	/*
 	BeforeAfterDescribe,
 	BeforeAfterDescribe2,
 	BeforeAfterDescribe3,
@@ -367,38 +367,28 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		/*
-		describe("Excluding suites with @exclude and xdescribe()", {
-			it("should not display suites or their specs at all.", {
-				this.suites.find(function(s) { return s.name == "Excluding suites with xdescribe()"; } ).should.be(null);
-				this.suites.find(function(s) { return s.name == "Excluding suites with @exclude"; } ).should.be(null);
-			});
-		});
-		*/
-
 		describe("Using trace() calls", {
 			it("should reroute the trace output to the reporter", {
 				trace("Test trace");
 				trace("Test trace 2");
 			});
 
-			/*
 			after({
-				var test = this.suites.last().specs.first();
-				if (test.traces.first().startsWith("AllTests.hx")
+				var test = SelfTest.lastSpec;
+				if (test.traces[0].startsWith("AllTests.hx")
 					&& test.traces.length == 2
-					&& test.traces.first().endsWith("Test trace")
-					&& test.traces.last().endsWith("Test trace 2"))
+					&& test.traces[0].endsWith("Test trace")
+					&& test.traces[1].endsWith("Test trace 2"))
 				{
-					Reflect.setProperty(test, "status", TestStatus.Passed);
+					SelfTest.setLastSpec(Passed);
+				} else {
+					SelfTest.setLastSpec(Failed);
 				}
 			});
-			*/
 		});
 	}
 }
 
-/*
 @exclude
 class TestExclude extends BuddySuite
 {
@@ -434,28 +424,17 @@ class TestAsync extends BuddySuite
 
 			var timeoutTestDescription = "should timeout with an error after an amount of time specified outside it()";
 			it(timeoutTestDescription, function(done) {
-				// No done() call in this spec, timeout will take care of it, going to "after" automatically.
-				timeoutErrorTest = this.suites.first().specs.find(function(s) {
-					return s.description == timeoutTestDescription;
-				});
-
-				timeoutErrorTest.status.should.be(TestStatus.Unknown);
-
 				// Wait long enough for all targets to fail properly. (Had problems on flash when wait = 20)
 				AsyncTools.wait(100).then(function(_) {
-					if (timeoutErrorTest.status == TestStatus.Failed)
-						Reflect.setProperty(timeoutErrorTest, "status", TestStatus.Passed);
-
-					timeoutErrorTest = null;
-					timeoutErrorTestDone();
+					true.should.be(true);
+					done();
 				});
 			});
 
-			after(function(done) {
-				if (timeoutErrorTest != null)
-					timeoutErrorTestDone = done;
-				else
-					done();
+			after({
+				var test = SelfTest.lastSpec;
+				if(test.description == timeoutTestDescription)
+					SelfTest.passLastSpecIf(test.status == Failed, "Didn't timeout");
 			});
 		});
 
@@ -467,9 +446,9 @@ class TestAsync extends BuddySuite
 			});
 
 			after({
-				var test = this.suites.last().specs.first();
+				var test = SelfTest.lastSpec;
 				if (test.status == TestStatus.Failed && test.error == "Expected 2, was 1")
-					Reflect.setProperty(test, "status", TestStatus.Passed);
+					SelfTest.setLastSpec(Passed);
 			});
 		});
 	}
@@ -489,9 +468,8 @@ class TestExceptionHandling extends BuddySuite
 			});
 
 			after({
-				var test = this.suites.first().specs.first();
-				if (test.status == TestStatus.Failed && test.error == "Test error!")
-					Reflect.setProperty(test, "status", TestStatus.Passed);
+				var test = SelfTest.lastSpec;
+				SelfTest.passLastSpecIf(test.status == Failed && test.error == "Test error!", "Exception wasn't caught");
 			});
 		});
 	}
@@ -526,9 +504,12 @@ class UtestUsage extends BuddySuite
 			#end
 
 			after({
-				var test = this.suites.first().specs.find(function(s) return s.description == failTestDesc);
-				if (test.status == TestStatus.Failed && test.error == "expected true")
-					Reflect.setProperty(test, "status", TestStatus.Passed);
+				var test = SelfTest.lastSpec;
+				if(test.description == failTestDesc) {
+					SelfTest.passLastSpecIf(
+						test.status == Failed && test.error == "expected true", "Didn't fail using utest.Assert"
+					);
+				}
 			});
 		});
 
@@ -542,6 +523,7 @@ class UtestUsage extends BuddySuite
 }
 #end
 
+/*
 class BeforeAfterDescribe extends BuddySuite
 {
 	public function new()

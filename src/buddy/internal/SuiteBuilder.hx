@@ -1,4 +1,4 @@
-package buddy.internal ;
+package buddy.internal;
 #if macro
 import haxe.macro.Compiler;
 import haxe.macro.Expr;
@@ -58,6 +58,8 @@ class SuiteBuilder
 
 			///// Before/After
 
+			// TODO: Deprecate before/after
+			
 			case macro before(function($n) $f), macro beforeEach(function($n) $f):
 				var change = macro beforeEach(buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
@@ -117,14 +119,10 @@ class SuiteBuilder
 		if (cls == null || cls.get().superClass == null) return null;
 
 		var fields = Context.getBuildFields();
-		for (f in fields)
-		{
-			if (f.name != "new") continue;
-			switch(f.kind)
-			{
+		for (f in fields) if(f.name == "new") {
+			switch f.kind {
 				case FFun(f):
-					switch(f.expr.expr)
-					{
+					switch(f.expr.expr)	{
 						case EBlock(exprs):
 							for (e in exprs) switch e {
 								case macro super():	

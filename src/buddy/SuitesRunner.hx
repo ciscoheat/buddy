@@ -1,5 +1,6 @@
 package buddy;
 import buddy.reporting.Reporter;
+import haxe.CallStack;
 import haxe.CallStack.StackItem;
 import haxe.Log;
 import haxe.PosInfos;
@@ -7,6 +8,12 @@ import haxe.rtti.Meta;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.BuddySuite;
+
+#if utest
+import utest.Assert;
+import utest.Assertation;
+#end
+
 using buddy.tools.AsyncTools;
 
 @:keep // prevent dead code elimination
@@ -14,16 +21,17 @@ class SuitesRunner
 {
 	public static var currentTest : Should.SpecAssertion;
 	
-	private var suites : Iterable<BuddySuite>;
+	private var buddySuites : Iterable<BuddySuite>;
 	private var reporter : Reporter;
 	private var aborted : Bool;
+	private var allTestsPassed = true;
 
 	public function new(buddySuites : Iterable<BuddySuite>, ?reporter : Reporter)
 	{
 		// Cannot use Lambda here, Java problem in Linux.
 		//var includeMode = [for (b in buddySuites) for (s in b.suites) if (s.include) s].length > 0;
 
-		this.suites = buddySuites;
+		this.buddySuites = buddySuites;
 		this.reporter = reporter == null ? new buddy.reporting.ConsoleReporter() : reporter;
 	}
 
@@ -62,7 +70,7 @@ class SuitesRunner
 	}
 
 	private function runDescribes(cb : Dynamic -> Void) {
-		forEachSeries(suites, function(suite, cb) {
+		forEachSeries(buddySuites, function(suite, cb) {
 			forEachSeries(suite.describeQueue, function(current, cb) {
 				suite.currentSuite = current.suite;
 						
@@ -80,10 +88,9 @@ class SuitesRunner
 	{
 		var def = new Deferred<Bool>();
 		var defPr = def.promise();
-		var allTestsPassed = true;
 		
 		runDescribes(function(err : Dynamic) {
-			if (err != null) throw err;
+			// TODO: Error handling
 
 			function runTestFunc<T>(func : TestFunc, done : T -> Void) {
 				switch func {
@@ -92,139 +99,131 @@ class SuitesRunner
 				}
 			}
 			
-			var mapTestSpec : TestSuite -> TestSpec -> (Dynamic -> TestStep -> Void) -> Void = null;
+			var mapTestSpec : BuddySuite -> TestSuite -> TestSpec -> (Dynamic -> TestStep -> Void) -> Void = null;
 
-			function mapTestSuite(testSuite : TestSuite, done : Dynamic -> Suite -> Void) {
+			function mapTestSuite(buddySuite : BuddySuite, testSuite : TestSuite, done : Dynamic -> Suite -> Void) {				
 				// Run beforeAll
 				forEachSeries(testSuite.beforeAll, runTestFunc, function(err) {
 					// TODO: Error handling
-					mapSeries(testSuite.specs, mapTestSpec.bind(testSuite), function(err, testSteps) {
+					mapSeries(testSuite.specs, mapTestSpec.bind(buddySuite, testSuite), function(err, testSteps) {
 						forEachSeries(testSuite.afterAll, runTestFunc, function(err) {
-							done(null, new Suite(testSuite.description, testSteps));
+							var suite = buddy.tests.SelfTest.lastSuite = new Suite(testSuite.description, testSteps);
+							done(null, suite);
 						});
 					});
 				});
 			}
 
-			mapTestSpec = function(testSuite : TestSuite, spec : TestSpec, done : Dynamic -> TestStep -> Void) {
+			mapTestSpec = function(buddySuite : BuddySuite, testSuite : TestSuite, testSpec : TestSpec, done : Dynamic -> TestStep -> Void) {
 				var oldLog = Log.trace;
+				var spec : Spec = null;
 
 				function runAfterEach(err : Dynamic, result : TestStep) {
 					Log.trace = oldLog;
-					forEachSeries(testSuite.afterEach, runTestFunc, function(err) done(err, result));
+					forEachSeries(testSuite.afterEach, runTestFunc, function(err) 
+						if (spec != null) reporter.progress(spec).then(function(_) done(err, result))
+						else done(err, result)
+					);
 				}
 				
 				forEachSeries(testSuite.beforeEach, runTestFunc, function(err) {
-					switch spec {				
-						
+					switch testSpec {						
 						case Describe(testSuite): 
-							mapTestSuite(testSuite, function(err, suite) {
+							mapTestSuite(buddySuite, testSuite, function(err, suite) {
 								runAfterEach(null, TSuite(suite));
 							});
+							
 						case It(desc, test): 
-							var spec = new Spec(desc);
-							var oldLog = Log.trace;
+							spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
+							var hasCompleted = false;
 							
 							Log.trace = function(v, ?pos : PosInfos) {
 								spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + Std.string(v));
 							};
 
-							var hasCompleted = false;
-
-							function specCompleted() {
+							function specCompleted(status : TestStatus, error : String, stack : Array<StackItem>) {
+								if (hasCompleted) return;
 								hasCompleted = true;
-								reporter.progress(spec).then(function(spec)
-									runAfterEach(null, TSpec(spec))
-								);
+								
+								spec.status = status;
+								spec.error = error;
+								spec.stack = stack;
+								
+								runAfterEach(null, TSpec(spec));
 							}
-							
+
+							// Test if spec is Pending (has only description)
 							if (test == null) {
-								spec.status = Pending;
-								return specCompleted();
+								return specCompleted(Pending, null, null);
 							}
 		
 							// Create a test that will be used in Should
 							SuitesRunner.currentTest = function(testStatus : Bool, error : String, stack : Array<StackItem>) {
 								if (hasCompleted || testStatus == true) return;
 								
-								allTestsPassed = false;
-								
-								spec.status = Failed;
-								spec.error = error;
-								spec.stack = stack;
-								specCompleted();
+								allTestsPassed = false;								
+								specCompleted(Failed, error, stack);
 							}
 							
-							runTestFunc(test, function(err) {
-								// TODO: Error handling
-								if (!hasCompleted) {
-									spec.status = Passed;
-									spec.error = null;
-									spec.stack = null;							
-									specCompleted();
+							// Set up utest if available
+							#if utest
+							Assert.results = new List<Assertation>();
+
+							function checkUtestResults() {
+								for (a in Assert.results) switch a {
+									case Success(_):										
+									case Warning(_):
+									case Failure(e, pos):
+										var stack = [StackItem.FilePos(null, pos.fileName, pos.lineNumber)];
+										specCompleted(Failed, Std.string(e), stack);
+										break;
+									case Error(e, stack), SetupError(e, stack), TeardownError(e, stack), AsyncError(e, stack):
+										specCompleted(Failed, Std.string(e), stack);
+										break;
+									case TimeoutError(e, stack):
+										specCompleted(Failed, Std.string(e), stack);
+										break;
 								}
-							});
+							}
+							#end
+							
+							// Set up timeout for the current spec
+							var timeout = buddySuite.timeoutMs;
+							AsyncTools.wait(timeout)
+								.catchError(function(e : Dynamic) if (e != null) throw e)
+								.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
+							
+							try {
+								runTestFunc(test, function(err) {
+									// TODO: Error handling
+									#if utest
+									checkUtestResults();
+									#end
+									specCompleted(Passed, null, null);
+								});
+							} catch (e : Dynamic) {
+								specCompleted(Failed, Std.string(e), CallStack.exceptionStack());
+							}
 					}
 				});
 			}
 		
-			mapSeries([for (s in suites) s.suite], mapTestSuite, function(err, suites) {
-				// TODO: Error handling, reporter
-				if (err != null) throw err;
-				
+			mapSeries(buddySuites, function(buddySuite, done) {
+				mapTestSuite(buddySuite, buddySuite.suite, done);
+			}, function(err, suites) {
+				// TODO: Error handling
 				reporter.done(suites, allTestsPassed).then(function(_) def.resolve(allTestsPassed));
 			});
-
-			/*
-			reporter.start().then(function(ok) {
-				if(ok)
-				{
-					suites.iterateAsyncBool(runSuite)
-						.pipe(function(_) return reporter.done(suites, !failed()))
-						.then(function(_) def.resolve(ok));
-				}
-				else
-				{
-					aborted = true;
-					def.resolve(ok);
-				}
-			});
-			*/
 		});
 		
 		return defPr;
 	}
 
-	public function failed() return false;
-	
-	/*
-	public function failed() : Bool
-	{
-		var testFail : Suite -> Bool = null;
-
-		testFail = function(s : Suite) {
-			var failed = false;
-			for (step in s.steps) switch step {
-				case TSpec(sp): if (sp.status == TestStatus.Failed) return true;
-				case TSuite(s2): if (testFail(s2)) return true;
-			}
-			return false;
-		};
-
-		for (s in suites) if (testFail(s)) return true;
-		return false;
-	}
-
-	private function runSuite(suite : Suite) : Promise<Suite>
-	{
-		return new SuiteRunner(suite, reporter).run();
-	}
-	*/
+	public function failed() return !allTestsPassed;
 
 	public function statusCode() : Int
 	{
 		if (aborted) return 1;
 		return failed() ? 1 : 0;
 	}
-
 }

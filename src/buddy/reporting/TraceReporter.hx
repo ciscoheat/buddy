@@ -82,7 +82,7 @@ class TraceReporter implements Reporter
 			}
 		};
 
-		suites.iter(printTests.bind(_, 0));
+		suites.iter(printTests.bind(_, -1));
 
 		println('$total specs, $failures failures, $pending pending');
 
