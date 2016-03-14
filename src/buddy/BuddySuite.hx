@@ -4,8 +4,6 @@ import haxe.CallStack;
 import haxe.PosInfos;
 import haxe.ds.GenericStack;
 import haxe.rtti.Meta;
-import haxecontracts.Contract;
-import haxecontracts.HaxeContracts;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.Should;
@@ -75,8 +73,6 @@ class Spec
 	@:allow(buddy.SuitesRunner) public var stack(default, null) = new Array<StackItem>();
 	@:allow(buddy.SuitesRunner) public var traces(default, null) = new Array<String>();
 
-	//@:allow(buddy.BuddySuite) private var include(default, null) : Bool;
-
 	public function new(description : String) {
 		if(description == null) throw "Spec must have a description.";
 		this.description = description;
@@ -92,8 +88,8 @@ enum TestFunc {
 }
 
 enum TestSpec {
-	Describe(suite : TestSuite);
-	It(description : String, test : Null<TestFunc>);
+	Describe(suite : TestSuite, included : Bool);
+	It(description : String, test : Null<TestFunc>, included : Bool);
 }
 
 class TestSuite
@@ -117,72 +113,109 @@ class TestSuite
 @:autoBuild(buddy.internal.SuiteBuilder.build())
 class BuddySuite
 {
-	// If set, suites are only included if marked by @include or if one of its specs are marked with @include
-	public static var includeMode = false;
-
-	public static var exclude(default, never) = "exclude";
-	public static var include(default, never) = "include";
-
-	/**
-	 * Milliseconds before an async spec timeout with an error. Default is 5000 (5 sec).
-	 */
-	public var timeoutMs(default, default) = 5000;
-
-	/**
-	 * Top-level test suite
-	 */
-	public var suite : TestSuite;
+	///// Internal vars /////
 	
-	// For building the test suite structure. Used in SuitesRunner
-	@:allow(buddy.SuitesRunner) var currentSuite(default, default) : TestSuite;
+	/**
+	 * Top-level test suite, used in reporting.
+	 */ 
+	@:allow(buddy.SuitesRunner) public var suite(default, null) : TestSuite;
 	
-	@:allow(buddy.SuitesRunner) var describeQueue(default, null) 
+	// For building the test suite structure.
+	@:noCompletion @:allow(buddy.SuitesRunner) var currentSuite(default, default) : TestSuite;	
+	@:noCompletion @:allow(buddy.SuitesRunner) var describeQueue(default, null) 
 		= new List<{ suite: TestSuite, spec: TestFunc }>();
 
-	//public var include(default, default) = false;
-	
+	///// Buddy API /////
+
 	public function new() {
 		suite = currentSuite = new TestSuite("");
 	}
 
-	///// Private API /////
+	/**
+	 * Milliseconds before a spec timeout with an error. Default is 5000 (5 sec).
+	 */
+	public var timeoutMs(default, null) = 1000;
 
-	private function describe(description : String, spec : TestFunc) {
+	/**
+	 * Defines a test Suite, containing Specs and other Suites.
+	 * @param	description Name that will be reported
+	 * @param	spec A block or function of additional defines
+	 * @param	hasInclude Only used internally
+	 */
+	private function describe(description : String, spec : TestFunc, _hasInclude = false) : Void {
 		var suite = new TestSuite(description);
 		
-		currentSuite.specs.add(TestSpec.Describe(suite));
+		currentSuite.specs.add(TestSpec.Describe(suite, _hasInclude));
 		// Will be looped through in SuitesRunner:
 		describeQueue.add({ suite: suite, spec: spec });
 	}
 		
-	private function xdescribe(description : String, spec : TestFunc) {
+	/**
+	 * Defines a test Suite, but will not include it in any test execution.
+	 * @param	description Name that will be reported
+	 * @param	spec A block or function of additional defines
+	 * @param	hasInclude Only used internally
+	 */
+	private function xdescribe(description : String, spec : TestFunc, _hasInclude = false) : Void {
 		// Do nothing, suite is excluded.
 	}
 
-	@:deprecated("Use beforeEach instead.")
-	private function before(init : TestFunc) beforeEach(init);
-
-	@:deprecated("Use afterEach instead.")
-	private function after(init : TestFunc) afterEach(init);
-
-	private function beforeEach(init : TestFunc) currentSuite.beforeEach.add(init);
-	private function beforeAll(init : TestFunc) currentSuite.beforeAll.add(init);
-	private function afterEach(init : TestFunc) currentSuite.afterEach.add(init);
-	private function afterAll(init : TestFunc) currentSuite.afterAll.add(init);
-	
-	private function it(desc : String, spec : TestFunc) {
-		currentSuite.specs.add(TestSpec.It(desc, spec));
-	}
-
 	/**
-	 * Creates a pending Spec.
+	 * Deprecated, use beforeEach instead.
 	 */
-	private function xit(desc : String, ?spec : TestFunc) {
-		currentSuite.specs.add(TestSpec.It(desc, null));
+	@:deprecated("Use beforeEach instead.")
+	private function before(init : TestFunc) : Void beforeEach(init);
+
+	/**
+	 * Deprecated, use afterEach instead.
+	 */
+	@:deprecated("Use afterEach instead.")
+	private function after(init : TestFunc) : Void afterEach(init);
+
+	/**
+	 * Defines a function that will be run before each underlying Suite or Spec.
+	 */
+	private function beforeEach(init : TestFunc) : Void currentSuite.beforeEach.add(init);
+	
+	/**
+	 * Defines a function that will be run once at the beginning of the current Suite.
+	 */
+	private function beforeAll(init : TestFunc) : Void currentSuite.beforeAll.add(init);
+
+	/**
+	 * Defines a function that will be run after each underlying Suite or Spec.
+	 */
+	private function afterEach(init : TestFunc) : Void currentSuite.afterEach.add(init);
+	
+	/**
+	 * Defines a function that will be run once at the end of the current Suite.
+	 */
+	private function afterAll(init : TestFunc) : Void currentSuite.afterAll.add(init);
+
+	/**
+	 * Defines a Spec, a test of conditions. Should is used for verifying the test itself.
+	 * @param	desc Test description
+	 * @param	spec A block or function of tests, or leave out for pending
+	 * @param	hasInclude Only used internally
+	 */
+	private function it(desc : String, ?spec : TestFunc, _hasInclude = false) : Void {
+		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
+		currentSuite.specs.add(TestSpec.It(desc, spec, _hasInclude));
 	}
 
 	/**
-	 * Fails the current Spec.
+	 * Defines a pending Spec.
+	 * @param	desc Test description
+	 * @param	spec A block or function of tests, or leave out
+	 * @param	hasInclude Only used internally
+	 */
+	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false) : Void {
+		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
+		currentSuite.specs.add(TestSpec.It(desc, null, _hasInclude));
+	}
+
+	/**
+	 * Fails the current Spec, with an optional error message.
 	 */
 	@:allow(buddy.SuitesRunner) private var fail : ?Dynamic -> ?PosInfos -> Void;
 }

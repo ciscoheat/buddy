@@ -14,9 +14,10 @@ import utest.Assert;
 import utest.Assertation;
 #end
 
+using Lambda;
 using buddy.tools.AsyncTools;
 
-@:keep // prevent dead code elimination
+@:keep // Prevent dead code elimination, since SuitesRunner is created dynamically
 class SuitesRunner
 {
 	public static var currentTest : Should.SpecAssertion;
@@ -26,8 +27,7 @@ class SuitesRunner
 	private var aborted : Bool;
 	private var allTestsPassed = true;
 
-	public function new(buddySuites : Iterable<BuddySuite>, ?reporter : Reporter)
-	{
+	public function new(buddySuites : Iterable<BuddySuite>, ?reporter : Reporter) {
 		// Cannot use Lambda here, Java problem in Linux.
 		//var includeMode = [for (b in buddySuites) for (s in b.suites) if (s.include) s].length > 0;
 
@@ -43,7 +43,7 @@ class SuitesRunner
 		var iterator = iterable.iterator();
 		var output = [];
 		
-		(function next() {
+		function next() {
 			if (!iterator.hasNext()) done(null, output);
 			else cb(iterator.next(), function(err, mapped) { 
 				if (err == null) {
@@ -52,7 +52,8 @@ class SuitesRunner
 				}
 				else done(err, output);
 			});
-		})();
+		}
+		next(); // Neko couldn't do self-calls
 	}
 
 	private function forEachSeries<T, Err>(
@@ -61,20 +62,23 @@ class SuitesRunner
 		done : Null<Err> -> Void) 
 	{
 		var iterator = iterable.iterator();
-					
-		(function next(err : Null<Err>) {
+		
+		function next(err : Null<Err>) {
 			if (err != null) done(err);
 			else if (!iterator.hasNext()) done(null);
 			else cb(iterator.next(), next);
-		})(null);
+		}		
+		next(null); // Neko couldn't do self-calls
 	}
 
 	private function runDescribes(cb : Dynamic -> Void) {
 		forEachSeries(buddySuites, function(suite, cb) {
-			(function processQueue() {
-				if (suite.describeQueue.isEmpty()) return cb(null);
+			function processQueue() {
+				if (suite.describeQueue.isEmpty()) return cb(null);				
 				
 				var current = suite.describeQueue.pop();
+				
+				// Set current suite, that will collect all describe/it/after/before calls.
 				suite.currentSuite = current.suite;
 				
 				// TODO: Errors when in describe phase?
@@ -82,9 +86,43 @@ class SuitesRunner
 					case Async(f): f(processQueue);
 					case Sync(f): f(); processQueue();
 				}
-			})();
-		}, cb);
-	}	
+			}
+			processQueue(); // Neko couldn't do self-calls
+		}, function(err) {
+			// If includes exists, start pruning the Suite tree.
+			if (Reflect.hasField(Meta.getType(BuddySuite), "includeMode")) {
+				startIncludeMode(cb);
+			} else {
+				cb(err);
+			}
+		});
+	}
+	
+	private function startIncludeMode(cb : Dynamic -> Void) {
+		function traverse(suite : TestSuite) : Bool {
+			suite.specs = suite.specs.filter(function(spec) {
+				switch spec {
+					case Describe(suite, included):
+						//trace(suite.description, included);
+						if (included) return true;
+						else return traverse(suite);
+					case It(desc, _, included):
+						//trace("It: " + desc, included);
+						return included;
+				}
+			});
+			return suite.specs.length > 0;
+		}
+		
+		buddySuites = buddySuites.filter(function(buddySuite) {
+			var suiteMeta = Meta.getType(Type.getClass(buddySuite));
+			if (Reflect.hasField(suiteMeta, "include")) return true;
+			
+			return traverse(buddySuite.suite);
+		});
+		
+		cb(null);
+	}
 	
 	public function run() : Promise<Bool>
 	{
@@ -104,7 +142,6 @@ class SuitesRunner
 			var mapTestSpec : BuddySuite -> TestSuite -> TestSpec -> (Dynamic -> Step -> Void) -> Void = null;
 
 			function mapTestSuite(buddySuite : BuddySuite, testSuite : TestSuite, done : Dynamic -> Suite -> Void) {				
-				// Run beforeAll
 				forEachSeries(testSuite.beforeAll, runTestFunc, function(err) {
 					// TODO: Error handling
 					mapSeries(testSuite.specs, mapTestSpec.bind(buddySuite, testSuite), function(err, testSteps) {
@@ -121,6 +158,7 @@ class SuitesRunner
 				var spec : Spec = null;
 
 				function runAfterEach(err : Dynamic, result : Step) {
+					// Restore Log and set Suites fail function to null
 					Log.trace = oldLog;
 					buddySuite.fail = null;
 					
@@ -132,19 +170,21 @@ class SuitesRunner
 				
 				forEachSeries(testSuite.beforeEach, runTestFunc, function(err) {
 					switch testSpec {						
-						case Describe(testSuite): 
+						case Describe(testSuite, included): 
 							mapTestSuite(buddySuite, testSuite, function(err, suite) {
 								runAfterEach(null, TSuite(suite));
 							});
 							
-						case It(desc, test): 
+						case It(desc, test, included): 
 							spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
 							var hasCompleted = false;
 							
+							// Log traces for each Spec, so they can be outputted in the reporter
 							Log.trace = function(v, ?pos : PosInfos) {
 								spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + Std.string(v));
 							};
 
+							// Called when, for any reason, the Spec is completed.
 							function specCompleted(status : SpecStatus, error : String, stack : Array<StackItem>) {
 								if (hasCompleted) return;
 								hasCompleted = true;
@@ -161,7 +201,8 @@ class SuitesRunner
 								return specCompleted(Pending, null, null);
 							}
 		
-							// Create a test that will be used in Should
+							// Create a test function that will be used in Should
+							// note that multiple successfull tests doesn't mean the Spec is completed.
 							SuitesRunner.currentTest = function(testStatus : Bool, error : String, stack : Array<StackItem>) {
 								if (hasCompleted || testStatus == true) return;
 								
@@ -191,11 +232,13 @@ class SuitesRunner
 							}
 							#end
 							
+							#if !php
 							// Set up timeout for the current spec
 							var timeout = buddySuite.timeoutMs;
 							AsyncTools.wait(timeout)
 								.catchError(function(e : Dynamic) if (e != null) throw e)
 								.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
+							#end
 							
 							// Set up fail function
 							buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
@@ -231,8 +274,7 @@ class SuitesRunner
 
 	public function failed() return !allTestsPassed;
 
-	public function statusCode() : Int
-	{
+	public function statusCode() : Int {
 		if (aborted) return 1;
 		return failed() ? 1 : 0;
 	}

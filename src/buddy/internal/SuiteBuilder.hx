@@ -10,6 +10,17 @@ using haxe.macro.ExprTools;
 
 class SuiteBuilder
 {
+	private static var superClass : ClassType;
+	private static var includeMode = false;
+
+	private static function setIncludeMode() {
+		if (includeMode) return;
+		includeMode = true;
+		
+		if (!superClass.meta.has("includeMode"))
+			superClass.meta.add("includeMode", [], Context.currentPos());
+	}
+	
 	private static function injectAsync(e : Expr)
 	{
 		switch(e.expr) {
@@ -37,32 +48,116 @@ class SuiteBuilder
 		}
 		
 		switch(e) {
-				
+			
+			///// Should
+			
 			case macro $a.should().$b, macro $a.should.$b:
 				// Need to use untyped here for some unknown macro reason...
 				var change = macro $a.should().$b;
 				e.expr = change.expr;
 
+			///// Include
+			
+			case macro @include describe($s, $f):
+				setIncludeMode();
+				var change = macro describe($s, $f, true);
+				e.expr = change.expr;
+				injectAsync(e);
+
+			case macro @include it($s):
+				setIncludeMode();
+				var change = macro it($s, null, true);
+				e.expr = change.expr;
+				injectAsync(e);
+				
+			case macro @include it($s, $f):
+				setIncludeMode();
+				var change = macro it($s, $f, true);
+				e.expr = change.expr;
+				injectAsync(e);
+
+			///// Exclude
+
+			case macro @exclude describe($s, $f):
+				var change = macro xdescribe($s, $f);
+				e.expr = change.expr;
+				injectAsync(e);
+
+			case macro @exclude it($s):
+				var change = macro xit($s);
+				e.expr = change.expr;
+				injectAsync(e);
+				
+			case macro @exclude it($s, $f):
+				var change = macro xit($s, $f);
+				e.expr = change.expr;
+				injectAsync(e);
+			
 			///// Describe
+
+			case macro describe($s, function() $f):
+				var change = macro describe($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
 
 			case macro describe($s, function($n) $f):
 				var change = macro describe($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro describe($s, function() $f), macro describe($s, $f):
-				var change = macro describe($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
+			case macro describe($s, function() $f, $i):
+				var change = macro describe($s, buddy.BuddySuite.TestFunc.Sync(function() $f), $i);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro xdescribe($s, function() $f), macro xdescribe($s, $f), macro @exclude describe($s, $f):
+			case macro describe($s, function($n) $f, $i):
+				var change = macro describe($s, buddy.BuddySuite.TestFunc.Async(function($n) $f), $i);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro describe($s, $f):
+				var change = macro describe($s, function() $f);
+				e.expr = change.expr;
+				injectAsync(e);
+
+			case macro describe($s, $f, $i):
+				var change = macro describe($s, function() $f, $i);
+				e.expr = change.expr;
+				injectAsync(e);				
+
+			///// Describe
+
+			case macro xdescribe($s, function() $f):
 				var change = macro xdescribe($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			///// BeforeEach/AfterEach
+			case macro xdescribe($s, function($n) $f):
+				var change = macro xdescribe($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
+				e.expr = change.expr;
+				f.iter(injectAsync);
 
-			// TODO: Deprecate before/after
+			case macro xdescribe($s, function() $f, $i):
+				var change = macro xdescribe($s, buddy.BuddySuite.TestFunc.Sync(function() $f), $i);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro xdescribe($s, function($n) $f, $i):
+				var change = macro xdescribe($s, buddy.BuddySuite.TestFunc.Async(function($n) $f), $i);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro xdescribe($s, $f):
+				var change = macro xdescribe($s, function() $f);
+				e.expr = change.expr;
+				injectAsync(e);
+
+			case macro xdescribe($s, $f, $i):
+				var change = macro xdescribe($s, function() $f, $i);
+				e.expr = change.expr;
+				injectAsync(e);				
+
+			///// BeforeEach/AfterEach
 
 			case macro before(function($n) $f):
 				var change = macro @:pos(e.pos) before(buddy.BuddySuite.TestFunc.Async(function($n) $f));
@@ -137,20 +232,61 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 				
-			case macro it($s, function() $f), macro it($s, $f):
+			case macro it($s, function() $f):
 				var change = macro it($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			case macro it($s, function() $f, $i):
+				var change = macro it($s, buddy.BuddySuite.TestFunc.Sync(function() $f), $i);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro it($s, function($n) $f, $i):
+				var change = macro it($s, buddy.BuddySuite.TestFunc.Async(function($n) $f), $i);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro it($s, $f):
+				var change = macro it($s, function() $f);
+				e.expr = change.expr;
+				injectAsync(e);				
+				
+			case macro it($s, $f, $i):
+				var change = macro it($s, function() $f, $i);
+				e.expr = change.expr;
+				injectAsync(e);
+
+			///// Xit
+
+			case macro xit($s), macro xit($s, {}), macro xit($s, function() {}):
+				var change = macro xit($s, null);
+				e.expr = change.expr;
+
 			case macro xit($s, function($n) $f):
-				var change = macro xit($s, null);
+				var change = macro xit($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
-			
-			case macro xit($s, function() $f), macro xit($s, $f), macro @exclude it($s, $f):
-				var change = macro xit($s, null);
+				
+			case macro xit($s, function() $f):
+				var change = macro xit($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
+
+			case macro xit($s, function($n) $f, $i):
+				var change = macro xit($s, buddy.BuddySuite.TestFunc.Async(function($n) $f), $i);
+				e.expr = change.expr;
+				f.iter(injectAsync);
+
+			case macro xit($s, $f):
+				var change = macro xit($s, function() $f);
+				e.expr = change.expr;
+				injectAsync(e);				
+				
+			case macro xit($s, $f, $i):
+				var change = macro xit($s, function() $f, $i);
+				e.expr = change.expr;
+				injectAsync(e);
 
 			/////
 
@@ -163,7 +299,10 @@ class SuiteBuilder
 		var exists = false;
 		var cls = Context.getLocalClass();
 		if (cls == null || cls.get().superClass == null) return null;
-
+		
+		superClass = cls.get().superClass.t.get();		
+		if (cls.get().meta.has("include")) setIncludeMode();
+		
 		var fields = Context.getBuildFields();
 		for (f in fields) if(f.name == "new") {
 			switch f.kind {

@@ -135,12 +135,11 @@ class GenerateMain
 		var output = new Array<ClassType>();
 		var include = new Array<ClassType>();
 
-		for (c in classes)
-		{
-			if (c.meta.has(BuddySuite.exclude)) continue;
+		for (c in classes) {
+			if (c.meta.has("exclude")) continue;
 			if (c.superClass != null && c.superClass.t.get().name == "BuddySuite")
 			{
-				if (c.meta.has(BuddySuite.include)) include.push(c);
+				if (c.meta.has("include")) include.push(c);
 				else output.push(c);
 			}
 		}
@@ -192,7 +191,7 @@ class GenerateMain
 		if (Context.defined("neko") || Context.defined("cpp"))
 		{
 			body = macro {
-				runner.run().then(function(_) { testsRunning = false; } );
+				runner.run().then(function(_) testsRunning = false);
 				while (testsRunning) Sys.sleep(0.1);
 				Sys.exit(runner.statusCode());
 			};
@@ -200,7 +199,7 @@ class GenerateMain
 		else if(Context.defined("cs"))
 		{
 			body = macro {
-				runner.run().then(function(_) { testsRunning = false; } );
+				runner.run().then(function(_) testsRunning = false);
 				while (testsRunning) cs.system.threading.Thread.Sleep(10);
 				cs.system.Environment.Exit(runner.statusCode());
 			};
@@ -208,8 +207,7 @@ class GenerateMain
 		else if(Context.defined("nodejs"))
 		{
 			body = macro {
-				// Windows bug doesn't flush stdout properly, need to wait: https://github.com/joyent/node/issues/3584
-				runner.run().then(function(_) { untyped __js__("if(process.platform == 'win32') { process.once('exit', function() { process.exit(runner.statusCode()); }); } else { process.exit(runner.statusCode()); }"); } );
+				runner.run().then(function(_) untyped __js__("process.exit(runner.statusCode())"));
 			};
 		}
 		else if(Context.defined("sys"))
@@ -218,9 +216,9 @@ class GenerateMain
 				runner.run().then(function(_) { Sys.exit(runner.statusCode()); });
 			};
 		}
-		else if (Context.defined("fdb-ci"))
+		else if (Context.defined("fdb-ci") || Context.defined("exit-flash"))
 		{
-			// If fdb-ci is defined, flash will exit. (For CI usage)
+			// If defined, flash will exit. (For CI usage)
 			body = macro {
 				runner.run().then(function(_) {	flash.system.System.exit(runner.statusCode()); });
 			}

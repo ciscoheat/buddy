@@ -55,7 +55,7 @@ class AsyncTools
 		#elseif python
 		new Timer(ms / 1000, done).start();
 		#elseif (js || flash)
-		Timer.delay(function() { done(); }, ms);
+		Timer.delay(function() done(), ms);
 		#elseif cs
 		var t = new Timer(ms);
 		t.add_Elapsed(new ElapsedEventHandler(function(sender : Dynamic, e : ElapsedEventArgs) {

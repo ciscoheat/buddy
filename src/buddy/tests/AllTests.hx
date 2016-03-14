@@ -3,7 +3,6 @@ package buddy.tests ;
 import buddy.BuddySuite;
 import buddy.Buddy;
 import buddy.tools.AsyncTools;
-import haxe.Timer;
 import promhx.Deferred;
 import promhx.Promise;
 
@@ -70,7 +69,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		describe("Testing dynamics", function(done) {
+		describe("Testing dynamics", function() {
 			var obj1 = { id: 1 };
 			var obj2 = { id: 2 };
 			var color1 = Red;
@@ -100,10 +99,23 @@ class TestBasicFeatures extends BuddySuite
 				
 				arr.should.be(fn());
 				// fn().should.be(arr); // Will fail because it's Unknown<0>, cast to fix.
+			});			
+		});
+
+		#if !php
+		describe("Testing async describe definitions", function(done) {
+			var a = 0;
+
+			it("should run specs after done has been called.", {
+				a.should().be(1);
 			});
 			
-			Timer.delay(done, 10);
+			AsyncTools.wait(10).then(function(_) {
+				a = 1;
+				done();
+			});
 		});
+		#end
 
 		describe("Testing strings", {
 			var str = "abc";
