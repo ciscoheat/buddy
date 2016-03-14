@@ -5,28 +5,6 @@ import haxe.CallStack;
 using Lambda;
 using StringTools;
 
-/*
-X toBe(b);
-X toBe(false);
-X toBeCloseTo(e, 0);
-- toBeDefined();
-- toBeFalsy();
-X toBeGreaterThan(0);
-X toBeLessThan(e);
-- toBeNull();
-- toBeTruthy();
-- toBeUndefined();
-X toContain("bar");
-X toEqual("I");
-toHaveBeenCalled();
-toHaveBeenCalledWith(456, 'another param');
-toHaveBeenCalledWith(jasmine.any(Number), jasmine.any(Function));
-toHaveBeenCalledWith(jasmine.objectContaining({
-X toMatch(/bar/);
-- toThrow();
-X toThrowError("quux");
-*/
-
 /**
  * A function that specifies the status for a spec with an optional error message and stack.
  */

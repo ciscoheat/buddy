@@ -10,14 +10,6 @@ using haxe.macro.ExprTools;
 
 class SuiteBuilder
 {
-	private static function debugDisplay(e : Expr)
-	{
-		var file = sys.io.File.write("e:\\temp\\buddy.txt", false);
-		file.writeString(Std.string(e.expr));
-		file.writeString("\r\n\r\n" + e.toString());
-		file.close();
-	}
-
 	private static function injectAsync(e : Expr)
 	{
 		switch(e.expr) {
