@@ -13,9 +13,13 @@ import Type in HaxeType;
 
 using haxe.macro.ExprTools;
 using Lambda;
+#end
 
 class GenerateMain
 {
+	public static var testsRunning : Bool;
+
+	#if macro
 	macro public static function withSuites(?buddySuites : Expr) : Array<Field>
 	{
 		var cls = Context.getLocalClass().get();
@@ -177,13 +181,12 @@ class GenerateMain
 					suites.push(Type.createInstance(Type.resolveClass(a), []));
 				}
 
-				var testsRunning = true;
+				buddy.internal.GenerateMain.testsRunning = true;
 				var runner = new buddy.SuitesRunner(suites, reporter);
 			};
 		} else {
 			header = macro {
 				var reporter = new $rep();
-				var testsRunning = true;
 				var runner = new buddy.SuitesRunner($allSuites, reporter);
 			};
 		}
@@ -191,16 +194,16 @@ class GenerateMain
 		if (Context.defined("neko") || Context.defined("cpp"))
 		{
 			body = macro {
-				runner.run().then(function(_) testsRunning = false);
-				while (testsRunning) Sys.sleep(0.1);
+				runner.run().then(function(_) buddy.internal.GenerateMain.testsRunning = false);
+				while (buddy.internal.GenerateMain.testsRunning) Sys.sleep(0.1);
 				Sys.exit(runner.statusCode());
 			};
 		}
 		else if(Context.defined("cs"))
 		{
 			body = macro {
-				runner.run().then(function(_) testsRunning = false);
-				while (testsRunning) cs.system.threading.Thread.Sleep(10);
+				runner.run().then(function(_) buddy.internal.GenerateMain.testsRunning = false);
+				while (buddy.internal.GenerateMain.testsRunning) cs.system.threading.Thread.Sleep(10);
 				cs.system.Environment.Exit(runner.statusCode());
 			};
 		}
@@ -238,5 +241,5 @@ class GenerateMain
 				throw "header or body isn't a block expression.";
 		}
 	}
+	#end
 }
-#end

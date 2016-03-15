@@ -38,7 +38,10 @@ enum Step {
 class Suite
 {
 	public var description(default, null) : String;
+	
 	@:allow(buddy.SuitesRunner) public var steps(default, null) = new Array<Step>();
+	@:allow(buddy.SuitesRunner) public var error(default, null) : String;
+	@:allow(buddy.SuitesRunner) public var stack(default, null) = new Array<StackItem>();
 
 	public var specs(get, never) : Array<Spec>;
 	private function get_specs() {

@@ -1,5 +1,6 @@
 package buddy.reporting;
 
+import haxe.CallStack.StackItem;
 import promhx.Deferred;
 import promhx.Promise;
 
@@ -53,6 +54,15 @@ class TraceReporter implements Reporter
 		{
 			var print = function(str : String) println(str.lpad(" ", str.length + indentLevel * 2));
 
+			function printStack(stack : Array<StackItem>) {
+				if (stack == null || stack.length == 0) return;
+				for (s in stack) switch s {
+					case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
+						print('    @ $file:$line');
+					case _:
+				}				
+			}
+			
 			if(s.description.length > 0) print(s.description);
 			for (step in s.steps) switch step
 			{
@@ -60,17 +70,9 @@ class TraceReporter implements Reporter
 					if (sp.status == Failed)
 					{
 						print("  " + sp.description + " (FAILED: " + sp.error + ")");
-
 						printTraces(sp);
-
-						if (sp.stack == null || sp.stack.length == 0) continue;
-
-						// Display the exception stack
-						for (s in sp.stack) switch s {
-							case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
-								print('    @ $file:$line');
-							case _:
-						}
+						printStack(sp.stack);
+						
 					}
 					else
 					{
@@ -78,7 +80,11 @@ class TraceReporter implements Reporter
 						printTraces(sp);
 					}
 				case TSuite(s):
-					printTests(s, indentLevel+1);
+					printTests(s, indentLevel + 1);
+					if (s.error != null) {
+						print("  ERROR: " + s.error);
+						printStack(s.stack);
+					}
 			}
 		};
 
