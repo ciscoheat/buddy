@@ -296,7 +296,7 @@ class SuitesRunner
 						#if utest
 						checkUtestResults();
 						#end
-						if (err) specCompleted(Failed, Std.string(err), CallStack.exceptionStack());
+						if (err != null) specCompleted(Failed, Std.string(err), CallStack.exceptionStack());
 						else specCompleted(Passed, null, null);
 					});
 			}

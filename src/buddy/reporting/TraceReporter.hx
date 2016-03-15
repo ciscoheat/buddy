@@ -24,8 +24,7 @@ class TraceReporter implements Reporter
 		return resolveImmediately(spec);
 	}
 
-	public function done(suites : Iterable<Suite>, status : Bool)
-	{
+	public function done(suites : Iterable<Suite>, status : Bool) {
 		println("");
 
 		var total = 0;
@@ -50,8 +49,7 @@ class TraceReporter implements Reporter
 
 		suites.iter(countTests);
 
-		printTests = function(s : Suite, indentLevel : Int)
-		{
+		printTests = function(s : Suite, indentLevel : Int) {
 			var print = function(str : String) println(str.lpad(" ", str.length + Std.int(Math.max(0, indentLevel * 2))));
 
 			function printStack(stack : Array<StackItem>) {
@@ -63,30 +61,32 @@ class TraceReporter implements Reporter
 				}
 			}
 			
+			function printTraces(spec : Spec) {
+				for (t in spec.traces) println("    " + t);
+			}
+			
 			if (s.description.length > 0) print(s.description);
 			
 			if (s.error != null) {
 				// The whole suite crashed.
 				print("ERROR: " + s.error);
 				printStack(s.stack);
-			} else {
-				for (step in s.steps) switch step {
-					case TSpec(sp):
-						if (sp.status == Failed)
-						{
-							print("  " + sp.description + " (FAILED: " + sp.error + ")");
-							printTraces(sp);
-							printStack(sp.stack);
-							
-						}
-						else
-						{
-							print("  " + sp.description + " (" + sp.status + ")");
-							printTraces(sp);
-						}
-					case TSuite(s):
-						printTests(s, indentLevel + 1);
-				}
+				return;
+			}
+				
+			for (step in s.steps) switch step {
+				case TSpec(sp):
+					if (sp.status == Failed) {
+						print("  " + sp.description + " (FAILED: " + sp.error + ")");
+						printTraces(sp);
+						printStack(sp.stack);							
+					}
+					else {
+						print("  " + sp.description + " (" + sp.status + ")");
+						printTraces(sp);
+					}
+				case TSuite(s):
+					printTests(s, indentLevel + 1);
 			}
 		};
 
@@ -97,24 +97,19 @@ class TraceReporter implements Reporter
 		return resolveImmediately(suites);
 	}
 
-	function printTraces(spec : Spec)
-	{
-		for (t in spec.traces)
-			println("    " + t);
-	}
-
-	private function print(s : String)
-	{
+	private function print(s : String) {
 		// Override when needed.
 	}
 
-	private function println(s : String)
-	{
+	private function println(s : String) {
+		// Override when needed.
 		trace(s);
 	}
-
-	private function resolveImmediately<T>(o : T) : Promise<T>
-	{
+	
+	/**
+	 * Convenience method.
+	 */
+	private function resolveImmediately<T>(o : T) : Promise<T> {
 		var def = new Deferred<T>();
 		var pr = def.promise();
 		def.resolve(o);
