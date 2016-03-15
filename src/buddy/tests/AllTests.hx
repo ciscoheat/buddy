@@ -13,9 +13,7 @@ using buddy.Should;
 using Slambda;
 using StringTools;
 
-// Cannot use interface syntax for Java until
-// https://github.com/HaxeFoundation/haxe/issues/4286 is fixed
-@:build(buddy.GenerateMain.withSuites([
+class AllTests implements Buddy<[
 	TestBasicFeatures,
 	TestExclude,
 	FailTest,
@@ -30,7 +28,7 @@ using StringTools;
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
 	CallDoneTest
-])) class AllTests {}
+]> {}
 
 class EmptyTestClass { public function new() {} }
 
