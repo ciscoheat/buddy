@@ -237,7 +237,7 @@ class TestBasicFeatures extends BuddySuite
 		});
 
 		describe("Testing Iterable", {
-			var a = [1,2,3];
+			var a = [1, 2, 3];
 			var b = [1, 2, 3];
 
 			var c = new List<Int>();

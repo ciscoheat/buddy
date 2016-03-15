@@ -17,6 +17,13 @@ import utest.Assertation;
 using Lambda;
 using buddy.tools.AsyncTools;
 
+#if python
+@:pythonImport("sys")
+extern class PythonSys {
+	public static function setrecursionlimit(i : Int) : Void;
+} 
+#end
+
 @:keep // Prevent dead code elimination, since SuitesRunner is created dynamically
 class SuitesRunner
 {
@@ -37,6 +44,10 @@ class SuitesRunner
 	public function run() : Promise<Bool> {
 		var def = new Deferred<Bool>();
 		var defPr = def.promise();
+		
+		#if python
+		PythonSys.setrecursionlimit(10000);
+		#end
 		
 		// C# and Java had problems when using an anonymous 
 		// function instead of actualRun.
@@ -173,12 +184,12 @@ class SuitesRunner
 			
 			forEachSeries(testSuite.beforeEach, runTestFunc, function(err) {
 				switch testSpec {						
-					case Describe(testSuite, included): 
+					case Describe(testSuite, _): 
 						mapTestSuite(buddySuite, testSuite, function(err, suite) {
 							runAfterEach(null, TSuite(suite));
 						});
 						
-					case It(desc, test, included): 
+					case It(desc, test, _): 
 						spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
 						var hasCompleted = false;
 						
@@ -256,6 +267,7 @@ class SuitesRunner
 								specCompleted(Passed, null, null);
 							});
 						} catch (e : Dynamic) {
+							trace(e);
 							specCompleted(Failed, Std.string(e), CallStack.exceptionStack());
 						}
 				}

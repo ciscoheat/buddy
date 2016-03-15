@@ -2,6 +2,11 @@ package buddy;
 import buddy.Should.ShouldIterable;
 import haxe.PosInfos;
 import haxe.CallStack;
+#if python
+import python.internal.UBuiltins;
+import python.lib.Builtins;
+#end
+
 using Lambda;
 using StringTools;
 
@@ -396,7 +401,15 @@ class Should<T>
 	 */
 	public function be(expected : T, ?p : PosInfos) : Void
 	{
-		test(value == expected, p,
+		#if python
+		// Python arrays compare arrays (list) by item-by-item equality as default.
+		var result = UBuiltins.isinstance(value, UBuiltins.list) && UBuiltins.isinstance(expected, UBuiltins.list)
+			? Builtins.id(cast value) == Builtins.id(cast expected)
+			: value == expected;
+		#else
+		var result = value == expected;
+		#end
+		test(result, p,
 			'Expected ${quote(expected)}, was ${quote(value)}',
 			'Didn\'t expect ${quote(expected)} but was equal to that'
 		);
