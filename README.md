@@ -16,10 +16,10 @@ Your friendly BDD testing library for Haxe!
 import buddy.*;
 using buddy.Should;
 
-// Add test suites within the brackets
+// Add test classes within the brackets
 class Main implements Buddy<[Tests]> {}
 
-// Test suites should extend BuddySuite
+// Test classes should extend BuddySuite
 class Tests extends BuddySuite {
     public function new() {
         // A test suite:
@@ -27,8 +27,7 @@ class Tests extends BuddySuite {
             var experience = "?";
             var mood = "?";
 
-            // Executed before each "it":
-            before({
+            beforeEach({
                 experience = "great";
             });
 
@@ -36,12 +35,11 @@ class Tests extends BuddySuite {
                 experience.should.be("great");
             });
 
-            it("should really make the tester happy", {
+            it("should make the tester really happy", {
                 mood.should.be("happy");
             });
 
-            // Executed after each "it":
-            after({
+            afterEach({
                 mood = "happy";
             });
         });
@@ -57,11 +55,11 @@ class Tests extends BuddySuite {
 ..
 Using Buddy
   should be a great testing experience (Passed)
-  should really make the tester happy (Passed)
+  should make the tester really happy (Passed)
 2 specs, 0 failures, 0 pending
 ```
 
-But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js, and `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (that one seems to vary between Linux and Win though).
+But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js, and possibly `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (seems to vary between Linux and Win).
 
 ## Asynchronous support
 
@@ -86,8 +84,8 @@ class AsyncTest extends BuddySuite {
                 }, 100);
             });
 
-			// Can be added to "it" and "after" as well if needed.
-            it("cannot be described in one sentence", {
+            // Can be added to "it" and "after" as well if needed.
+            it("can be described in a certain word", {
                 mood.should.be("thrilled");
             });
         });
@@ -95,7 +93,7 @@ class AsyncTest extends BuddySuite {
 }
 ```
 
-The default timeout is 5000 ms, after which the spec will automatically fail if `done()` hasn't been called. If you want to change the timeout, set the property `timeoutMs` in the `BuddySuite` **before** the actual `it()` specification, or in the before/after block. Here's an example:
+The default timeout is 5000 ms, after which the spec will automatically fail if `done()` hasn't been called, or in the case of synchronous tests, if it hasn't returned. If you want to change the timeout, set the property `timeoutMs` in the `BuddySuite` **before** the actual `it()` specification, or in the before/after block. Here's an example:
 
 ```haxe
 import buddy.*;
@@ -157,7 +155,7 @@ Same as Int plus
 `a.should.beAfter(date)` - Test if `a` is after a given date.
 
 `a.should.beAfterStr(string)` - Same as above, but specified by a string.
-	
+    
 ### Iterable<T>
 
 `a.should.contain(b)` - Test if an Iterable contains `b`.
@@ -194,12 +192,12 @@ it("should fail manually when using fail()", {
 });
 
 it("should fail if a promise fails", function(done) {
-	request.getJson("/some/url")
-	.then(function(r) {
-		r.statusCode.should.be(200);
-		done();
-	})
-	.catchError(fail);
+    request.getJson("/some/url")
+    .then(function(r) {
+        r.statusCode.should.be(200);
+        done();
+    })
+    .catchError(fail);
 });
 
 it("should also fail when throwing an exception", {
@@ -209,7 +207,7 @@ it("should also fail when throwing an exception", {
 
 ## Pending tests
 
-Since BDD is also made for non-programmers to use, a common development style is to write empty, or *pending* tests, and let a programmer implement them later. To do this, just write the string in the `describe` and `it` methods. Our previous test class would then look like this:
+Since BDD is also made for non-programmers to use, a common development style is to write empty, or *pending* tests, and let a programmer implement them later. To do this, just write a string in the `it` methods, nothing else. Our previous test class would then look like this:
 
 **Main.hx**
 
@@ -246,7 +244,7 @@ Classes, suites and specs can all be marked with `@include` and `@exclude`. `@in
 
 ## Customizing reporting
 
-If the default console reporter isn't to your liking, you can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are three ways to use it:
+If the default console reporter isn't to your liking, you can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are two ways to use it:
 
 ### Metadata
 
@@ -261,31 +259,9 @@ class Main implements Buddy<[Tests]> {}
 
 The compilation flag will override the metadata, if both are set.
 
-### Manually
-
-```haxe
-import path.to.your.CustomReporter;
-import buddy.SuitesRunner;
-
-class Main {
-    public static function main() {
-        var reporter = new CustomReporter();
-
-        var runner = new SuitesRunner([
-            new FirstTestSuite(),
-            new AnotherTestSuite()
-        ], reporter);
-
-        runner.run();
-    }
-}
-```
-
-Note that running tests manually like this is rare, usually you will use the `Buddy` interface. See the first FAQ question for an explanation.
-
 ### List of built-in Reporters
 
-`buddy.reporting.ConsoleReporter` is the default reporter, if you need to run it manually similar to above.
+`buddy.reporting.ConsoleReporter` is the default reporter.
 
 `buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI in Flash together with the `-D fdb-ci` compiler flag. See the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
 
@@ -299,13 +275,13 @@ Ok, you noticed that it was missing! Using some macro magic, you only need to im
 
 ```haxe
 class Main implements buddy.Buddy<[
-	path.to.YourBuddySuite,
-	AnotherTestSuite,
-	new SpecialSuite("Constant value", 123)
+    path.to.YourBuddySuite,
+    AnotherTestSuite,
+    new SpecialSuite("Constant value", 123)
 ]> {}
 ```
 
-The advantage with implementing `Buddy` is that platform-specific code for waiting until the tests are finished will be generated. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
+The advantage of implementing `Buddy` is that platform-specific code for waiting until the tests are finished will be generated. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can easily use Buddy in CI tools.
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
@@ -331,9 +307,6 @@ The [HaxeContracts](https://github.com/ciscoheat/HaxeContracts) library is a nic
 
 ## Upcoming features
 
-- [x] Tutorial for general guidelines when doing BDD.
-- [x] More assertions for "should".
-- [x] Ways to customize running and reporting of specific test suites.
 - [ ] Nicer reporters (especially for the browser) with stack traces for failures.
 - [ ] Your choice! Send me a gmail (ciscoheat) or create an issue here.
 

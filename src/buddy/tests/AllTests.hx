@@ -1,7 +1,5 @@
 package buddy.tests ;
 
-import buddy.BuddySuite;
-import buddy.Buddy;
 import buddy.tools.AsyncTools;
 import promhx.Deferred;
 import promhx.Promise;
@@ -10,6 +8,7 @@ import Slambda.fn;
 import utest.Assert;
 
 using buddy.Should;
+
 using Slambda;
 using StringTools;
 
@@ -418,7 +417,7 @@ class TestAsync extends BuddySuite
 	{
 		describe("Testing async", {
 			var a;
-			var timeoutErrorTest : Spec;
+			var timeoutErrorTest : buddy.BuddySuite.Spec;
 			var timeoutErrorTestDone : ?Bool -> Void = null;
 
 			beforeEach(function(done) {

@@ -1,4 +1,4 @@
-package buddy ;
+package buddy.internal ;
 
 #if macro
 import buddy.reporting.ConsoleReporter;
