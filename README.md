@@ -47,7 +47,7 @@ class Tests extends BuddySuite {
 
 3) Make a quick test:
 
-`haxe -lib buddy -main Main --interp`
+`haxe -x Main -lib buddy`
 
 ```
 ..

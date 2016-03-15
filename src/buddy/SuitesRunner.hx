@@ -244,7 +244,7 @@ class SuitesRunner
 						}
 						#end
 						
-						#if !php
+						#if (!php && !macro)
 						// Set up timeout for the current spec
 						var timeout = buddySuite.timeoutMs;
 						if(timeout > 0) {

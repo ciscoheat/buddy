@@ -47,7 +47,7 @@ class AsyncTools
 		var pr = def.promise();
 		var done = function() { if (!pr.isFulfilled()) def.resolve(true); };
 
-		#if neko
+		#if (neko && !macro)
 		Thread.create(function() {
 			Sys.sleep(ms / 1000);
 			done();
@@ -78,8 +78,7 @@ class AsyncTools
 		#elseif php
 		throw "AsyncTools.wait not supported for PHP.";
 		#else
-		Sys.sleep(ms / 1000);
-		done();
+		throw "AsyncTools.wait not supported for current target.";
 		#end
 
 		return pr;
