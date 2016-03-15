@@ -2,8 +2,9 @@
 -lib promhx
 -lib utest
 -lib slambda
+-lib hxcpp
 -cpp bin
 -main buddy.tests.AllTests
 -cmd echo "---------- CPP ----------"
 -cmd bin/AllTests
--D HXCPP_M64
+# -D HXCPP_M64

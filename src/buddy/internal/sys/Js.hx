@@ -1,5 +1,6 @@
 package buddy.internal.sys;
 #if js
+import js.html.Element;
 import js.html.DivElement;
 import js.html.Text;
 import js.html.SpanElement;
@@ -8,24 +9,15 @@ using StringTools;
 
 class Js
 {
-	private static function replaceSpace(s : String)
-	{
-		if (Browser.navigator.userAgent.indexOf("PhantomJS") >= 0) return s;
-		return s.replace(" ", "&nbsp;");
+	// Set in ConsoleReporter
+	public static var outputElement : Element;
+	
+	public static function print(s : String) {
+		outputElement.innerHTML += s;
 	}
 
-	public static function print(s : String)
-	{
-		var sp = Browser.document.createSpanElement();
-		sp.innerHTML = replaceSpace(s);
-		Browser.document.body.appendChild(sp);
-	}
-
-	public static function println(s : String)
-	{
-		var div = Browser.document.createDivElement();
-		div.innerHTML = replaceSpace(s);
-		Browser.document.body.appendChild(div);
+	public static function println(s : String) {
+		outputElement.innerHTML += s + "\n";
 	}
 }
 #end

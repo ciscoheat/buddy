@@ -10,6 +10,8 @@ using StringTools;
 import buddy.internal.sys.NodeJs;
 private typedef Sys = NodeJs;
 #elseif js
+import js.html.PreElement;
+import js.Browser;
 import buddy.internal.sys.Js;
 private typedef Sys = Js;
 #elseif flash
@@ -19,10 +21,6 @@ private typedef Sys = Flash;
 
 class ConsoleReporter extends TraceReporter
 {
-	#if php
-	var cli : Bool;
-	#end
-
 	public function new() {
 		super();
 	}
@@ -31,8 +29,10 @@ class ConsoleReporter extends TraceReporter
 	{
 		// A small convenience for PHP, to avoid creating a new reporter.
 		#if php
-		cli = (untyped __call__("php_sapi_name")) == 'cli';
-		if(!cli) println("<pre>");
+		if (untyped __call__("php_sapi_name") != "cli") println("<pre>");
+		#elseif (js && !nodejs)
+		Js.outputElement = Browser.document.createPreElement();
+		Browser.document.body.appendChild(Js.outputElement);
 		#end
 
 		return resolveImmediately(true);
@@ -55,19 +55,25 @@ class ConsoleReporter extends TraceReporter
 		var output = super.done(suites, status);
 
 		#if php
-		if(!cli) println("</pre>");
-		#end
-
+		if(untyped __call__("php_sapi_name") != "cli") println("</pre>");
+		#end	
+		
 		return output;
 	}
 
 	override private function print(s : String)
 	{
 		Sys.print(s);
+		#if php
+		untyped __call__("flush");
+		#end
 	}
 
 	override private function println(s : String)
 	{
 		Sys.println(s);
+		#if php
+		untyped __call__("flush");
+		#end
 	}
 }

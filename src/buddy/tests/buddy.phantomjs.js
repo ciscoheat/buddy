@@ -6,7 +6,7 @@ page.open('bin/index.html', function(status) {
 		phantom.exit(1);
     } else {
 		setInterval(function() {
-			var result = page.evaluate(function() { return document.body.innerText; });
+			var result = page.evaluate(function() { return document.body.textContent; });
 			if(!/\d+ specs, \d+ failures, \d+ pending/.test(result)) return;
 
 			console.log(result);
