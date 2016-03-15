@@ -1,6 +1,7 @@
 package buddy.tests ;
 
 import buddy.tools.AsyncTools;
+import haxe.CallStack;
 import promhx.Deferred;
 import promhx.Promise;
 
@@ -39,6 +40,12 @@ class TestBasicFeatures extends BuddySuite
 
 	public function new()
 	{
+		var top = 0;
+		
+		beforeAll({
+			top++;
+		});
+
 		describe("Testing before", {
 			var a = 0;
 
@@ -53,6 +60,12 @@ class TestBasicFeatures extends BuddySuite
 
 			it("'before' should be run before every 'it' specification", {
 				a.should.be(1);
+			});
+		});
+
+		describe("Testing top-level beforeAll", {
+			it("should be possible to set beforeAll before a top-level describe", {
+				top.should.be(1);
 			});
 		});
 
@@ -637,6 +650,7 @@ class NestedBeforeAfter extends BuddySuite
 			});
 			
 			beforeEach({
+				throw "failing";
 				order.push("BE1A");
 			});
 

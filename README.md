@@ -266,6 +266,10 @@ it("should also fail when throwing an exception", {
 });
 ```
 
+## General error handling
+
+Exceptions in `it` will be handled as above, but if something goes wrong in a `before/after` section, Buddy will stop executing the whole `BuddySuite`, and move to the next one. This is in case there are many large test suites. It will also count as a failure.
+
 ## Pending tests
 
 Since BDD is also made for non-programmers to use, a common development style is to write empty, or *pending* tests, and let a programmer implement them later. To do this, just write a string in the `it` methods, nothing else. Our previous test class would then look like this:

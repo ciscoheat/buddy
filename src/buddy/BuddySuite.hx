@@ -40,7 +40,7 @@ class Suite
 	public var description(default, null) : String;
 	
 	@:allow(buddy.SuitesRunner) public var steps(default, null) = new Array<Step>();
-	@:allow(buddy.SuitesRunner) public var error(default, null) : String;
+	@:allow(buddy.SuitesRunner) public var error(default, null) : Dynamic;
 	@:allow(buddy.SuitesRunner) public var stack(default, null) = new Array<StackItem>();
 
 	public var specs(get, never) : Array<Spec>;
@@ -71,12 +71,9 @@ class Suite
 		return !suites.exists(function(suite) return !suite.passed());
 	}
 
-	public function new(description : String, steps : Iterable<Step>) {
-		if (description == null) throw "Suite requires a description.";
-		if (steps == null) throw "Suite steps cannot be null.";
-		
+	public function new(description : String) {
+		if (description == null) throw "Suite requires a description.";		
 		this.description = description;
-		this.steps = steps.array();
 	}
 }
 
@@ -85,7 +82,7 @@ class Spec
 {
 	public var description(default, null) : String;
 	@:allow(buddy.SuitesRunner) public var status(default, null) : SpecStatus = Unknown;
-	@:allow(buddy.SuitesRunner) public var error(default, null) : String;
+	@:allow(buddy.SuitesRunner) public var error(default, null) : Dynamic;
 	@:allow(buddy.SuitesRunner) public var stack(default, null) = new Array<StackItem>();
 	@:allow(buddy.SuitesRunner) public var traces(default, null) = new Array<String>();
 

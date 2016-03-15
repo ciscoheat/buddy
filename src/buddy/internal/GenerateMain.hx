@@ -17,6 +17,7 @@ using Lambda;
 
 class GenerateMain
 {
+	// Will be set in SuitesRunner
 	public static var testsRunning : Bool;
 
 	#if macro
@@ -151,8 +152,9 @@ class GenerateMain
 		return include.length > 0 ? include : output;
 	}
 
-	private static function buildMain(exprs : Array<Expr>, cls : ClassType, reporter : String, ?allSuites : ExprOf<Array<BuddySuite>>)
-	{
+	private static function buildMain(exprs : Array<Expr>, cls : ClassType, reporter : String, ?allSuites : ExprOf<Array<BuddySuite>>) {
+		if (allSuites == null) Context.error("No BuddySuites found.", cls.pos);
+		
 		function toTypeStringExpr(type : ClassType) : Expr {
 			return {expr: EConst(CString(type.pack.concat([type.name]).join("."))), pos: Context.currentPos()};
 		}
@@ -169,67 +171,75 @@ class GenerateMain
 			pack: pack,
 			name: type
 		}
+		
+		var noEventLoop = Context.defined("neko") || Context.defined("cpp") || Context.defined("cs");
 
-		var header;
+		var header = macro {
+			var testsDone = false; // For platforms without event loop
+			var runner : SuitesRunner = null;
+			
+			function error() {
+				trace(runner.unrecoverableError);
 
-		if (allSuites == null) {
-			header = macro {
-				var reporter = new $rep();
-				var suites = [];
-
-				for (a in haxe.rtti.Meta.getType(Type.resolveClass($e)).autoIncluded) {
-					suites.push(Type.createInstance(Type.resolveClass(a), []));
+				var stack = runner.unrecoverableErrorStack;
+				if (stack == null || stack.length == 0) return;
+				
+				for (s in stack) switch s {
+					case FilePos(_, file, line): trace(file+":"+line);
+					case _:
 				}
-
-				buddy.internal.GenerateMain.testsRunning = true;
-				var runner = new buddy.SuitesRunner(suites, reporter);
-			};
-		} else {
-			header = macro {
-				var reporter = new $rep();
-				var runner = new buddy.SuitesRunner($allSuites, reporter);
-			};
-		}
+			}
+			
+			function startRun(done : Void -> Void) : Void {
+				runner = new buddy.SuitesRunner($allSuites, new $rep());
+				runner.run().then(function(_) {
+					if (runner.unrecoverableError != null && !$v{noEventLoop}) error();
+					done();
+				});
+			}				
+		};
 
 		if (Context.defined("neko") || Context.defined("cpp"))
 		{
 			body = macro {
-				runner.run().then(function(_) buddy.internal.GenerateMain.testsRunning = false);
-				while (buddy.internal.GenerateMain.testsRunning) Sys.sleep(0.1);
+				startRun(function() testsDone = true);
+				while (!testsDone) Sys.sleep(0.1);
+				if (runner.unrecoverableError != null) error();
 				Sys.exit(runner.statusCode());
 			};
 		}
 		else if(Context.defined("cs"))
 		{
 			body = macro {
-				runner.run().then(function(_) buddy.internal.GenerateMain.testsRunning = false);
-				while (buddy.internal.GenerateMain.testsRunning) cs.system.threading.Thread.Sleep(10);
+				startRun(function() testsDone = true);
+				while (!testsDone) cs.system.threading.Thread.Sleep(10);
+				if (runner.unrecoverableError != null) error();
 				cs.system.Environment.Exit(runner.statusCode());
 			};
 		}
 		else if(Context.defined("nodejs"))
 		{
 			body = macro {
-				runner.run().then(function(_) untyped __js__("process.exit(runner.statusCode())"));
+				startRun(function() untyped __js__("process.exit(runner.statusCode())"));
 			};
 		}
 		else if(Context.defined("sys"))
 		{
 			body = macro {
-				runner.run().then(function(_) { Sys.exit(runner.statusCode()); });
+				startRun(function() Sys.exit(runner.statusCode()));
 			};
 		}
 		else if (Context.defined("fdb-ci") || Context.defined("exit-flash"))
 		{
 			// If defined, flash will exit. (For CI usage)
 			body = macro {
-				runner.run().then(function(_) {	flash.system.System.exit(runner.statusCode()); });
+				startRun(function() flash.system.System.exit(runner.statusCode()));
 			}
 		}
 		else
 		{
 			body = macro {
-				runner.run();
+				startRun(function() {});
 			};
 		}
 

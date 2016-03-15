@@ -15,13 +15,11 @@ class TraceReporter implements Reporter
 {
 	public function new() {}
 
-	public function start()
-	{
+	public function start()	{
 		return resolveImmediately(true);
 	}
 
-	public function progress(spec:Spec)
-	{
+	public function progress(spec:Spec)	{
 		// No progress is shown, it would generate too much noise.
 		return resolveImmediately(spec);
 	}
@@ -38,6 +36,8 @@ class TraceReporter implements Reporter
 		var printTests : Suite -> Int -> Void = null;
 
 		countTests = function(s : Suite) {
+			if (s.error != null) failures++;
+
 			for (sp in s.steps) switch sp {
 				case TSpec(sp):
 					total++;
@@ -52,7 +52,7 @@ class TraceReporter implements Reporter
 
 		printTests = function(s : Suite, indentLevel : Int)
 		{
-			var print = function(str : String) println(str.lpad(" ", str.length + indentLevel * 2));
+			var print = function(str : String) println(str.lpad(" ", str.length + Std.int(Math.max(0, indentLevel * 2))));
 
 			function printStack(stack : Array<StackItem>) {
 				if (stack == null || stack.length == 0) return;
@@ -60,31 +60,33 @@ class TraceReporter implements Reporter
 					case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
 						print('    @ $file:$line');
 					case _:
-				}				
+				}
 			}
 			
-			if(s.description.length > 0) print(s.description);
-			for (step in s.steps) switch step
-			{
-				case TSpec(sp):
-					if (sp.status == Failed)
-					{
-						print("  " + sp.description + " (FAILED: " + sp.error + ")");
-						printTraces(sp);
-						printStack(sp.stack);
-						
-					}
-					else
-					{
-						print("  " + sp.description + " (" + sp.status + ")");
-						printTraces(sp);
-					}
-				case TSuite(s):
-					printTests(s, indentLevel + 1);
-					if (s.error != null) {
-						print("  ERROR: " + s.error);
-						printStack(s.stack);
-					}
+			if (s.description.length > 0) print(s.description);
+			
+			if (s.error != null) {
+				// The whole suite crashed.
+				print("ERROR: " + s.error);
+				printStack(s.stack);
+			} else {
+				for (step in s.steps) switch step {
+					case TSpec(sp):
+						if (sp.status == Failed)
+						{
+							print("  " + sp.description + " (FAILED: " + sp.error + ")");
+							printTraces(sp);
+							printStack(sp.stack);
+							
+						}
+						else
+						{
+							print("  " + sp.description + " (" + sp.status + ")");
+							printTraces(sp);
+						}
+					case TSuite(s):
+						printTests(s, indentLevel + 1);
+				}
 			}
 		};
 
