@@ -8,9 +8,7 @@ Your friendly BDD testing library for Haxe!
 
 `haxelib install buddy`
 
-2) Create a test file:
-
-**Main.hx**
+2) Create a test file called **Main.hx**:
 
 ```haxe
 import buddy.*;
@@ -77,7 +75,7 @@ class AsyncTest extends BuddySuite {
             var mood = "?";
 
             // Add function(done) here to enable async testing:
-            before(function(done) {
+            beforeAll(function(done) {
                 haxe.Timer.delay(function() {
                     mood = "thrilled";
                     done(); // Call the done() function when the async operation is complete.
@@ -114,7 +112,68 @@ class AsyncTest extends BuddySuite {
 }
 ```
 
-## Should assertions
+## Before/After
+
+To setup tests, you can use `beforeAll`, `beforeEach`, `afterEach` and `afterAll`:
+
+```haxe
+class BeforeAfterTest extends BuddySuite {
+    public function new() {
+        describe("Using before/after", {
+            var test = 0;
+
+            // Will run once as the first thing in the current describe block
+            beforeAll({
+                test++;
+            });
+
+            // Will run before every "it" and "describe" inside this block
+            beforeEach({
+                test++;
+            });
+
+            // Multiple blocks will work as well.
+            beforeEach({
+                test++;
+            });
+
+            it("should be a convenient way to set up tests", {
+                test.should.be(3);
+            });
+
+            // Will run after every "it" and "describe" inside this block
+            afterEach({
+                test--;
+            });
+
+            // Will run once as the last thing in the current describe block
+            afterAll({
+                test--;
+            });
+        });
+    }
+}
+```
+
+## Nesting tests
+
+You can nest describes, for structuring your tests:
+
+```haxe
+class NestingTest extends BuddySuite {
+    public function new() {
+        describe("Nesting tests", {
+            describe("In as many levels as you want", {
+                it("is no problem at all", {
+                    true.should.be(true);
+                });
+            });
+        });
+    }
+}
+```
+
+## "Should" assertions
 
 As you've seen in the examples, testing if specifications are correct is as simple as adding `using Buddy.should` to the package and then use the `should` extension for the identifier you want to test. The following assertions are supported:
 
@@ -236,7 +295,7 @@ Using Buddy
 2 specs, 0 failures, 2 pending
 ```
 
-If domain terms are used that matches the system architecture, the programmer should be able to implement system or integration tests that matches the users mental model of the system. (See [haxedci](https://github.com/ciscoheat/haxedci-example) for more details how to achieve this using the DCI architecture!)
+If domain terms are used that matches the system architecture, the programmer should be able to implement system or integration tests that matches the users mental model of the system. (See [haxedci](https://github.com/ciscoheat/haxedci-example) for more details how to achieve this using the DCI architecture.)
 
 ## Including and excluding tests
 
@@ -297,7 +356,7 @@ Yes, there is special support for [utest](http://code.google.com/p/utest/) and g
 
 ### There's an exception thrown in an asynchronous method, but Buddy won't catch it and fail the test?
 
-It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done()` in the spec, or use the `fail` method as described in the section "Failing tests".
+It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done` in the spec, or use the `fail` method as described in the section "Failing tests".
 
 ## The story behind Buddy
 

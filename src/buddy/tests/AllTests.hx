@@ -637,7 +637,11 @@ class NestedBeforeAfter extends BuddySuite
 			});
 			
 			beforeEach({
-				order.push("BE1");
+				order.push("BE1A");
+			});
+
+			beforeEach({
+				order.push("BE1B");
 			});
 
 			it('should run befores outwards and in, and after inwards and out', function() {
@@ -692,7 +696,7 @@ class NestedBeforeAfter extends BuddySuite
 		afterAll({
 			order.push("AA1");			
 			SelfTest.passLastSpecIf(a == 0 && 
-				order.join(",") == "BA0,BE0,BA1,BE1,IT1,AE1,BE1,IT2,AE1,BE1,BA2,BE2,IT3,AE2,AA2,AE1,AA1,AE0,AA1", 
+				order.join(",") == "BA0,BE0,BA1,BE1A,BE1B,IT1,AE1,BE1A,BE1B,IT2,AE1,BE1A,BE1B,BA2,BE2,IT3,AE2,AA2,AE1,AA1,AE0,AA1", 
 				"Incorrect nested order: " + order
 			);
 		});
