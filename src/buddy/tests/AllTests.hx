@@ -650,7 +650,6 @@ class NestedBeforeAfter extends BuddySuite
 			});
 			
 			beforeEach({
-				throw "failing";
 				order.push("BE1A");
 			});
 
