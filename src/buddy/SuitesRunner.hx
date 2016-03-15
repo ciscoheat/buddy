@@ -247,9 +247,11 @@ class SuitesRunner
 						#if !php
 						// Set up timeout for the current spec
 						var timeout = buddySuite.timeoutMs;
-						AsyncTools.wait(timeout)
-							.catchError(function(e : Dynamic) if (e != null) throw e)
-							.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
+						if(timeout > 0) {
+							AsyncTools.wait(timeout)
+								.catchError(function(e : Dynamic) if (e != null) throw e)
+								.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
+						}
 						#end
 						
 						// Set up fail function

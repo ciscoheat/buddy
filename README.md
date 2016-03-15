@@ -112,6 +112,8 @@ class AsyncTest extends BuddySuite {
 }
 ```
 
+You can set `timeoutMs` to 0 to disable the timeout check. **Note:** Timeouts and asynchronous behavior aren't supported when targeting PHP.
+
 ## Before/After
 
 To setup tests, you can use `beforeAll`, `beforeEach`, `afterEach` and `afterAll`:
