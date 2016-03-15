@@ -102,7 +102,7 @@ class Main implements Buddy<[AsyncTest]> {}
 class AsyncTest extends BuddySuite {
     public function new() {
         describe("Using Buddy asynchronously", {
-            this.timeoutMs = 100;
+            timeoutMs = 100;
             it("should fail specs after a timeout set before it()", function(done) {
                 // This test will fail after 100 ms.
                 haxe.Timer.delay(done, 200);
