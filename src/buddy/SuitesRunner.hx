@@ -232,6 +232,7 @@ class SuitesRunner
 					
 					// Log traces for each Spec, so they can be outputted in the reporter
 					Log.trace = function(v, ?pos : PosInfos) {
+						if(pos == null) pos = {fileName: "", lineNumber: 0, className: "", methodName: ""};
 						spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
 					};
 

@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "First official release, some C# fixes.",
-  "version": "1.0.1",
+  "releasenote": "First official release, a trace fix.",
+  "version": "1.0.2",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }
