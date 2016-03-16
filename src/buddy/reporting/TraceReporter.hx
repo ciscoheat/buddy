@@ -35,7 +35,7 @@ class TraceReporter implements Reporter
 		var printTests : Suite -> Int -> Void = null;
 
 		countTests = function(s : Suite) {
-			if (s.error != null) failures++;
+			if (s.error != null) failures++; // Count a crashed BuddySuite as a failure?
 
 			for (sp in s.steps) switch sp {
 				case TSpec(sp):

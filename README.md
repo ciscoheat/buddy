@@ -129,21 +129,34 @@ class BeforeAfterTest extends BuddySuite {
                 test++;
             });
 
-            // Will run before every "it" and "describe" inside this block
-            beforeEach({
-                test++;
-            });
-
-            // Multiple blocks will work as well.
+            // Will run before each "it" in the current and before each "it" in any nested describes.
             beforeEach({
                 test++;
             });
 
             it("should be a convenient way to set up tests", {
-                test.should.be(3);
+                test.should.be(2);
             });
 
-            // Will run after every "it" and "describe" inside this block
+			describe("When nesting describes", {
+				beforeEach({
+					test++;
+				});
+				
+				it("should run all before/afterEach defined here or above", {
+					test.should.be(3);
+				});
+				
+				afterEach({
+					test--;
+				});
+			});
+			
+			it("should run in correct order too", {
+				test.should.be(2);
+			});
+
+            // Will run after each "it" in the current and before each "it" in any nested describes.
             afterEach({
                 test--;
             });
@@ -151,24 +164,6 @@ class BeforeAfterTest extends BuddySuite {
             // Will run once as the last thing in the current describe block
             afterAll({
                 test--;
-            });
-        });
-    }
-}
-```
-
-## Nesting tests
-
-You can nest describes, for structuring your tests:
-
-```haxe
-class NestingTest extends BuddySuite {
-    public function new() {
-        describe("Nesting tests", {
-            describe("In as many levels as you want", {
-                it("is no problem at all", {
-                    true.should.be(true);
-                });
             });
         });
     }

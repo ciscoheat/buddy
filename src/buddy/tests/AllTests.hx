@@ -1,5 +1,6 @@
 package buddy.tests ;
 
+import buddy.BuddySuite;
 import buddy.tools.AsyncTools;
 import haxe.CallStack;
 import promhx.Deferred;
@@ -27,6 +28,7 @@ class AllTests implements Buddy<[
 	BeforeAfterDescribe2,
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
+	SimpleNestedBeforeAfter,
 	CallDoneTest
 ]> {}
 
@@ -691,6 +693,11 @@ class NestedBeforeAfter extends BuddySuite
 					a--;
 				});
 			});
+			
+			it('should run in correct order when mixing its and describes', {
+				order.push("IT4");
+				a.should.be(1);
+			});
 
 			afterEach({
 				order.push("AE1");
@@ -707,12 +714,64 @@ class NestedBeforeAfter extends BuddySuite
 		});
 		
 		afterAll({
-			order.push("AA1");			
-			SelfTest.passLastSpecIf(a == 0 && 
-				order.join(",") == "BA0,BE0,BA1,BE1A,BE1B,IT1,AE1,BE1A,BE1B,IT2,AE1,BE1A,BE1B,BA2,BE2,IT3,AE2,AA2,AE1,AA1,AE0,AA1", 
-				"Incorrect nested order: " + order
+			order.push("AA0");			
+			SelfTest.passLastSpecIf(a == 0 && order.join(",") == 
+				"BA0,BA1,BE0,BE1A,BE1B,IT1,AE1,AE0,BE0,BE1A,BE1B,IT2,AE1,AE0," +
+				"BA2,BE0,BE1A,BE1B,BE2,IT3,AE2,AE1,AE0,AA2,BE0,BE1A,BE1B,IT4,AE1,AE0,AA1,AA0",
+				("Incorrect nested order: " + order)
 			);
 		});
+	}
+}
+
+class SimpleNestedBeforeAfter extends BuddySuite
+{
+	public function new() {
+        describe("Using before/after", {
+            var test = 0;
+
+            // Will run once in the current describe block
+            beforeAll({
+                test++;
+            });
+
+            // Will run before every "it" in this *and* in any nested describes.
+            beforeEach({
+                test++;
+            });
+
+            it("should be a convenient way to set up tests", {
+                test.should.be(2);
+            });
+
+			describe("When nesting describes", {
+				beforeEach({
+					test++;
+				});
+				
+				it("should run all before/afterEach defined here or above", {
+					test.should.be(3);
+				});
+				
+				afterEach({
+					test--;
+				});
+			});
+			
+			it("should run in correct order too", {
+				test.should.be(2);
+			});
+
+            // Will run after every "it" in this *and* in any nested describes.
+            afterEach({
+                test--;
+            });
+
+            // Will run once as the last thing in the current describe block
+            afterAll({
+                test--;
+            });
+        });		
 	}
 }
 

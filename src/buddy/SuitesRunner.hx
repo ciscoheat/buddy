@@ -114,11 +114,13 @@ class SuitesRunner
 			}
 			
 			mapSeries(buddySuites, function(buddySuite, done) { 
-				mapTestSuite(buddySuite, buddySuite.suite, function(err, suite) {
-					if (err != null) {
-						suite.error = err;
-						suite.stack = CallStack.exceptionStack();
-					}
+				mapTestSuite(
+					buddySuite, 
+					buddySuite.suite, 
+					[[]], 
+					[[]], 
+				function(err, suite) {
+					if (err != null) suiteError(suite, err);
 					done(null, suite);
 				});
 			}, function(err, suites) {
@@ -160,19 +162,32 @@ class SuitesRunner
 		suite.stack = CallStack.exceptionStack();
 	}
 	
-	private function mapTestSuite(buddySuite : BuddySuite, testSuite : TestSuite, done : Dynamic -> Suite -> Void) {
+	private function mapTestSuite(
+		buddySuite : BuddySuite, 
+		testSuite : TestSuite, 
+		beforeEachStack : Array<Array<TestFunc>>,
+		afterEachStack : Array<Array<TestFunc>>,
+		done : Dynamic -> Suite -> Void
+	) {
 		var currentSuite = buddy.tests.SelfTest.lastSuite = new Suite(testSuite.description);
+		beforeEachStack.push(testSuite.beforeEach.array());
+		afterEachStack.unshift(testSuite.afterEach.array());
 
 		// === Run beforeAll
 		forEachSeries(testSuite.beforeAll, runTestFunc, function(err) {
 			if (err != null) return done(err, currentSuite);
 			// === Map TestSpec -> Step
-			mapSeries(testSuite.specs, mapTestSpec.bind(buddySuite, testSuite, currentSuite), function(err, testSteps) {
+			mapSeries(testSuite.specs, function(testSpec, cb) {
+				mapTestSpec(buddySuite, testSuite, beforeEachStack, afterEachStack, testSpec, cb);
+			}, function(err, testSteps) {
 				if (err != null) return done(err, currentSuite);
 				// === Run afterAll
 				forEachSeries(testSuite.afterAll, runTestFunc, function(err) {
 					if (err != null) return done(err, currentSuite);
 					currentSuite.steps = testSteps;
+					beforeEachStack.pop();
+					afterEachStack.shift();
+
 					done(null, currentSuite);
 				});
 			});
@@ -188,117 +203,117 @@ class SuitesRunner
 		} catch (e : Dynamic) {
 			done(e);
 		}
-	}		
+	}
+	
+	private function flatten<T>(arr : Array<Array<T>>) : Array<T> {
+		return [for(a in arr) for(b in a) b];
+	}
 
-	private	function mapTestSpec(buddySuite : BuddySuite, testSuite : TestSuite, currentSuite : Suite, testSpec : TestSpec, done : Dynamic -> Step -> Void) {
+	private	function mapTestSpec(
+		buddySuite : BuddySuite, 
+		testSuite : TestSuite, 
+		beforeEachStack : Array<Array<TestFunc>>,
+		afterEachStack : Array<Array<TestFunc>>,
+		testSpec : TestSpec,
+		done : Dynamic -> Step -> Void
+	) {
 		var oldLog = Log.trace;
-		var oldFail = buddySuite.fail = function(err : Dynamic = "Exception", ?p : PosInfos) {
-			done(err, null);
-		}		
+		var oldFail = buddySuite.fail = function(err : Dynamic = "Exception", ?p : PosInfos) done(err, null);
 		
-		function runAfterEach(err : Dynamic, result : Step) {
-			// Restore Log and set Suites fail function to null
-			Log.trace = oldLog;
-			buddySuite.fail = oldFail;
+		switch testSpec {						
+			case Describe(testSuite, _): 
+				// === Map TestSuite -> Suite
+				mapTestSuite(buddySuite, testSuite, beforeEachStack, afterEachStack, function(err, newSuite) {
+					if (err != null) done(err, null);
+					else done(null, TSuite(newSuite));
+				});
+				
+			case It(desc, test, _):
+				// Assign top-level spec var here, so it can be used in reporting.
+				var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
+				var hasCompleted = false;
+				
+				// Log traces for each Spec, so they can be outputted in the reporter
+				Log.trace = function(v, ?pos : PosInfos) {
+					if(pos == null) spec.traces.push(Std.string(v));
+					else spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
+				};
 
-			if (err != null) return done(err, result);
-			
-			// === Run afterEach
-			forEachSeries(testSuite.afterEach, runTestFunc, function(err) {
-				if (err != null) return done(err, result);
-				switch(result) {
-					case TSuite(_): done(null, result);
-					case TSpec(spec): reporter.progress(spec).then(function(_) done(null, result));
-				}
-			});
-		}
-		
-		// === Run beforeEach
-		forEachSeries(testSuite.beforeEach, runTestFunc, function(err) {
-			if (err != null) return done(err, null);
-			
-			switch testSpec {						
-				case Describe(testSuite, _): 
-					// === Map TestSuite -> Suite
-					mapTestSuite(buddySuite, testSuite, function(err, newSuite) {
+				// Called when, for any reason, the Spec is completed.
+				function specCompleted(status : SpecStatus, error : Dynamic, stack : Array<StackItem>) {
+					if (hasCompleted) return;
+					hasCompleted = true;
+					
+					spec.status = status;
+					spec.error = error;
+					spec.stack = stack;
+
+					// Restore Log and set Suites fail function to null
+					Log.trace = oldLog;
+					buddySuite.fail = oldFail;
+
+					// === Run afterEach
+					forEachSeries(flatten(afterEachStack), runTestFunc, function(err) {
 						if (err != null) done(err, null);
-						else runAfterEach(err, TSuite(newSuite));
+						else reporter.progress(spec).then(function(_) done(null, TSpec(spec)));
 					});
-					
-				case It(desc, test, _):
-					// Assign top-level spec var here, so it can be used in reporting.
-					var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
-					var hasCompleted = false;
-					
-					// Log traces for each Spec, so they can be outputted in the reporter
-					Log.trace = function(v, ?pos : PosInfos) {
-						if(pos == null) pos = {fileName: "", lineNumber: 0, className: "", methodName: ""};
-						spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
-					};
+				}
 
-					// Called when, for any reason, the Spec is completed.
-					function specCompleted(status : SpecStatus, error : Dynamic, stack : Array<StackItem>) {
-						if (hasCompleted) return;
-						hasCompleted = true;
-						
-						spec.status = status;
-						spec.error = error;
-						spec.stack = stack;
-						
-						runAfterEach(null, TSpec(spec));
-					}
+				// Test if spec is Pending (has only description)
+				if (test == null) {
+					return specCompleted(Pending, null, null);
+				}
 
-					// Test if spec is Pending (has only description)
-					if (test == null) {
-						return specCompleted(Pending, null, null);
-					}
+				// Create a test function that will be used in Should
+				// note that multiple successfull tests doesn't mean the Spec is completed.
+				SuitesRunner.currentTest = function(testStatus : Bool, error : Dynamic, stack : Array<StackItem>) {
+					if (hasCompleted || testStatus == true) return;								
+					specCompleted(Failed, error, stack);
+				}
+				
+				// Set up utest if available
+				#if utest
+				Assert.results = new List<Assertation>();
 
-					// Create a test function that will be used in Should
-					// note that multiple successfull tests doesn't mean the Spec is completed.
-					SuitesRunner.currentTest = function(testStatus : Bool, error : Dynamic, stack : Array<StackItem>) {
-						if (hasCompleted || testStatus == true) return;								
-						specCompleted(Failed, error, stack);
+				function checkUtestResults() {
+					for (a in Assert.results) switch a {
+						case Success(_):										
+						case Warning(_):
+						case Failure(e, pos):
+							var stack = posInfosToStack(pos);
+							specCompleted(Failed, e, stack);
+							break;
+						case Error(e, stack), SetupError(e, stack), TeardownError(e, stack), AsyncError(e, stack):
+							specCompleted(Failed, e, stack);
+							break;
+						case TimeoutError(e, stack):
+							specCompleted(Failed, e, stack);
+							break;
 					}
+				}
+				#end
+				
+				#if (!php && !macro)
+				// Set up timeout for the current spec
+				var timeout = buddySuite.timeoutMs;
+				if(timeout > 0) {
+					AsyncTools.wait(timeout)
+						.catchError(function(e : Dynamic) { 
+							specCompleted(Failed, e, CallStack.exceptionStack());
+						})
+						.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
+				}
+				#end
+				
+				// Set up fail function						
+				buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
+					specCompleted(Failed, err, posInfosToStack(p));
+				}
 					
-					// Set up utest if available
-					#if utest
-					Assert.results = new List<Assertation>();
+				// === Run beforeEach
+				forEachSeries(flatten(beforeEachStack), runTestFunc, function(err) {
+					if (err != null) return done(err, null);
 
-					function checkUtestResults() {
-						for (a in Assert.results) switch a {
-							case Success(_):										
-							case Warning(_):
-							case Failure(e, pos):
-								var stack = posInfosToStack(pos);
-								specCompleted(Failed, e, stack);
-								break;
-							case Error(e, stack), SetupError(e, stack), TeardownError(e, stack), AsyncError(e, stack):
-								specCompleted(Failed, e, stack);
-								break;
-							case TimeoutError(e, stack):
-								specCompleted(Failed, e, stack);
-								break;
-						}
-					}
-					#end
-					
-					#if (!php && !macro)
-					// Set up timeout for the current spec
-					var timeout = buddySuite.timeoutMs;
-					if(timeout > 0) {
-						AsyncTools.wait(timeout)
-							.catchError(function(e : Dynamic) { 
-								specCompleted(Failed, e, CallStack.exceptionStack());
-							})
-							.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
-					}
-					#end
-					
-					// Set up fail function						
-					buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
-						specCompleted(Failed, err, posInfosToStack(p));
-					}
-						
 					// Run the test function, synchronous exceptions will be reported in 'err'.
 					runTestFunc(test, function(err) {
 						#if utest
@@ -307,8 +322,8 @@ class SuitesRunner
 						if (err != null) specCompleted(Failed, err, CallStack.exceptionStack());
 						else specCompleted(Passed, null, null);						
 					});
-			}
-		});
+				});
+		}
 	}	
 
 	private function haveUnrecoverableError(err) {
