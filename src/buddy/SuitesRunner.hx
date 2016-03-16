@@ -38,6 +38,8 @@ class SuitesRunner
 	private var buddySuites : Iterable<BuddySuite>;
 	private var reporter : Reporter;
 	private var runCompleted : Deferred<SuitesRunner>;
+	
+	private var oldLog : Dynamic -> ?PosInfos -> Void;
 
 	///////////////////////////////////////////////////////////////////////
 	
@@ -53,6 +55,7 @@ class SuitesRunner
 
 		this.buddySuites = buddySuites;
 		this.reporter = reporter == null ? new buddy.reporting.ConsoleReporter() : reporter;
+		this.oldLog = Log.trace;
 	}
 	
 	public function run() : Promise<SuitesRunner> {
@@ -113,12 +116,15 @@ class SuitesRunner
 				return;
 			}
 			
+			var beforeEachStack = [[]];
+			var afterEachStack = [[]];
+			
 			mapSeries(buddySuites, function(buddySuite, done) { 
 				mapTestSuite(
 					buddySuite, 
 					buddySuite.suite, 
-					[[]], 
-					[[]], 
+					beforeEachStack, 
+					afterEachStack, 
 				function(err, suite) {
 					if (err != null) suiteError(suite, err);
 					done(null, suite);
@@ -168,8 +174,9 @@ class SuitesRunner
 		beforeEachStack : Array<Array<TestFunc>>,
 		afterEachStack : Array<Array<TestFunc>>,
 		done : Dynamic -> Suite -> Void
-	) {
+	) : Void {
 		var currentSuite = buddy.tests.SelfTest.lastSuite = new Suite(testSuite.description);
+		
 		beforeEachStack.push(testSuite.beforeEach.array());
 		afterEachStack.unshift(testSuite.afterEach.array());
 
@@ -177,9 +184,9 @@ class SuitesRunner
 		forEachSeries(testSuite.beforeAll, runTestFunc, function(err) {
 			if (err != null) return done(err, currentSuite);
 			// === Map TestSpec -> Step
-			mapSeries(testSuite.specs, function(testSpec, cb) {
+			mapSeries(testSuite.specs, function(testSpec : TestSpec, cb : Dynamic -> Step -> Void) {
 				mapTestSpec(buddySuite, testSuite, beforeEachStack, afterEachStack, testSpec, cb);
-			}, function(err, testSteps) {
+			}, function(err : Dynamic, testSteps : Array<Step>) {
 				if (err != null) return done(err, currentSuite);
 				// === Run afterAll
 				forEachSeries(testSuite.afterAll, runTestFunc, function(err) {
@@ -216,14 +223,13 @@ class SuitesRunner
 		afterEachStack : Array<Array<TestFunc>>,
 		testSpec : TestSpec,
 		done : Dynamic -> Step -> Void
-	) {
-		var oldLog = Log.trace;
+	) : Void {
 		var oldFail = buddySuite.fail = function(err : Dynamic = "Exception", ?p : PosInfos) done(err, null);
-		
-		switch testSpec {						
+
+		switch testSpec {
 			case Describe(testSuite, _): 
 				// === Map TestSuite -> Suite
-				mapTestSuite(buddySuite, testSuite, beforeEachStack, afterEachStack, function(err, newSuite) {
+				mapTestSuite(buddySuite, testSuite, beforeEachStack, afterEachStack, function(err : Dynamic, newSuite : Suite) {
 					if (err != null) done(err, null);
 					else done(null, TSuite(newSuite));
 				});
@@ -240,7 +246,7 @@ class SuitesRunner
 				};
 
 				// Called when, for any reason, the Spec is completed.
-				function specCompleted(status : SpecStatus, error : Dynamic, stack : Array<StackItem>) {
+				function specCompleted(status : SpecStatus, error : Dynamic, stack : Array<StackItem>) : Void {
 					if (hasCompleted) return;
 					hasCompleted = true;
 					
@@ -253,7 +259,7 @@ class SuitesRunner
 					buddySuite.fail = oldFail;
 
 					// === Run afterEach
-					forEachSeries(flatten(afterEachStack), runTestFunc, function(err) {
+					forEachSeries(flatten(afterEachStack), runTestFunc, function(err : Dynamic) {
 						if (err != null) done(err, null);
 						else reporter.progress(spec).then(function(_) done(null, TSpec(spec)));
 					});
@@ -261,7 +267,8 @@ class SuitesRunner
 
 				// Test if spec is Pending (has only description)
 				if (test == null) {
-					return specCompleted(Pending, null, null);
+					specCompleted(Pending, null, null);
+					return; // C# and Java cannot return specCompleted directly.
 				}
 
 				// Create a test function that will be used in Should
