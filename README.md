@@ -57,7 +57,7 @@ Using Buddy
 2 specs, 0 failures, 0 pending
 ```
 
-But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js.
+But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` to your hxml, if you're targeting Node.js.
 
 ## Asynchronous support
 
