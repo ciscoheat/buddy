@@ -8,7 +8,7 @@ import promhx.Deferred;
 import promhx.Promise;
 import buddy.Should;
 
-#if cpp
+#if (cpp && hxcpp)
 import hxcpp.StaticStd;
 import hxcpp.StaticRegexp;
 #end

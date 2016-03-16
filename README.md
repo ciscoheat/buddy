@@ -57,7 +57,7 @@ Using Buddy
 2 specs, 0 failures, 0 pending
 ```
 
-But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js, and possibly `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (seems to vary between Linux and Win).
+But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` if you're targeting Node.js.
 
 ## Asynchronous support
 
@@ -363,6 +363,10 @@ Yes, there is special support for [utest](http://code.google.com/p/utest/) and g
 ### There's an exception thrown in an asynchronous method, but Buddy won't catch it and fail the test?
 
 It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done` in the spec, or use the `fail` method as described in the section "Failing tests".
+
+### I'm having problem compiling with C++
+
+This usually happens if you're not linking in the correct `.ndll` files. An easy fix is to add `-lib hxcpp` to your hxml. Another problem could be fixed by adding `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (seems to vary between Linux and Win).
 
 ## The story behind Buddy
 

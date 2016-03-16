@@ -175,8 +175,8 @@ class GenerateMain
 		var noEventLoop = Context.defined("neko") || Context.defined("cpp") || Context.defined("cs");
 
 		var header = macro {
-			var testsDone = false; // For platforms without event loop
-			var runner : SuitesRunner = null;
+			var testsDone : Bool = false; // For platforms without event loop
+			var runner : buddy.SuitesRunner = null;
 			
 			function error() {
 				trace(runner.unrecoverableError);
