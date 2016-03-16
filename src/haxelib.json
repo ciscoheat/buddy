@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "First official release, bugfixes.",
-  "version": "1.0.3",
+  "releasenote": "First official release, a TraceReporter output fix.",
+  "version": "1.0.4",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

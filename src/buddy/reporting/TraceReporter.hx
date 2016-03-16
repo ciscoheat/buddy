@@ -62,7 +62,7 @@ class TraceReporter implements Reporter
 			}
 			
 			function printTraces(spec : Spec) {
-				for (t in spec.traces) println("    " + t);
+				for (t in spec.traces) print("    " + t);
 			}
 			
 			if (s.description.length > 0) print(s.description);
