@@ -38,7 +38,15 @@ class SuitesRunner
 	private var buddySuites : Iterable<BuddySuite>;
 	private var reporter : Reporter;
 	private var runCompleted : Deferred<SuitesRunner>;
+
+	///////////////////////////////////////////////////////////////////////
 	
+	public static function posInfosToStack(p : Null<PosInfos>) : Array<StackItem> {
+		return p == null
+			? [StackItem.FilePos(null, "", 0)]
+			: [StackItem.FilePos(null, p.fileName, p.lineNumber)];
+	}
+
 	public function new(buddySuites : Iterable<BuddySuite>, ?reporter : Reporter) {
 		// Cannot use Lambda here, Java problem in Linux.
 		//var includeMode = [for (b in buddySuites) for (s in b.suites) if (s.include) s].length > 0;
@@ -185,7 +193,6 @@ class SuitesRunner
 	private	function mapTestSpec(buddySuite : BuddySuite, testSuite : TestSuite, currentSuite : Suite, testSpec : TestSpec, done : Dynamic -> Step -> Void) {
 		var oldLog = Log.trace;
 		var oldFail = buddySuite.fail = function(err : Dynamic = "Exception", ?p : PosInfos) {
-			var stackItem = [StackItem.FilePos(null, p.fileName, p.lineNumber)];
 			done(err, null);
 		}		
 		
@@ -225,11 +232,11 @@ class SuitesRunner
 					
 					// Log traces for each Spec, so they can be outputted in the reporter
 					Log.trace = function(v, ?pos : PosInfos) {
-						spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + Std.string(v));
+						spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
 					};
 
 					// Called when, for any reason, the Spec is completed.
-					function specCompleted(status : SpecStatus, error : String, stack : Array<StackItem>) {
+					function specCompleted(status : SpecStatus, error : Dynamic, stack : Array<StackItem>) {
 						if (hasCompleted) return;
 						hasCompleted = true;
 						
@@ -247,7 +254,7 @@ class SuitesRunner
 
 					// Create a test function that will be used in Should
 					// note that multiple successfull tests doesn't mean the Spec is completed.
-					SuitesRunner.currentTest = function(testStatus : Bool, error : String, stack : Array<StackItem>) {
+					SuitesRunner.currentTest = function(testStatus : Bool, error : Dynamic, stack : Array<StackItem>) {
 						if (hasCompleted || testStatus == true) return;								
 						specCompleted(Failed, error, stack);
 					}
@@ -261,14 +268,14 @@ class SuitesRunner
 							case Success(_):										
 							case Warning(_):
 							case Failure(e, pos):
-								var stack = [StackItem.FilePos(null, pos.fileName, pos.lineNumber)];
-								specCompleted(Failed, Std.string(e), stack);
+								var stack = posInfosToStack(pos);
+								specCompleted(Failed, e, stack);
 								break;
 							case Error(e, stack), SetupError(e, stack), TeardownError(e, stack), AsyncError(e, stack):
-								specCompleted(Failed, Std.string(e), stack);
+								specCompleted(Failed, e, stack);
 								break;
 							case TimeoutError(e, stack):
-								specCompleted(Failed, Std.string(e), stack);
+								specCompleted(Failed, e, stack);
 								break;
 						}
 					}
@@ -280,7 +287,7 @@ class SuitesRunner
 					if(timeout > 0) {
 						AsyncTools.wait(timeout)
 							.catchError(function(e : Dynamic) { 
-								specCompleted(Failed, Std.string(e), CallStack.exceptionStack());
+								specCompleted(Failed, e, CallStack.exceptionStack());
 							})
 							.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
 					}
@@ -288,16 +295,16 @@ class SuitesRunner
 					
 					// Set up fail function						
 					buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
-						var stackItem = [StackItem.FilePos(null, p.fileName, p.lineNumber)];
-						specCompleted(Failed, Std.string(err), stackItem);
+						specCompleted(Failed, err, posInfosToStack(p));
 					}
 						
+					// Run the test function, synchronous exceptions will be reported in 'err'.
 					runTestFunc(test, function(err) {
 						#if utest
 						checkUtestResults();
 						#end
-						if (err != null) specCompleted(Failed, Std.string(err), CallStack.exceptionStack());
-						else specCompleted(Passed, null, null);
+						if (err != null) specCompleted(Failed, err, CallStack.exceptionStack());
+						else specCompleted(Passed, null, null);						
 					});
 			}
 		});
@@ -319,7 +326,7 @@ class SuitesRunner
 		
 		function next() {
 			if (!iterator.hasNext()) done(null, output);
-			else cb(iterator.next(), function(err, mapped) { 
+			else cb(iterator.next(), function(err : Err, mapped : T2) { 
 				if (err == null) {
 					output.push(mapped); 
 					next();
@@ -337,11 +344,10 @@ class SuitesRunner
 	{
 		var iterator = iterable.iterator();
 		
-		function next(err : Null<Err>) {
-			if (err != null) done(err);
-			else if (!iterator.hasNext()) done(null);
-			else cb(iterator.next(), next);
+		function next() {
+			if (!iterator.hasNext()) done(null);
+			else cb(iterator.next(), function(err : Err) err == null ? next() : done(err));
 		}		
-		next(null); // Neko couldn't do self-calls
+		next(); // Neko couldn't do self-calls
 	}	
 }

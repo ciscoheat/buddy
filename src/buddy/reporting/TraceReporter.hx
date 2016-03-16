@@ -55,7 +55,7 @@ class TraceReporter implements Reporter
 			function printStack(stack : Array<StackItem>) {
 				if (stack == null || stack.length == 0) return;
 				for (s in stack) switch s {
-					case FilePos(_, file, line) if (file.indexOf("buddy/internal/") != 0):
+					case FilePos(_, file, line) if (line > 0 && file.indexOf("buddy/internal/") != 0):
 						print('    @ $file:$line');
 					case _:
 				}
@@ -79,7 +79,7 @@ class TraceReporter implements Reporter
 					if (sp.status == Failed) {
 						print("  " + sp.description + " (FAILED: " + sp.error + ")");
 						printTraces(sp);
-						printStack(sp.stack);							
+						printStack(sp.stack);
 					}
 					else {
 						print("  " + sp.description + " (" + sp.status + ")");

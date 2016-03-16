@@ -185,7 +185,7 @@ class GenerateMain
 				if (stack == null || stack.length == 0) return;
 				
 				for (s in stack) switch s {
-					case FilePos(_, file, line): trace(file+":"+line);
+					case FilePos(_, file, line) if(line > 0): trace(file+":"+line);
 					case _:
 				}
 			}

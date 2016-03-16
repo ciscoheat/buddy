@@ -367,19 +367,14 @@ class ShouldFunctions
 		return Std.is(v, String) ? '"$v"' : Std.string(v);
 	}
 
-	private function stackPos(p : PosInfos)
-	{
-		return [StackItem.FilePos(null, p.fileName, p.lineNumber)];
-	}
-
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
 		if (SuitesRunner.currentTest == null) throw "SuitesRunner.currentTest was null";
 		
 		if(!inverse)
-			SuitesRunner.currentTest(expr, error, stackPos(p));
+			SuitesRunner.currentTest(expr, error, SuitesRunner.posInfosToStack(p));
 		else
-			SuitesRunner.currentTest(!expr, errorInverted, stackPos(p));
+			SuitesRunner.currentTest(!expr, errorInverted, SuitesRunner.posInfosToStack(p));
 	}
 }
 
@@ -428,18 +423,13 @@ class Should<T>
 		return Std.is(v, String) ? '"$v"' : Std.string(v);
 	}
 
-	private function stackPos(p : PosInfos)
-	{
-		return [StackItem.FilePos(null, p.fileName, p.lineNumber)];
-	}
-
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
 		if (SuitesRunner.currentTest == null) throw "SuitesRunner.currentTest was null";
 		
 		if(!inverse)
-			SuitesRunner.currentTest(expr, error, stackPos(p));
+			SuitesRunner.currentTest(expr, error, SuitesRunner.posInfosToStack(p));
 		else
-			SuitesRunner.currentTest(!expr, errorInverted, stackPos(p));
+			SuitesRunner.currentTest(!expr, errorInverted, SuitesRunner.posInfosToStack(p));
 	}
 }
