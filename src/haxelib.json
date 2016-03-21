@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "First official release, afterEach/beforeEach now runs in correct order.",
-  "version": "1.0.5",
+  "releasenote": "Made a pending function available in tests, similar to fail.",
+  "version": "1.1.0",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

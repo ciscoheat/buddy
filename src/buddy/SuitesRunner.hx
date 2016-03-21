@@ -77,15 +77,16 @@ class SuitesRunner
 	private function runDescribes(cb : Dynamic -> Void) : Void {
 		// Process the queue of describe calls
 		forEachSeries(buddySuites, function(suite, cb) {
+			var queue = suite.describeQueue;
 			function processQueue() {
-				if (suite.describeQueue.isEmpty()) return cb(null);				
-				
-				var current = suite.describeQueue.pop();
-				
-				// Set current suite, that will collect all describe/it/after/before calls.
-				suite.currentSuite = current.suite;
-				
 				try {
+					if (queue.empty()) return cb(null);
+					
+					var current = queue.pop();
+					
+					// Set current suite, that will collect all describe/it/after/before calls.
+					suite.currentSuite = current.suite;
+				
 					switch current.spec {
 						case Async(f): f(processQueue);
 						case Sync(f): f(); processQueue();
@@ -225,6 +226,7 @@ class SuitesRunner
 		done : Dynamic -> Step -> Void
 	) : Void {
 		var oldFail = buddySuite.fail = function(err : Dynamic = "Exception", ?p : PosInfos) done(err, null);
+		var oldPending = buddySuite.pending = function(?message : String, ?p : PosInfos) done("Cannot call pending here.", null);
 
 		switch testSpec {
 			case Describe(testSuite, _): 
@@ -257,6 +259,7 @@ class SuitesRunner
 					// Restore Log and set Suites fail function to null
 					Log.trace = oldLog;
 					buddySuite.fail = oldFail;
+					buddySuite.pending = oldPending;
 
 					// === Run afterEach
 					forEachSeries(flatten(afterEachStack), runTestFunc, function(err : Dynamic) {
@@ -312,11 +315,15 @@ class SuitesRunner
 				}
 				#end
 				
-				// Set up fail function						
+				// Set up fail and pending function
 				buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
 					specCompleted(Failed, err, posInfosToStack(p));
 				}
-					
+
+				buddySuite.pending = function(?message : String, ?p : PosInfos) {
+					specCompleted(Pending, null, posInfosToStack(p));
+				}
+
 				// === Run beforeEach
 				forEachSeries(flatten(beforeEachStack), runTestFunc, function(err) {
 					if (err != null) return done(err, null);

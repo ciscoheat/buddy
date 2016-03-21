@@ -135,13 +135,14 @@ class BuddySuite
 	
 	// For building the test suite structure.
 	@:noCompletion @:allow(buddy.SuitesRunner) var currentSuite(default, default) : TestSuite;	
-	@:noCompletion @:allow(buddy.SuitesRunner) var describeQueue(default, null) 
-		= new List<{ suite: TestSuite, spec: TestFunc }>();
+	// Note: Cannot be List, problem with PHP.
+	@:noCompletion @:allow(buddy.SuitesRunner) var describeQueue(default, null) : Array<{ suite: TestSuite, spec: TestFunc }>;
 
 	///// Buddy API /////
 
 	public function new() {
 		suite = currentSuite = new TestSuite("");
+		describeQueue = new Array<{suite: TestSuite, spec: TestFunc}>();
 	}
 
 	/**
@@ -157,10 +158,10 @@ class BuddySuite
 	 */
 	private function describe(description : String, spec : TestFunc, _hasInclude = false) : Void {
 		var suite = new TestSuite(description);
-		
+
 		currentSuite.specs.add(TestSpec.Describe(suite, _hasInclude));
 		// Will be looped through in SuitesRunner:
-		describeQueue.add({ suite: suite, spec: spec });
+		describeQueue.push( { suite: suite, spec: spec } );
 	}
 		
 	/**
@@ -186,7 +187,7 @@ class BuddySuite
 	private function after(init : TestFunc) : Void afterEach(init);
 
 	/**
-	 * Defines a function that will be run before each underlying Suite or Spec.
+	 * Defines a function that will be run before each underlying Spec.
 	 */
 	private function beforeEach(init : TestFunc) : Void currentSuite.beforeEach.add(init);
 	
@@ -196,7 +197,7 @@ class BuddySuite
 	private function beforeAll(init : TestFunc) : Void currentSuite.beforeAll.add(init);
 
 	/**
-	 * Defines a function that will be run after each underlying Suite or Spec.
+	 * Defines a function that will be run after each underlying Spec.
 	 */
 	private function afterEach(init : TestFunc) : Void currentSuite.afterEach.add(init);
 	
@@ -209,7 +210,7 @@ class BuddySuite
 	 * Defines a Spec, a test of conditions. Should is used for verifying the test itself.
 	 * @param	desc Test description
 	 * @param	spec A block or function of tests, or leave out for pending
-	 * @param	hasInclude Only used internally
+	 * @param	hasInclude Used internally only
 	 */
 	private function it(desc : String, ?spec : TestFunc, _hasInclude = false) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
@@ -220,7 +221,7 @@ class BuddySuite
 	 * Defines a pending Spec.
 	 * @param	desc Test description
 	 * @param	spec A block or function of tests, or leave out
-	 * @param	hasInclude Only used internally
+	 * @param	hasInclude Used internally only
 	 */
 	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
@@ -231,4 +232,9 @@ class BuddySuite
 	 * Fails the current Spec, with an optional error message.
 	 */
 	@:allow(buddy.SuitesRunner) private var fail : ?Dynamic -> ?PosInfos -> Void;
+	
+	/**
+	 * Makes the current Spec pending, with an optional message (currently does nothing).
+	 */
+	@:allow(buddy.SuitesRunner) private var pending : ?String -> ?PosInfos -> Void;
 }

@@ -78,13 +78,12 @@ class TraceReporter implements Reporter
 				case TSpec(sp):
 					if (sp.status == Failed) {
 						print("  " + sp.description + " (FAILED: " + sp.error + ")");
-						printTraces(sp);
-						printStack(sp.stack);
 					}
 					else {
 						print("  " + sp.description + " (" + sp.status + ")");
-						printTraces(sp);
 					}
+					printTraces(sp);
+					printStack(sp.stack);
 				case TSuite(s):
 					printTests(s, indentLevel + 1);
 			}

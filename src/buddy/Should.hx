@@ -342,6 +342,8 @@ class ShouldFunctions
 			exceptionName = Type.getClassName(Type.getClass(e));
 			caught = Std.is(e, type);
 		}
+		
+		if (exceptionName == null) exceptionName = "no exception";
 
 		test(caught, p,
 			'Expected ${quote(value)} to throw type $name, $exceptionName was thrown instead',

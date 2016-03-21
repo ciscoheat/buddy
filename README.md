@@ -296,7 +296,7 @@ Using Buddy
 2 specs, 0 failures, 2 pending
 ```
 
-If domain terms are used that matches the system architecture, the programmer should be able to implement system or integration tests that matches the users mental model of the system. (See [haxedci](https://github.com/ciscoheat/haxedci-example) for more details how to achieve this using the DCI architecture.)
+There is also a `pending` method available to make a spec pending, similar to `fail`.
 
 ## Including and excluding tests
 
