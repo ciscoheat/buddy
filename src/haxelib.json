@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "Made a pending function available in tests, similar to fail.",
-  "version": "1.1.0",
+  "releasenote": "Timeout had incorrect default value, now 5 seconds.",
+  "version": "1.1.1",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

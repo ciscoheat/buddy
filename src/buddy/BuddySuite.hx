@@ -148,7 +148,7 @@ class BuddySuite
 	/**
 	 * Milliseconds before a spec timeout with an error. Default is 5000 (5 sec).
 	 */
-	public var timeoutMs(default, null) = 1000;
+	public var timeoutMs(default, null) = 5000;
 
 	/**
 	 * Defines a test Suite, containing Specs and other Suites.
