@@ -190,7 +190,7 @@ class GenerateMain
 				}
 			}
 			
-			function startRun(done : Void -> Void) : Void {
+			function startRun(done : Void -> Void) : Void {				
 				runner = new buddy.SuitesRunner($allSuites, new $rep());
 				runner.run().then(function(_) {
 					if (runner.unrecoverableError != null && !$v{noEventLoop}) error();
@@ -220,6 +220,9 @@ class GenerateMain
 		else if(Context.defined("nodejs"))
 		{
 			body = macro {
+				untyped __js__("process.on('uncaughtException', function(err) {");
+				runner.haveUnrecoverableError(untyped err);
+				untyped __js__("})");
 				startRun(function() untyped __js__("process.exit(runner.statusCode())"));
 			};
 		}

@@ -340,7 +340,7 @@ class SuitesRunner
 		}
 	}	
 
-	private function haveUnrecoverableError(err) {
+	public function haveUnrecoverableError(err) {
 		unrecoverableError = err;
 		unrecoverableErrorStack = CallStack.exceptionStack();
 		runCompleted.resolve(this);

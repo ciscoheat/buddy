@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "Timeout had incorrect default value, now 5 seconds.",
-  "version": "1.1.1",
+  "releasenote": "Added should.throwAnything(). Better error handling for Node.js.",
+  "version": "1.2.0",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

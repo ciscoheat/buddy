@@ -303,6 +303,25 @@ class ShouldFunctions
 	}
 
 	/**
+	 * Will call the specified method and test if it throws anything.
+	 */
+	public function throwAnything(?p : PosInfos) : Null<Dynamic>
+	{
+		var caught = false;
+		var exception : Dynamic = null;
+		
+		try { value(); }
+		catch (e : Dynamic) { exception = e; caught = true; };
+
+		test(caught, p,
+			'Expected ${quote(value)} to throw anything, nothing was thrown',
+			'Expected ${quote(value)} not to throw anything, ${quote(exception)} was thrown'
+		);
+		
+		return exception;
+	}
+
+	/**
 	 * Will call the specified method and test if it throws a specific value.
 	 */
 	public function throwValue<T>(v : T, ?p : PosInfos) : Null<T>

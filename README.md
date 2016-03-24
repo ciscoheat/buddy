@@ -230,7 +230,9 @@ If the function signature is `String -> Void` then apply the string argument lik
 
 `a.bind("test").should.throwType(String)`
 
-`throwValue` and `throwType` will return the exception object, so it can be tested further. This works synchonously only.
+`a.bind("test").should.throwAnything()`
+
+The above methods will return the exception object, so it can be tested further. This works synchonously only.
 
 ### Inverting assertions
 
