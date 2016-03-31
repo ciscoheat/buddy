@@ -178,6 +178,11 @@ class ShouldString extends Should<String>
 
 	public function contain(substring : String, ?p : PosInfos)
 	{
+		if (value == null) return fail(
+			'Expected string to contain ${quote(substring)} but string was null', 
+			'Expected string not to contain ${quote(substring)} but string was null',
+			p);
+		
 		test(value.indexOf(substring) >= 0, p,
 			'Expected ${quote(value)} to contain ${quote(substring)}',
 			'Expected ${quote(value)} not to contain ${quote(substring)}'
@@ -186,6 +191,11 @@ class ShouldString extends Should<String>
 
 	public function startWith(substring : String, ?p : PosInfos)
 	{
+		if (value == null) return fail(
+			'Expected string to start with ${quote(substring)} but string was null', 
+			'Expected string not to start with ${quote(substring)} but string was null', 
+			p);
+		
 		test(value.startsWith(substring), p,
 			'Expected ${quote(value)} to start with ${quote(substring)}',
 			'Expected ${quote(value)} not to start with ${quote(substring)}'
@@ -194,6 +204,11 @@ class ShouldString extends Should<String>
 
 	public function endWith(substring : String, ?p : PosInfos)
 	{
+		if (value == null) return fail(
+			'Expected string to end with ${quote(substring)} but string was null', 
+			'Expected string not to end with ${quote(substring)} but string was null', 
+			p);
+		
 		test(value.endsWith(substring), p,
 			'Expected ${quote(value)} to end with ${quote(substring)}',
 			'Expected ${quote(value)} not to end with ${quote(substring)}'
@@ -202,6 +217,11 @@ class ShouldString extends Should<String>
 
 	public function match(regexp : EReg, ?p : PosInfos)
 	{
+		if (value == null) return fail(
+			'Expected string to match regular expression but string was null', 
+			'Expected string not to match regular expression but string was null', 
+			p);
+		
 		test(regexp.match(value), p,
 			'Expected ${quote(value)} to match regular expression',
 			'Expected ${quote(value)} not to match regular expression'
@@ -444,6 +464,11 @@ class Should<T>
 		return Std.is(v, String) ? '"$v"' : Std.string(v);
 	}
 
+	private function fail(error : String, errorInverted : String, p : PosInfos)
+	{
+		SuitesRunner.currentTest(false, inverse ? errorInverted : error, SuitesRunner.posInfosToStack(p));
+	}
+	
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
 		if (SuitesRunner.currentTest == null) throw "SuitesRunner.currentTest was null";

@@ -172,13 +172,13 @@ class GenerateMain
 			name: type
 		}
 		
-		var noEventLoop = Context.defined("neko") || Context.defined("cpp") || Context.defined("cs");
-
 		var header = macro {
 			var testsDone : Bool = false; // For platforms without event loop
 			var runner : buddy.SuitesRunner = null;
+			var oldTrace = haxe.Log.trace;
 			
-			function error() {
+			function outputError() {
+				haxe.Log.trace = oldTrace; // Restore original trace
 				trace(runner.unrecoverableError);
 
 				var stack = runner.unrecoverableErrorStack;
@@ -193,7 +193,7 @@ class GenerateMain
 			function startRun(done : Void -> Void) : Void {				
 				runner = new buddy.SuitesRunner($allSuites, new $rep());
 				runner.run().then(function(_) {
-					if (runner.unrecoverableError != null && !$v{noEventLoop}) error();
+					if (runner.unrecoverableError != null) outputError();
 					done();
 				});
 			}				
@@ -204,7 +204,6 @@ class GenerateMain
 			body = macro {
 				startRun(function() testsDone = true);
 				while (!testsDone) Sys.sleep(0.1);
-				if (runner.unrecoverableError != null) error();
 				Sys.exit(runner.statusCode());
 			};
 		}
@@ -213,7 +212,6 @@ class GenerateMain
 			body = macro {
 				startRun(function() testsDone = true);
 				while (!testsDone) cs.system.threading.Thread.Sleep(10);
-				if (runner.unrecoverableError != null) error();
 				cs.system.Environment.Exit(runner.statusCode());
 			};
 		}

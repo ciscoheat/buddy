@@ -50,9 +50,6 @@ class SuitesRunner
 	}
 
 	public function new(buddySuites : Iterable<BuddySuite>, ?reporter : Reporter) {
-		// Cannot use Lambda here, Java problem in Linux.
-		//var includeMode = [for (b in buddySuites) for (s in b.suites) if (s.include) s].length > 0;
-
 		this.buddySuites = buddySuites;
 		this.reporter = reporter == null ? new buddy.reporting.ConsoleReporter() : reporter;
 		this.oldLog = Log.trace;
@@ -138,7 +135,7 @@ class SuitesRunner
 				}
 			});
 		});
-	}	
+	}
 
 	private function startIncludeMode() {
 		// Filter out all tests not marked with @include
@@ -225,8 +222,18 @@ class SuitesRunner
 		testSpec : TestSpec,
 		done : Dynamic -> Step -> Void
 	) : Void {
-		var oldFail = buddySuite.fail = function(err : Dynamic = "Exception", ?p : PosInfos) done(err, null);
-		var oldPending = buddySuite.pending = function(?message : String, ?p : PosInfos) done("Cannot call pending here.", null);
+		var hasCompleted = false;
+		var oldFail : ?Dynamic -> ?PosInfos -> Void = null;
+		
+		oldFail = buddySuite.fail = function(err : Dynamic = "Exception", ?p : PosInfos) {
+			// Test if it still references the same suite.
+			if (!hasCompleted && oldFail == buddySuite.fail) {
+				done(err, null);
+			}
+		}
+		var oldPending = buddySuite.pending = function(?message : String, ?p : PosInfos) {
+			done("Cannot call pending here.", null);
+		}
 
 		switch testSpec {
 			case Describe(testSuite, _): 
@@ -239,10 +246,9 @@ class SuitesRunner
 			case It(desc, test, _):
 				// Assign top-level spec var here, so it can be used in reporting.
 				var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
-				var hasCompleted = false;
 				
 				// Log traces for each Spec, so they can be outputted in the reporter
-				Log.trace = function(v, ?pos : PosInfos) {
+				if(!BuddySuite.useDefaultTrace) Log.trace = function(v, ?pos : PosInfos) {
 					if(pos == null) spec.traces.push(Std.string(v));
 					else spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
 				};
@@ -255,9 +261,9 @@ class SuitesRunner
 					spec.status = status;
 					spec.error = error;
 					spec.stack = stack;
-
+					
 					// Restore Log and set Suites fail function to null
-					Log.trace = oldLog;
+					if(!BuddySuite.useDefaultTrace) Log.trace = oldLog;
 					buddySuite.fail = oldFail;
 					buddySuite.pending = oldPending;
 

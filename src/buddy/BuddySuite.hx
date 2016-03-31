@@ -126,6 +126,11 @@ class TestSuite
 @:autoBuild(buddy.internal.SuiteBuilder.build())
 class BuddySuite
 {
+	/** 
+	 * If true, the default Log.trace will be used. Used for debugging.
+	 */
+	public static var useDefaultTrace : Bool = false;
+
 	///// Internal vars /////
 	
 	/**
