@@ -1,6 +1,7 @@
 package buddy.tests ;
 
 import buddy.BuddySuite;
+import buddy.tests.AllTests.ColorTree;
 import buddy.tools.AsyncTools;
 import haxe.CallStack;
 import promhx.Deferred;
@@ -35,6 +36,8 @@ class AllTests implements Buddy<[
 class EmptyTestClass { public function new() {} }
 
 enum Color { Red; Green; Blue; }
+
+enum ColorTree { Leaf(c : Color); Node(l : ColorTree, r : ColorTree); }
 
 class TestBasicFeatures extends BuddySuite
 {
@@ -159,6 +162,22 @@ class TestBasicFeatures extends BuddySuite
 				str.should().endWith("c");
 				str.should().endWith("abc");
 				str.should().not.endWith("b");
+			});
+		});
+		
+		describe("Testing Enums", {
+			it("should make deep Enum comparisons", {
+				var tree = Node(Node(Leaf(Red), Leaf(Green)), Leaf(Blue));				
+				tree.should.equal(Node(Node(Leaf(Red), Leaf(Green)), Leaf(Blue)));
+				
+				switch tree {
+					case Node(l, r): 
+						l.should.equal(Node(Leaf(Red), Leaf(Green)));
+						r.should.not.be(Leaf(Blue));
+						r.should.equal(Leaf(Blue));
+					case _: 
+						fail("Incorrect tree structure for the test.");
+				}
 			});
 		});
 

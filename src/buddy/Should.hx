@@ -29,6 +29,32 @@ class ShouldDynamic extends Should<Dynamic>
 	private function get_not() { return new ShouldDynamic(value, !inverse); }
 }
 
+class ShouldEnum extends Should<EnumValue>
+{
+	static public function should(e : EnumValue)
+	{
+		return new ShouldEnum(e);
+	}
+
+	public function new(value : EnumValue, inverse = false)
+	{
+		super(value, inverse);
+	}
+
+	public var not(get, never) : ShouldEnum;
+	private function get_not() { return new ShouldEnum(value, !inverse); }
+
+	//////////
+
+	public function equal(expected : EnumValue, ?p : PosInfos)
+	{
+		test(Type.enumEq(value, expected), p,
+			'Expected ${quote(expected)}, was ${quote(value)}',
+			'Didn\'t expect ${quote(value)} but was equal to that'
+		);
+	}	
+}
+
 class ShouldInt extends Should<Int>
 {
 	static public function should(i : Int)
