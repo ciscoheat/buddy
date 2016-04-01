@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "More stable error handling outside specs.",
-  "version": "1.2.1",
+  "releasenote": "Added should for Enum.equal",
+  "version": "1.3.0",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

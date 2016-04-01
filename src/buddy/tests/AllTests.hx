@@ -93,8 +93,8 @@ class TestBasicFeatures extends BuddySuite
 			it("should compare objects with be()", {
 				obj1.should.be(obj1);
 				obj1.should.not.be(obj2);
-				Red.should.be( Red );
-				Red.should.not.be( Green );
+				Red.should.equal( Red );
+				Red.should.not.equal( Green );
 			});
 			
 			it("should compare types with beType()", {
@@ -173,8 +173,8 @@ class TestBasicFeatures extends BuddySuite
 				switch tree {
 					case Node(l, r): 
 						l.should.equal(Node(Leaf(Red), Leaf(Green)));
-						r.should.not.be(Leaf(Blue));
 						r.should.equal(Leaf(Blue));
+						r.should.not.equal(Leaf(Green));
 					case _: 
 						fail("Incorrect tree structure for the test.");
 				}

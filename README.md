@@ -176,7 +176,7 @@ As you've seen in the examples, testing if specifications are correct is as simp
 
 ### All types
 
-`a.should.be(b)` - Tests equality for value types (`Bool`, `Float`, `Int` and the special `String`) and identity for the other (reference) types.
+`a.should.be(b)` - Tests equality for value types (`Bool`, `Float`, `Int` and the immutable `String`) and identity for the other (reference) types.
 
 `a.should.beType(b)` - Tests if `a` is of type `b`. Basically a wrapper around `Std.is`.
 
@@ -219,6 +219,10 @@ Same as Int plus
 `a.should.containAll(b)` - Test if an Iterable contains all objects in Iterable `b`.
 
 `a.should.containExactly(b)` - Test if an Iterable contains exactly the same objects as in Iterable `b` and in the same order.
+
+### Enum
+
+`a.should.equal(b)` - Makes a deep equality check, using `Type.enumEq`. A warning will be given when enums is compared by `should.be` since the result of that comparison is undefined.
 
 ### Exceptions
 

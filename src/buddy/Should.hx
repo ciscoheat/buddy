@@ -45,6 +45,11 @@ class ShouldEnum extends Should<EnumValue>
 	private function get_not() { return new ShouldEnum(value, !inverse); }
 
 	//////////
+	
+	@:deprecated("Use should.equal instead for enum comparisons")
+	override public function be(expected : EnumValue, ?p : PosInfos) : Void {
+		equal(expected, p);
+	}
 
 	public function equal(expected : EnumValue, ?p : PosInfos)
 	{
