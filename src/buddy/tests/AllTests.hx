@@ -379,12 +379,13 @@ class TestBasicFeatures extends BuddySuite
 		describe("Testing null", {
 			it("should pass even if the var is null", {
 				var s : EmptyTestClass = null;
-				var i : Int = null;
 				var d : Dynamic = null;
 				s.should.be(null);
-				i.should.be(null);
 				d.should.be(null);
 				#if js
+				var i : Int = null;
+				i.should.be(null);
+				
 				var undef : Dynamic = untyped __js__("undefined");
 				undef.should.be(null);
 				#end
