@@ -222,7 +222,7 @@ Same as Int plus
 
 ### Enum
 
-`a.should.equal(b)` - Makes a deep equality check, using `Type.enumEq`. A warning will be given when enums is compared by `should.be` since the result of that comparison is undefined.
+`a.should.equal(b)` - Makes a deep equality check, using `Type.enumEq`. A warning will be given when enums are compared by `should.be`, since the result of that comparison is undefined.
 
 ### Exceptions
 

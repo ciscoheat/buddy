@@ -82,8 +82,8 @@ class TraceReporter implements Reporter
 					else {
 						print("  " + sp.description + " (" + sp.status + ")");
 					}
+					if(sp.status != Passed) printStack(sp.stack);
 					printTraces(sp);
-					printStack(sp.stack);
 				case TSuite(s):
 					printTests(s, indentLevel + 1);
 			}

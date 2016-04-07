@@ -48,7 +48,6 @@ class SuiteBuilder
 			///// Should
 			
 			case macro $a.should().$b, macro $a.should.$b:
-				// Need to use untyped here for some unknown macro reason...
 				var change = macro $a.should().$b;
 				e.expr = change.expr;
 
