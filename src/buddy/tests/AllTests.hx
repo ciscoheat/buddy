@@ -382,10 +382,13 @@ class TestBasicFeatures extends BuddySuite
 				var d : Dynamic = null;
 				s.should.be(null);
 				d.should.be(null);
-				#if js
+				
+				#if (js || neko || php || python)
 				var i : Int = null;
 				i.should.be(null);
+				#end
 				
+				#if js
 				var undef : Dynamic = untyped __js__("undefined");
 				undef.should.be(null);
 				#end
