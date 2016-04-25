@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "Added should for Enum.equal",
-  "version": "1.3.0",
+  "releasenote": "Added buddy.SingleSuite for getting started easier.",
+  "version": "1.4.0",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }
