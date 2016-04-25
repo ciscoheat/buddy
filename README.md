@@ -11,14 +11,9 @@ Your friendly BDD testing library for Haxe!
 2) Create a test file called **Main.hx**:
 
 ```haxe
-import buddy.*;
 using buddy.Should;
 
-// Add test classes within the brackets
-class Main implements Buddy<[Tests]> {}
-
-// Test classes should extend BuddySuite
-class Tests extends BuddySuite {
+class Main extends buddy.SingleSuite {
     public function new() {
         // A test suite:
         describe("Using Buddy", {
@@ -64,12 +59,9 @@ But please don't stop there. Try using it on other targets than Neko, Buddy supp
 Buddy was built from the ground up to have great support for async testing, so it's fully compatible with Node.js and handles ajax requests with ease. To use it, just create the specification with a function that takes one argument (targeting javascript now):
 
 ```haxe
-import buddy.*;
 using buddy.Should;
 
-class Main implements Buddy<[AsyncTest]> {}
-
-class AsyncTest extends BuddySuite {
+class Main extends buddy.SingleSuite {
     public function new() {
         describe("Using Buddy asynchronously", {
             var mood = "?";
@@ -94,12 +86,9 @@ class AsyncTest extends BuddySuite {
 The default timeout is 5000 ms, after which the spec will automatically fail if `done()` hasn't been called, or in the case of synchronous tests, if it hasn't returned. If you want to change the timeout, set the property `timeoutMs` in the `BuddySuite` **before** the actual `it()` specification, or in the before/after block. Here's an example:
 
 ```haxe
-import buddy.*;
 using buddy.Should;
 
-class Main implements Buddy<[AsyncTest]> {}
-
-class AsyncTest extends BuddySuite {
+class Main extends buddy.SingleSuite {
     public function new() {
         describe("Using Buddy asynchronously", {
             timeoutMs = 100;
@@ -119,7 +108,9 @@ You can set `timeoutMs` to 0 to disable the timeout check. **Note:** Timeouts an
 To setup tests, you can use `beforeAll`, `beforeEach`, `afterEach` and `afterAll`:
 
 ```haxe
-class BeforeAfterTest extends BuddySuite {
+using buddy.Should;
+
+class BeforeAfterTest extends buddy.SingleSuite {
     public function new() {
         describe("Using before/after", {
             var test = 0;
@@ -269,7 +260,7 @@ it("should also fail when throwing an exception", {
 
 ## General error handling
 
-Exceptions in `it` will be handled as above, but if something goes wrong in a `before/after` section, Buddy will stop executing the whole `BuddySuite`, and move to the next one. This is in case there are many large test suites. It will also count as a failure.
+Exceptions in `it` will be handled as above, but if something goes wrong in a `before/after` section, Buddy will stop executing the whole suite. It will also count as a failure.
 
 ## Pending tests
 
@@ -278,10 +269,9 @@ Since BDD is also made for non-programmers to use, a common development style is
 **Main.hx**
 
 ```haxe
-import buddy.*;
+using buddy.Should;
 
-// Combining extends and implements this time
-class Main extends BuddySuite implements Buddy<[Main]>
+class Main extends buddy.SingleSuite
 {
     public function new() {
         describe("Using Buddy", {
@@ -307,6 +297,36 @@ There is also a `pending` method available to make a spec pending, similar to `f
 ## Including and excluding tests
 
 Classes, suites and specs can all be marked with `@include` and `@exclude`. `@include` will only run the tests that are marked, `@exclude` does the opposite, it prevents the marked ones from running. If you have a huge test suite, it can be convenient to mark the suite you're currently working on with `@include`. You can also use `xit()` and `xdescribe()` to exclude specs and suites from running.
+
+## Multiple test suites
+
+Extending `buddy.SingleSuite` is nice and simple, but you can have multiple test classes, and separate them from the main class if you like. Here's how to do it:
+
+**Main.hx**
+
+```haxe
+import buddy.*;
+using buddy.Should;
+
+// Implement "Buddy" and define an array of classes within the brackets:
+class Main implements Buddy<[
+	Tests,
+    path.to.YourBuddySuite,
+    AnotherTestSuite,
+    new SpecialSuite("Constant value", 123)
+]> {}
+
+// All test classes should now extend BuddySuite (not SingleSuite)
+class Tests extends BuddySuite
+{
+    public function new() {
+        describe("Using Buddy", {
+            it("should be a great testing experience");
+            it("should really make the tester happy");
+        });
+    }
+}
+```
 
 ## Customizing reporting
 
@@ -337,17 +357,7 @@ The compilation flag will override the metadata, if both are set.
 
 ### Where's main()?
 
-Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.Buddy` on your Main class and specify an array of test suites within the type brackets like so: 
-
-```haxe
-class Main implements buddy.Buddy<[
-    path.to.YourBuddySuite,
-    AnotherTestSuite,
-    new SpecialSuite("Constant value", 123)
-]> {}
-```
-
-The advantage of implementing `Buddy` is that platform-specific code for waiting until the tests are finished will be generated. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can easily use Buddy in CI tools.
+Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.SingleSuite`, or alternatively `buddy.Buddy` on your Main class. Then platform-specific code will be generated for waiting until the tests are finished. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 

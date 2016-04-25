@@ -30,14 +30,19 @@ class GenerateMain
 		
 		if (buddySuites == null || buddySuites.expr.equals(EConst(CIdent("null")))) {
 			var buddyInterface = cls.interfaces.find(function(f) return f.t.get().name == 'Buddy');
-			if (buddyInterface == null) error();
-			
-			switch buddyInterface.params[0] {
-				case TInst(t, _): switch t.get().kind {
-					case KExpr(e): buddySuites = e;
+			if (buddyInterface == null) {
+				if (cls.superClass.t != null && cls.superClass.t.get().name == "SingleSuite")
+					buddySuites = macro [$p{cls.pack.concat([cls.name])}];
+				else
+					error();
+			} else {
+				switch buddyInterface.params[0] {
+					case TInst(t, _): switch t.get().kind {
+						case KExpr(e): buddySuites = e;
+						case _: error();
+					}
 					case _: error();
 				}
-				case _: error();
 			}
 		}
 			
