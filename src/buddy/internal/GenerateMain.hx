@@ -204,7 +204,8 @@ class GenerateMain
 			}				
 		};
 
-		if (Context.defined("neko") || Context.defined("cpp"))
+		// Targets that requires a waiting loop
+		if (Context.defined("neko") || Context.defined("cpp") || Context.defined("python"))
 		{
 			body = macro {
 				startRun(function() testsDone = true);
