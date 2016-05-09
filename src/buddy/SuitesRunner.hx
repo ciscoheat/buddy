@@ -310,14 +310,18 @@ class SuitesRunner
 				#end
 				
 				#if (!php && !macro)
+				var isAsync = switch test {
+					case Async(_): true;
+					case Sync(_): false;
+				}
+				
 				// Set up timeout for the current spec
-				var timeout = buddySuite.timeoutMs;
-				if(timeout > 0) {
-					AsyncTools.wait(timeout)
+				if(isAsync && buddySuite.timeoutMs > 0) {
+					AsyncTools.wait(buddySuite.timeoutMs)
 						.catchError(function(e : Dynamic) { 
 							specCompleted(Failed, e, CallStack.exceptionStack());
 						})
-						.then(function(_) specCompleted(Failed, 'Timeout after $timeout ms', null));
+						.then(function(_) specCompleted(Failed, 'Timeout after ${buddySuite.timeoutMs} ms', null));
 				}
 				#end
 				

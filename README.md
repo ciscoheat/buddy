@@ -83,7 +83,7 @@ class Main extends buddy.SingleSuite {
 }
 ```
 
-The default timeout is 5000 ms, after which the spec will automatically fail if `done()` hasn't been called, or in the case of synchronous tests, if it hasn't returned. If you want to change the timeout, set the property `timeoutMs` in the `BuddySuite` **before** the actual `it()` specification, or in the before/after block. Here's an example:
+The default timeout is 5000 ms, after which the spec will automatically fail if `done()` hasn't been called. If you want to change the timeout, set the property `timeoutMs` in the `BuddySuite` **before** the actual `it()` specification, or in the before/after block. Here's an example:
 
 ```haxe
 using buddy.Should;
