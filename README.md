@@ -343,6 +343,7 @@ class Main implements Buddy<[Tests]> {}
 ### Compilation flags
 
 `-D reporter=path.to.your.Reporter` - Set reporter
+
 `-D buddy-colors`, `-D buddy-no-colors` - Enable/disable ANSI color output (default is disabled)
 
 The compilation flag will override the metadata, if both are set.

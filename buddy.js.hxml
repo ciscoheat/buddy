@@ -4,6 +4,7 @@
 -lib slambda
 -js bin/buddy.js
 -main buddy.tests.AllTests
+-D buddy-no-colors
 -cmd echo "---------- JS (PhantomJS) ----------"
 -cmd cp src/buddy/tests/index.html bin
 -cmd cp src/buddy/tests/buddy.phantomjs.js bin
