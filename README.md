@@ -328,7 +328,7 @@ class Tests extends BuddySuite
 }
 ```
 
-## Customizing reporting
+## Customizing reporting and output
 
 If the default console reporter isn't to your liking, you can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are two ways to use it:
 
