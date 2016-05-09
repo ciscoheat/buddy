@@ -2,6 +2,7 @@ package buddy;
 import buddy.Should.ShouldIterable;
 import haxe.PosInfos;
 import haxe.CallStack;
+import haxe.Int64;
 #if python
 import python.internal.UBuiltins;
 import python.lib.Builtins;
@@ -86,6 +87,40 @@ class ShouldInt extends Should<Int>
 	}
 
 	public function beGreaterThan(expected : Int, ?p : PosInfos)
+	{
+		test(value > expected, p,
+			'Expected greater than ${quote(expected)}, was ${quote(value)}',
+			'Expected not greater than ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+}
+
+class ShouldInt64 extends Should<Int64>
+{
+	static public function should(i : Int64)
+	{
+		return new ShouldInt64(i);
+	}
+
+	public function new(value : Int64, inverse = false)
+	{
+		super(value, inverse);
+	}
+
+	public var not(get, never) : ShouldInt64;
+	private function get_not() { return new ShouldInt64(value, !inverse); }
+
+	//////////
+
+	public function beLessThan(expected : Int64, ?p : PosInfos)
+	{
+		test(value < expected, p,
+			'Expected less than ${quote(expected)}, was ${quote(value)}',
+			'Expected not less than ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
+	public function beGreaterThan(expected : Int64, ?p : PosInfos)
 	{
 		test(value > expected, p,
 			'Expected greater than ${quote(expected)}, was ${quote(value)}',
