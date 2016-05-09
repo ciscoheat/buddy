@@ -126,7 +126,14 @@ class GenerateMain
 	private static function reporter() : String
 	{
 		var cls = Context.getLocalClass().get();
-		var reporter = "buddy.reporting.ConsoleReporter";
+		
+		var colors = ["buddy-colors", "buddy_colors"].exists(Context.defined) || 
+			["buddy-colors", "buddy_colors", "colors", "color"].exists(cls.meta.has);
+
+		if (["buddy-no-colors", "buddy_no_colors"].exists(Context.defined))
+			colors = false;
+
+		var reporter = colors ? "buddy.reporting.ConsoleColorReporter" : "buddy.reporting.ConsoleReporter";
 
 		if (Context.defined("reporter"))
 		{

@@ -16,7 +16,7 @@ using buddy.Should;
 using Slambda;
 using StringTools;
 
-class AllTests implements Buddy<[
+@colors class AllTests implements Buddy<[
 	TestBasicFeatures,
 	TestExclude,
 	FailTest,
@@ -59,7 +59,7 @@ class TestBasicFeatures extends BuddySuite
 				a = 1;
 			});
 
-			it("should set the variable a to 1 in the before function", {
+			it("should set the variable a to 1 in the before function", {				
 				a.should.be(1);
 				a = 2;
 			});

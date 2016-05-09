@@ -11,9 +11,23 @@ import buddy.BuddySuite.SpecStatus;
 using Lambda;
 using StringTools;
 
+@:enum abstract Color(Int) {
+	var Default = 39;
+	var Red = 31;
+	var Yellow = 33;
+	var Green = 32;
+	var White = 37;
+	
+	@:to public function ansiCode() : String return String.fromCharCode(27) + '[${this}m';
+}
+
 class TraceReporter implements Reporter
 {
-	public function new() {}
+	var colors : Bool;
+	
+	public function new(colors = false) {
+		this.colors = colors;
+	}
 
 	public function start()	{
 		return resolveImmediately(true);
@@ -49,27 +63,30 @@ class TraceReporter implements Reporter
 
 		suites.iter(countTests);
 
-		printTests = function(s : Suite, indentLevel : Int) {
-			var print = function(str : String) println(str.lpad(" ", str.length + Std.int(Math.max(0, indentLevel * 2))));
+		printTests = function(s : Suite, indentLevel : Int) {			
+			function print(str : String, color : Color = Default) {
+				var start = strCol(color), end = strCol(Default);
+				println(start + str.lpad(" ", str.length + Std.int(Math.max(0, indentLevel * 2))) + end);
+			}
 
 			function printStack(stack : Array<StackItem>) {
 				if (stack == null || stack.length == 0) return;
 				for (s in stack) switch s {
-					case FilePos(_, file, line) if (line > 0 && file.indexOf("buddy/internal/") != 0):
-						print('    @ $file:$line');
+					case FilePos(_, file, line) if (line > 0 && file.indexOf("buddy/internal/") != 0 && file.indexOf("buddy.SuitesRunner") != 0):
+						print('    @ $file:$line', Yellow);
 					case _:
 				}
 			}
 			
 			function printTraces(spec : Spec) {
-				for (t in spec.traces) print("    " + t);
+				for (t in spec.traces) print("    " + t, Yellow);
 			}
 			
 			if (s.description.length > 0) print(s.description);
 			
 			if (s.error != null) {
 				// The whole suite crashed.
-				print("ERROR: " + s.error);
+				print("ERROR: " + s.error, Red);
 				printStack(s.stack);
 				return;
 			}
@@ -77,10 +94,10 @@ class TraceReporter implements Reporter
 			for (step in s.steps) switch step {
 				case TSpec(sp):
 					if (sp.status == Failed) {
-						print("  " + sp.description + " (FAILED: " + sp.error + ")");
+						print(strCol(Red) + "  " + sp.description + strCol(Yellow) + " (FAILED: " + sp.error + ")");
 					}
 					else {
-						print("  " + sp.description + " (" + sp.status + ")");
+						print("  " + sp.description + " (" + sp.status + ")", sp.status == Passed ? Green : Yellow);
 					}
 					if(sp.status != Passed) printStack(sp.stack);
 					printTraces(sp);
@@ -91,7 +108,14 @@ class TraceReporter implements Reporter
 
 		suites.iter(printTests.bind(_, -1));
 
-		println('$total specs, $failures failures, $pending pending');
+		var totalColor = if (failures > 0) Red else Green;
+		var pendingColor = if (pending > 0) Yellow else totalColor;
+		
+		println(
+			strCol(totalColor) + '$total specs, $failures failures, ' + 
+			strCol(pendingColor) + '$pending pending' + 
+			strCol(Default)
+		);
 
 		return resolveImmediately(suites);
 	}
@@ -104,6 +128,8 @@ class TraceReporter implements Reporter
 		// Override when needed.
 		trace(s);
 	}
+	
+	private function strCol(color : Color) return this.colors ? color.ansiCode() : "";
 	
 	/**
 	 * Convenience method.

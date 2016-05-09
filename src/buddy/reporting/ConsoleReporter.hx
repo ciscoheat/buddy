@@ -1,8 +1,9 @@
-package buddy.reporting ;
+package buddy.reporting;
 
 import buddy.BuddySuite;
 import buddy.reporting.Reporter;
 import haxe.CallStack;
+import buddy.reporting.TraceReporter.Color;
 using Lambda;
 using StringTools;
 
@@ -21,8 +22,8 @@ private typedef Sys = Flash;
 
 class ConsoleReporter extends TraceReporter
 {
-	public function new() {
-		super();
+	public function new(colors = false) {
+		super(colors);
 	}
 
 	override public function start()
@@ -40,12 +41,12 @@ class ConsoleReporter extends TraceReporter
 
 	override public function progress(spec : Spec)
 	{
-		print(switch(spec.status) {
-			case Failed: "X";
-			case Passed: ".";
-			case Pending: "P";
-			case Unknown: "?";
-		});
+		print((switch(spec.status) {
+			case Failed: strCol(Red) + "X";
+			case Passed: strCol(Green) + ".";
+			case Pending: strCol(Yellow) + "P";
+			case Unknown: strCol(Yellow) + "?";
+		}) + strCol(Default));
 
 		return resolveImmediately(spec);
 	}

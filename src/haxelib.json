@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "Fixed exit code on timeout failures for Python.",
-  "version": "1.4.1",
+  "releasenote": "Int64 should added. Threading fix. Added ConsoleColorReporter.",
+  "version": "1.5.0",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "" }
 }

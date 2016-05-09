@@ -101,7 +101,7 @@ class Main extends buddy.SingleSuite {
 }
 ```
 
-You can set `timeoutMs` to 0 to disable the timeout check. **Note:** Timeouts and asynchronous behavior aren't supported when targeting PHP.
+You can set `timeoutMs` to 0 to disable the timeout check. **Note:** When using `function(done)`, on some targets the timeout check will run in a separate thread. Also, timeouts and asynchronous behavior aren't supported when targeting PHP.
 
 ## Before/After
 
@@ -335,19 +335,23 @@ If the default console reporter isn't to your liking, you can make your own repo
 ### Metadata
 
 ```haxe
-@reporter("path.to.your.Reporter")
+@reporter("path.to.your.Reporter") // Set reporter
+@colors // Enable ANSI color output
 class Main implements Buddy<[Tests]> {}
 ```
 
-### Compilation flag
+### Compilation flags
 
-`-D reporter=path.to.your.Reporter`
+`-D reporter=path.to.your.Reporter` - Set reporter
+`-D buddy-colors`, `-D buddy-no-colors` - Enable/disable ANSI color output (default is disabled)
 
 The compilation flag will override the metadata, if both are set.
 
 ### List of built-in Reporters
 
 `buddy.reporting.ConsoleReporter` is the default reporter.
+
+`buddy.reporting.ConsoleColorReporter` is the default reporter with ANSI color output. Can be enabled with metadata or compilation flags, as specified above.
 
 `buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI in Flash together with the `-D fdb-ci` compiler flag. See the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
 
@@ -357,7 +361,7 @@ The compilation flag will override the metadata, if both are set.
 
 ### Where's main()?
 
-Ok, you noticed that it was missing! Using some macro magic, you only need to implement `buddy.SingleSuite`, or alternatively `buddy.Buddy` on your Main class. Then platform-specific code will be generated for waiting until the tests are finished. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
+Ok, you noticed that it was missing! Using some macro magic, you only need to extend `buddy.SingleSuite`, or alternatively implement `buddy.Buddy` on your Main class. Then platform-specific code will be generated for waiting until the tests are finished. On all server platforms, exit code 0 will be returned for "all tests passed" and 1 if not, so you can use Buddy in CI tools.
 
 ### Autocompletion sometimes doesn't work for "x.should." or numbers.
 
@@ -379,6 +383,29 @@ It's not possible to do that, since the program has already passed the exception
 
 This usually happens if you're not linking in the correct `.ndll` files. An easy fix is to add `-lib hxcpp` to your hxml. Another problem could be fixed by adding `-D HXCPP_M64` if you're targeting C++ on a 64bit platform (seems to vary between Linux and Win).
 
+### Can I run the tests manually, without generating main?
+
+Yes, but make sure you know what you're doing, some targets requires a wait loop if you have asynchronous tests, for example... Here's a minimal setup for synchronous execution (without exit code):
+
+```haxe
+import buddy.reporting.ConsoleColorReporter;
+
+class Main {
+    public static function main() {
+        var reporter = new ConsoleColorReporter();
+
+        var runner = new buddy.SuitesRunner([
+            new FirstTestSuite(),
+            new AnotherTestSuite()
+        ], reporter);
+
+        runner.run();
+    }
+}
+```
+
+Please make sure that the auto-generated version doesn't work in your case before doing this.
+
 ## The story behind Buddy
 
 After my [speech about HaxeContracts](http://www.silexlabs.org/wwx2014-speech-andreas-soderlund-dci-how-to-get-ahead-in-system-architecture/) at WWX2014, I concluded that one does not simply bash unit testing without providing a nice alternative! Having used [Jasmine](http://jasmine.github.io/2.0/introduction.html) before, I borrowed some if its nice features, and found the perfect aid to implementing async support with the [promhx](https://github.com/jdonaldson/promhx) library.
@@ -387,7 +414,7 @@ The [HaxeContracts](https://github.com/ciscoheat/HaxeContracts) library is a nic
 
 ## Upcoming features
 
-- [ ] Nicer reporters (especially for the browser) with stack traces for failures.
+- [ ] Nicer browser reporter
 - [ ] Your choice! Send me a gmail (ciscoheat) or create an issue here.
 
 Have a good time and much productivity with your new Buddy! :)
