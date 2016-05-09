@@ -171,7 +171,7 @@ As you've seen in the examples, testing if specifications are correct is as simp
 
 `a.should.beType(b)` - Tests if `a` is of type `b`. Basically a wrapper around `Std.is`.
 
-### Int
+### Int / Int64
 
 `a.should.beLessThan(b)`
 

@@ -4,6 +4,7 @@ import buddy.BuddySuite;
 import buddy.tests.AllTests.ColorTree;
 import buddy.tools.AsyncTools;
 import haxe.CallStack;
+import haxe.Int64;
 import promhx.Deferred;
 import promhx.Promise;
 
@@ -198,6 +199,18 @@ class TestBasicFeatures extends BuddySuite
 
 			it("beMoreThan should compare against float", {
 				int.should.beGreaterThan(2.9);
+			});
+		});
+
+		describe("Testing Int64", {
+			var int64 = Int64.make(1, 1);
+			
+			it("should have a beLessThan() method", {
+				int64.should.beLessThan(Int64.make(2, 0));
+			});
+
+			it("should have a beMoreThan() method", {
+				int64.should.beGreaterThan(2147483647);
 			});
 		});
 
