@@ -356,7 +356,7 @@ The compilation flag will override the metadata, if both are set.
 
 `buddy.reporting.ConsoleReporter` is the default reporter.
 
-`buddy.reporting.ConsoleColorReporter` is the default reporter with ANSI color output. Can be enabled with metadata or compilation flags, as specified above.
+`buddy.reporting.ConsoleColorReporter` is identical to the default reporter but with ANSI color output. This reporter will be used if colors are enabled with metadata or compilation flags, as specified above.
 
 `buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI in Flash together with the `-D fdb-ci` compiler flag. See the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
 
