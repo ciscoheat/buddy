@@ -82,14 +82,26 @@ class Spec
 {
 	public var description(default, null) : String;
 	@:allow(buddy.SuitesRunner) public var status(default, null) : SpecStatus = Unknown;
-	@:allow(buddy.SuitesRunner) public var error(default, null) : Dynamic;
-	@:allow(buddy.SuitesRunner) public var stack(default, null) = new Array<StackItem>();
+	@:allow(buddy.SuitesRunner) public var failures(default, null) = new Array<Failure>();
 	@:allow(buddy.SuitesRunner) public var traces(default, null) = new Array<String>();
 
 	public function new(description : String) {
 		if(description == null) throw "Spec must have a description.";
 		this.description = description;
 	}
+}
+
+// A failed should
+class Failure
+{
+	public var error(default, null) : Dynamic;
+	public var stack(default, null) : Array<StackItem>;
+
+	public function new(error : Dynamic, stack : Array<StackItem>) {
+		if (error == null) throw "Failure must have an error.";
+		this.error = error;
+		this.stack = stack == null ? [] : stack;
+	}	
 }
 
 ///// Classes and enums starting with "Test" represents the system before testing is completed.

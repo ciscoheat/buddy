@@ -471,7 +471,9 @@ class ShouldFunctions
 
 	private function quote(v : Dynamic)
 	{
-		return Std.is(v, String) ? '"$v"' : Std.string(v);
+		if (Std.is(v, String)) return '"$v"';
+		if (Std.is(v, List)) return Std.string(Lambda.array(v));
+		return Std.string(v);
 	}
 
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
@@ -527,7 +529,9 @@ class Should<T>
 	
 	private function quote(v : Dynamic)
 	{
-		return Std.is(v, String) ? '"$v"' : Std.string(v);
+		if (Std.is(v, String)) return '"$v"';
+		if (Std.is(v, List)) return Std.string(Lambda.array(v));
+		return Std.string(v);
 	}
 
 	private function fail(error : String, errorInverted : String, p : PosInfos)

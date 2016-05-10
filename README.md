@@ -262,6 +262,8 @@ it("should also fail when throwing an exception", {
 
 Exceptions in `it` will be handled as above, but if something goes wrong in a `before/after` section, Buddy will stop executing the whole suite. It will also count as a failure.
 
+Also note that putting code that should be tested outside a `describe`, `it` or any `each` block (basically, directly in the constructor) can result in undefined behavior.
+
 ## Pending tests
 
 Since BDD is also made for non-programmers to use, a common development style is to write empty, or *pending* tests, and let a programmer implement them later. To do this, just write a string in the `it` methods, nothing else. Our previous test class would then look like this:
@@ -292,7 +294,7 @@ Using Buddy
 2 specs, 0 failures, 2 pending
 ```
 
-There is also a `pending` method available to make a spec pending, similar to `fail`.
+There is also a `pending(reason : String)` method available to make a spec pending, similar to `fail`.
 
 ## Including and excluding tests
 

@@ -69,11 +69,11 @@ class TraceReporter implements Reporter
 				println(start + str.lpad(" ", str.length + Std.int(Math.max(0, indentLevel * 2))) + end);
 			}
 
-			function printStack(stack : Array<StackItem>) {
+			function printStack(indent : String, stack : Array<StackItem>) {
 				if (stack == null || stack.length == 0) return;
 				for (s in stack) switch s {
 					case FilePos(_, file, line) if (line > 0 && file.indexOf("buddy/internal/") != 0 && file.indexOf("buddy.SuitesRunner") != 0):
-						print('    @ $file:$line', Yellow);
+						print(indent + '@ $file:$line', Yellow);
 					case _:
 				}
 			}
@@ -87,19 +87,23 @@ class TraceReporter implements Reporter
 			if (s.error != null) {
 				// The whole suite crashed.
 				print("ERROR: " + s.error, Red);
-				printStack(s.stack);
+				printStack('  ', s.stack);
 				return;
 			}
 				
 			for (step in s.steps) switch step {
 				case TSpec(sp):
 					if (sp.status == Failed) {
-						print(strCol(Red) + "  " + sp.description + strCol(Yellow) + " (FAILED: " + sp.error + ")");
+						print("  " + sp.description + " (FAILED)", Red);
+						
+						for(failure in sp.failures) {
+							print("    " + failure.error, Yellow);
+							printStack('      ', failure.stack);
+						}
 					}
 					else {
 						print("  " + sp.description + " (" + sp.status + ")", sp.status == Passed ? Green : Yellow);
 					}
-					if(sp.status != Passed) printStack(sp.stack);
 					printTraces(sp);
 				case TSuite(s):
 					printTests(s, indentLevel + 1);

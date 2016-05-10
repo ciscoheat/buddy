@@ -252,15 +252,18 @@ class SuitesRunner
 					if(pos == null) spec.traces.push(Std.string(v));
 					else spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
 				};
-
-				// Called when, for any reason, the Spec is completed.
-				function specCompleted(status : SpecStatus, error : Dynamic, stack : Array<StackItem>) : Void {
+				
+				function reportFailure(error : Dynamic, stack : Array<StackItem>) : Void {
 					if (hasCompleted) return;
-					hasCompleted = true;
+					spec.status = Failed;
+					spec.failures.push(new Failure(error, stack));
+				}
+				
+				function specCompleted(status : SpecStatus) : Void {
+					if (hasCompleted) return;
+					hasCompleted = true;					
 					
-					spec.status = status;
-					spec.error = error;
-					spec.stack = stack;
+					if(spec.status == Unknown) spec.status = status;
 					
 					// Restore Log and set Suites fail function to null
 					if(!BuddySuite.useDefaultTrace) Log.trace = oldLog;
@@ -276,15 +279,14 @@ class SuitesRunner
 
 				// Test if spec is Pending (has only description)
 				if (test == null) {
-					specCompleted(Pending, null, null);
+					specCompleted(Pending);
 					return; // C# and Java cannot return specCompleted directly.
 				}
 
 				// Create a test function that will be used in Should
 				// note that multiple successfull tests doesn't mean the Spec is completed.
 				SuitesRunner.currentTest = function(testStatus : Bool, error : Dynamic, stack : Array<StackItem>) {
-					if (hasCompleted || testStatus == true) return;								
-					specCompleted(Failed, error, stack);
+					if (testStatus != true) reportFailure(error, stack);
 				}
 				
 				// Set up utest if available
@@ -294,17 +296,14 @@ class SuitesRunner
 				function checkUtestResults() {
 					for (a in Assert.results) switch a {
 						case Success(_):										
-						case Warning(_):
+						case Warning(msg):
+							spec.traces.push(msg);
 						case Failure(e, pos):
-							var stack = posInfosToStack(pos);
-							specCompleted(Failed, e, stack);
-							break;
+							reportFailure(e, posInfosToStack(pos));
 						case Error(e, stack), SetupError(e, stack), TeardownError(e, stack), AsyncError(e, stack):
-							specCompleted(Failed, e, stack);
-							break;
+							reportFailure(e, stack);
 						case TimeoutError(e, stack):
-							specCompleted(Failed, e, stack);
-							break;
+							reportFailure(e, stack);
 					}
 				}
 				#end
@@ -319,19 +318,26 @@ class SuitesRunner
 				if(isAsync && buddySuite.timeoutMs > 0) {
 					AsyncTools.wait(buddySuite.timeoutMs)
 						.catchError(function(e : Dynamic) { 
-							specCompleted(Failed, e, CallStack.exceptionStack());
+							reportFailure(e, CallStack.exceptionStack());
+							specCompleted(Failed);
 						})
-						.then(function(_) specCompleted(Failed, 'Timeout after ${buddySuite.timeoutMs} ms', null));
+						.then(function(_) {
+							reportFailure('Timeout after ${buddySuite.timeoutMs} ms', []);
+							specCompleted(Failed);
+						});
 				}
 				#end
 				
 				// Set up fail and pending function
 				buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
-					specCompleted(Failed, err, posInfosToStack(p));
+					reportFailure(err, posInfosToStack(p));
+					specCompleted(Failed);
 				}
 
 				buddySuite.pending = function(?message : String, ?p : PosInfos) {
-					specCompleted(Pending, null, posInfosToStack(p));
+					var msg = p.fileName + ":" + p.lineNumber + (message != null ? ': $message' : '');
+					spec.traces.push(msg);
+					specCompleted(Pending);
 				}
 
 				// === Run beforeEach
@@ -343,8 +349,12 @@ class SuitesRunner
 						#if utest
 						checkUtestResults();
 						#end
-						if (err != null) specCompleted(Failed, err, CallStack.exceptionStack());
-						else specCompleted(Passed, null, null);						
+						if (err != null) {
+							reportFailure(err, CallStack.exceptionStack());
+							specCompleted(Failed);
+						}
+						else 
+							specCompleted(Passed);
 					});
 				});
 		}
