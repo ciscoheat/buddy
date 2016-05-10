@@ -442,7 +442,9 @@ class TestBasicFeatures extends BuddySuite
 			
 			afterEach({
 				var test = SelfTest.lastSpec;
-				SelfTest.passLastSpecIf(test.status == Pending && test.traces[0].endsWith("Manually"), "Test wasn't pending with a message");
+				SelfTest.passLastSpecIf(test.status == Pending && 
+					test.traces.length == 1 &&
+					test.traces[0].endsWith("Manually"), "Test wasn't pending with a message");
 			});
 		});
 
@@ -463,6 +465,24 @@ class TestBasicFeatures extends BuddySuite
 				} else {
 					SelfTest.setLastSpec(Failed);
 				}
+			});
+		});
+		
+		describe("Multiple 'should' failures in the same spec", {
+			it("should report every failure in the spec", {
+				(10).should.be(1);
+				(11).should.be(1);
+			});
+			
+			afterEach({
+				var test = SelfTest.lastSpec;
+				if (test.failures.length == 2 &&
+					test.failures[0].error == "Expected 1, was 10" &&
+					test.failures[1].error == "Expected 1, was 11")
+				{
+					SelfTest.setLastSpec(Passed);
+				} else
+					SelfTest.setLastSpec(Failed);
 			});
 		});
 	}
@@ -526,7 +546,9 @@ class TestAsync extends BuddySuite
 
 			afterEach({
 				var test = SelfTest.lastSpec;
-				SelfTest.passLastSpecIf(test.status == Failed && test.failures[0].error == "Expected 2, was 1", "Threw an exception when done called after fail");
+				SelfTest.passLastSpecIf(test.status == Failed && 
+					test.failures.length == 1 &&
+					test.failures[0].error == "Expected 2, was 1", "Threw an exception when done called after fail");
 			});
 		});
 	}
@@ -547,7 +569,9 @@ class TestExceptionHandling extends BuddySuite
 
 			afterEach({
 				var test = SelfTest.lastSpec;
-				SelfTest.passLastSpecIf(test.status == Failed && test.failures[0].error == "Test error!", "Exception wasn't caught");
+				SelfTest.passLastSpecIf(test.status == Failed && 
+					test.failures.length == 1 &&
+					test.failures[0].error == "Test error!", "Exception wasn't caught");
 			});
 		});
 	}
@@ -584,8 +608,9 @@ class UtestUsage extends BuddySuite
 			afterEach({
 				var test = SelfTest.lastSpec;
 				if(test.description == failTestDesc) {
-					SelfTest.passLastSpecIf(
-						test.status == Failed && test.failures[0].error == "expected true", "Didn't fail using utest.Assert"
+					SelfTest.passLastSpecIf(test.status == Failed && 
+						test.failures.length == 1 &&
+						test.failures[0].error == "expected true", "Didn't fail using utest.Assert"
 					);
 				}
 			});
@@ -842,7 +867,8 @@ class FailTest extends BuddySuite
 
 			afterEach({
 				var	test = SelfTest.lastSpec;
-				SelfTest.passLastSpecIf(test.failures[0].error == "Exceptionally", "Didn't fail when exception was thrown");
+				SelfTest.passLastSpecIf(test.failures.length == 1 &&
+					test.failures[0].error == "Exceptionally", "Didn't fail when exception was thrown");
 			});
 		});
 
@@ -853,7 +879,8 @@ class FailTest extends BuddySuite
 
 			afterEach({
 				var	test = SelfTest.lastSpec;
-				SelfTest.passLastSpecIf(test.failures[0].error == "fail()", "Didn't fail when fail() was called");
+				SelfTest.passLastSpecIf(test.failures.length == 1 &&
+					test.failures[0].error == "fail()", "Didn't fail when fail() was called");
 			});
 		});
 	}
@@ -875,7 +902,8 @@ class FailTestAsync extends BuddySuite
 			
 			afterEach({
 				var test = SelfTest.lastSpec;
-				SelfTest.passLastSpecIf(test.failures[0].error == "Rejected", "Didn't fail when using fail as a callback");
+				SelfTest.passLastSpecIf(test.failures.length == 1 &&
+					test.failures[0].error == "Rejected", "Didn't fail when using fail as a callback");
 			});
 		});
 	}

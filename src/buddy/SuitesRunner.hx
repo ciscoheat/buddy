@@ -124,7 +124,11 @@ class SuitesRunner
 					beforeEachStack, 
 					afterEachStack, 
 				function(err, suite) {
-					if (err != null) suiteError(suite, err);
+					// Errors outside it()
+					if (err != null) {
+						suite.error = err;
+						suite.stack = CallStack.exceptionStack();
+					}
 					done(null, suite);
 				});
 			}, function(err, suites) {
@@ -158,12 +162,6 @@ class SuitesRunner
 			
 			return traverse(buddySuite.suite);
 		});
-	}
-	
-	// Errors outside it()
-	private function suiteError(suite : Suite, err : Dynamic) {
-		suite.error = err;
-		suite.stack = CallStack.exceptionStack();
 	}
 	
 	private function mapTestSuite(
@@ -245,6 +243,7 @@ class SuitesRunner
 				
 			case It(desc, test, _):
 				// Assign top-level spec var here, so it can be used in reporting.
+				//trace("Starting it: " + desc);
 				var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
 				
 				// Log traces for each Spec, so they can be outputted in the reporter

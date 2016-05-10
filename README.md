@@ -262,7 +262,9 @@ it("should also fail when throwing an exception", {
 
 Exceptions in `it` will be handled as above, but if something goes wrong in a `before/after` section, Buddy will stop executing the whole suite. It will also count as a failure.
 
-Also note that putting code that should be tested outside a `describe`, `it` or any `each` block (basically, directly in the constructor) can result in undefined behavior.
+If you're getting an early runtime error, you might want to disable the trace capture that buddy uses. You can do that globally by putting `BuddySuite.useDefaultTrace = true` in the beginning of a test class. Then you'll see the traces immediately instead of in the reporter.
+
+Please note that putting code that should be tested outside a `describe`, `it` or any `before/after` block can result in undefined behavior.
 
 ## Pending tests
 

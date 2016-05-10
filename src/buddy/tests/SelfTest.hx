@@ -1,5 +1,6 @@
 package buddy.tests;
 
+import buddy.BuddySuite.Failure;
 import buddy.BuddySuite.Spec;
 import buddy.BuddySuite.Suite;
 import buddy.BuddySuite.SpecStatus;
@@ -14,13 +15,11 @@ class SelfTest {
 	public static function passLastSpecIf(expr : Bool, failReason : String) {
 		if (expr) {
 			setLastSpec(Passed);
-			failReason = null;
 		}
 		else {
 			setLastSpec(Failed);
+			lastSpec.failures.push(new Failure(failReason, []));
 		}
-		
-		Reflect.setProperty(lastSpec, "error", failReason);
 	}
 	
 	public static function setLastSpec(status : SpecStatus) {
