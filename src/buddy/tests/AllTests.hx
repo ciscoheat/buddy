@@ -213,6 +213,13 @@ class TestBasicFeatures extends BuddySuite
 			it("should have a beMoreThan() method", {
 				int64.should.beGreaterThan(2147483647);
 			});
+			
+			it("should test 'be' with equality, not identity", {
+				var one : Int64 = 1000341504;
+				var two : Int64 = 1000341504;
+
+				one.should.be(two);
+			});
 		});
 
 		describe("Testing floats", {

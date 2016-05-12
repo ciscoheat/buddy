@@ -167,7 +167,7 @@ As you've seen in the examples, testing if specifications are correct is as simp
 
 ### All types
 
-`a.should.be(b)` - Tests equality for value types (`Bool`, `Float`, `Int` and the immutable `String`) and identity for the other (reference) types.
+`a.should.be(b)` - Tests equality for value types (`Bool`, `Float`, `Int`, `Int64`, and the immutable `String`) and identity for the other (reference) types.
 
 `a.should.beType(b)` - Tests if `a` is of type `b`. Basically a wrapper around `Std.is`.
 

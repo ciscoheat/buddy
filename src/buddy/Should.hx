@@ -112,6 +112,15 @@ class ShouldInt64 extends Should<Int64>
 
 	//////////
 
+	public override function be(expected : Int64, ?p : PosInfos) : Void
+	{
+		var result = Int64.compare(expected, value) == 0;
+		test(result, p,
+			'Expected ${quote(expected)}, was ${quote(value)}',
+			'Didn\'t expect ${quote(expected)} but was equal to that'
+		);
+	}
+	
 	public function beLessThan(expected : Int64, ?p : PosInfos)
 	{
 		test(value < expected, p,
@@ -501,7 +510,7 @@ class Should<T>
 	}
 
 	/**
-	 * Test for equality between two value types (bool, int, float), or identity for reference types
+	 * Test for equality between "expected" value types (bool, int, int64, float, string), identity for other (reference) types
 	 */
 	public function be(expected : T, ?p : PosInfos) : Void
 	{
