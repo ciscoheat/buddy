@@ -390,7 +390,7 @@ This usually happens if you're not linking in the correct `.ndll` files. An easy
 
 ### Can I run the tests manually, without generating main?
 
-Yes, but make sure you know what you're doing, some targets requires a wait loop if you have asynchronous tests, for example... Here's a minimal setup for synchronous execution (without exit code):
+Yes, but make sure you know what you're doing, some targets requires a wait loop if you have asynchronous tests, for example... Here's a minimal setup for synchronous execution:
 
 ```haxe
 import buddy.reporting.ConsoleColorReporter;
@@ -405,6 +405,10 @@ class Main {
         ], reporter);
 
         runner.run();
+		
+		#if sys
+		Sys.exit(runner.statusCode());
+		#end
     }
 }
 ```
