@@ -1,7 +1,9 @@
 -cp src 
+-lib asynctools
 -lib promhx
 -lib utest
 -lib slambda
+-D buddy-no-colors
 -main buddy.tests.AllTests
 -cmd echo "---------- Neko -----------"
 -x bin/buddy.n

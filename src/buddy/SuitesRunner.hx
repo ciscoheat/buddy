@@ -9,6 +9,7 @@ import haxe.rtti.Meta;
 import promhx.Deferred;
 import promhx.Promise;
 import buddy.BuddySuite;
+import buddy.tools.AsyncTools in BuddyAsync;
 
 #if utest
 import utest.Assert;
@@ -16,7 +17,7 @@ import utest.Assertation;
 #end
 
 using Lambda;
-using buddy.tools.AsyncTools;
+using AsyncTools;
 
 #if python
 @:pythonImport("sys")
@@ -73,7 +74,7 @@ class SuitesRunner
 
 	private function runDescribes(cb : Dynamic -> Void) : Void {
 		// Process the queue of describe calls
-		forEachSeries(buddySuites, function(suite, cb) {
+		AsyncTools.aEachSeries(buddySuites, function(suite, cb) {
 			var queue = suite.describeQueue;
 			function processQueue() {
 				try {
@@ -117,7 +118,7 @@ class SuitesRunner
 			var beforeEachStack = [[]];
 			var afterEachStack = [[]];
 			
-			mapSeries(buddySuites, function(buddySuite, done) { 
+			AsyncTools.aMapSeries(buddySuites, function(buddySuite, done) { 
 				mapTestSuite(
 					buddySuite, 
 					buddySuite.suite, 
@@ -177,15 +178,15 @@ class SuitesRunner
 		afterEachStack.unshift(testSuite.afterEach.array());
 
 		// === Run beforeAll
-		forEachSeries(testSuite.beforeAll, runTestFunc, function(err) {
+		AsyncTools.aEachSeries(testSuite.beforeAll, runTestFunc, function(err) {
 			if (err != null) return done(err, currentSuite);
 			// === Map TestSpec -> Step
-			mapSeries(testSuite.specs, function(testSpec : TestSpec, cb : Dynamic -> Step -> Void) {
+			AsyncTools.aMapSeries(testSuite.specs, function(testSpec : TestSpec, cb : Dynamic -> Step -> Void) {
 				mapTestSpec(buddySuite, testSuite, beforeEachStack, afterEachStack, testSpec, cb);
 			}, function(err : Dynamic, testSteps : Array<Step>) {
 				if (err != null) return done(err, currentSuite);
 				// === Run afterAll
-				forEachSeries(testSuite.afterAll, runTestFunc, function(err) {
+				AsyncTools.aEachSeries(testSuite.afterAll, runTestFunc, function(err) {
 					if (err != null) return done(err, currentSuite);
 					currentSuite.steps = testSteps;
 					beforeEachStack.pop();
@@ -270,7 +271,7 @@ class SuitesRunner
 					buddySuite.pending = oldPending;
 
 					// === Run afterEach
-					forEachSeries(flatten(afterEachStack), runTestFunc, function(err : Dynamic) {
+					AsyncTools.aEachSeries(flatten(afterEachStack), runTestFunc, function(err : Dynamic) {
 						if (err != null) done(err, null);
 						else reporter.progress(spec).then(function(_) done(null, TSpec(spec)));
 					});
@@ -315,7 +316,7 @@ class SuitesRunner
 				
 				// Set up timeout for the current spec
 				if(isAsync && buddySuite.timeoutMs > 0) {
-					AsyncTools.wait(buddySuite.timeoutMs)
+					BuddyAsync.wait(buddySuite.timeoutMs)
 						.catchError(function(e : Dynamic) { 
 							reportFailure(e, CallStack.exceptionStack());
 							specCompleted(Failed);
@@ -340,7 +341,7 @@ class SuitesRunner
 				}
 
 				// === Run beforeEach
-				forEachSeries(flatten(beforeEachStack), runTestFunc, function(err) {
+				AsyncTools.aEachSeries(flatten(beforeEachStack), runTestFunc, function(err) {
 					if (err != null) return done(err, null);
 
 					// Run the test function, synchronous exceptions will be reported in 'err'.
@@ -364,39 +365,4 @@ class SuitesRunner
 		unrecoverableErrorStack = CallStack.exceptionStack();
 		runCompleted.resolve(this);
 	}
-	
-	private function mapSeries<T, T2, Err>(
-		iterable : Iterable<T>, 
-		cb : T -> (Null<Err> -> Null<T2> -> Void) -> Void, 
-		done : Null<Err> -> Null<Array<T2>> -> Void) 
-	{
-		var iterator = iterable.iterator();
-		var output = [];
-		
-		function next() {
-			if (!iterator.hasNext()) done(null, output);
-			else cb(iterator.next(), function(err : Err, mapped : T2) { 
-				if (err == null) {
-					output.push(mapped); 
-					next();
-				}
-				else done(err, output);
-			});
-		}
-		next(); // Neko couldn't do self-calls
-	}
-
-	private function forEachSeries<T, Err>(
-		iterable : Iterable<T>, 
-		cb : T -> (Null<Err> -> Void) -> Void, 
-		done : Null<Err> -> Void) 
-	{
-		var iterator = iterable.iterator();
-		
-		function next() {
-			if (!iterator.hasNext()) done(null);
-			else cb(iterator.next(), function(err : Err) err == null ? next() : done(err));
-		}		
-		next(); // Neko couldn't do self-calls
-	}	
 }

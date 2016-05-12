@@ -25,6 +25,7 @@ before_install:
   - haxelib install promhx
   - haxelib install utest
   - haxelib install slambda
+  - haxelib install asynctools
 
   # apt packages for each target
   - sudo apt-get update

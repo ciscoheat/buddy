@@ -28,6 +28,7 @@
   </build>
   <!-- haxelib libraries -->
   <haxelib>
+    <library name="asynctools" />
     <library name="promhx" />
     <library name="utest" />
     <library name="slambda" />
