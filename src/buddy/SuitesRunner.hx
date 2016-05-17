@@ -33,6 +33,11 @@ private typedef Tests<T : Function> = {
 	run: T
 }
 
+private enum TestFuncBlock {
+	SingleAsync(func : (Void -> Void) -> Void);
+	BlockWithSync(funcs : Iterable<Void -> Void>);
+}
+
 @:keep // Prevent dead code elimination, since SuitesRunner is created dynamically
 class SuitesRunner
 {
@@ -216,7 +221,7 @@ class SuitesRunner
 		afterEachStack.unshift(testSuite.afterEach.array());
 
 		// === Run beforeAll
-		AsyncTools.aEachSeries(testSuite.beforeAll, runTestFunc, function(err) {
+		runTestFuncs(testSuite.beforeAll, function(err) {
 			if (err != null) return done(err, currentSuite);
 			// === Map TestSpec -> Step
 			AsyncTools.aMapSeries(testSuite.specs, function(testSpec : TestSpec, cb : Dynamic -> Step -> Void) {
@@ -224,7 +229,7 @@ class SuitesRunner
 			}, function(err : Dynamic, testSteps : Array<Step>) {
 				if (err != null) return done(err, currentSuite);
 				// === Run afterAll
-				AsyncTools.aEachSeries(testSuite.afterAll, runTestFunc, function(err) {
+				runTestFuncs(testSuite.afterAll, function(err) {
 					if (err != null) return done(err, currentSuite);
 					currentSuite.steps = testSteps;
 					beforeEachStack.pop();
@@ -234,6 +239,49 @@ class SuitesRunner
 				});
 			});
 		});
+	}
+
+	private function runTestFuncs(funcs : Iterable<TestFunc>, done : Dynamic -> Void) {
+		var blocks = new Array<TestFuncBlock>();
+		var currentBlocks = [];
+		
+		function addCurrentBlocks() {
+			if (currentBlocks.length == 0) return;
+			blocks.push(TestFuncBlock.BlockWithSync(currentBlocks));
+		}
+		
+		for(func in funcs) switch func {
+			case Async(f): 
+				addCurrentBlocks();
+				blocks.push(TestFuncBlock.SingleAsync(f));
+			
+			case Sync(f):
+				currentBlocks.push(f);
+		}
+		addCurrentBlocks();
+		
+		var it = blocks.iterator();
+		function processNextBatch() {
+			if (!it.hasNext()) return done(null);
+			
+			switch it.next() {
+				case SingleAsync(f):
+					f(function() {
+						processNextBatch();
+					});
+						
+				case BlockWithSync(funcs): 
+					try {
+						for (f in funcs) f();
+						processNextBatch();
+					}
+					catch (err : Dynamic) {
+						done(err);
+					}
+			}
+		}
+		
+		processNextBatch();
 	}
 
 	private function runTestFunc(func : TestFunc, done : Dynamic -> Void) {
@@ -309,7 +357,7 @@ class SuitesRunner
 					buddySuite.pending = oldPending;
 
 					// === Run afterEach
-					AsyncTools.aEachSeries(flatten(afterEachStack), runTestFunc, function(err : Dynamic) {
+					runTestFuncs(flatten(afterEachStack), function(err : Dynamic) {
 						if (err != null) done(err, null);
 						else reporter.progress(spec).then(function(_) done(null, TSpec(spec)));
 					});
@@ -379,7 +427,7 @@ class SuitesRunner
 				}
 
 				// === Run beforeEach
-				AsyncTools.aEachSeries(flatten(beforeEachStack), runTestFunc, function(err) {
+				runTestFuncs(flatten(beforeEachStack), function(err) {
 					if (err != null) return done(err, null);
 
 					// Run the test function, synchronous exceptions will be reported in 'err'.
