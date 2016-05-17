@@ -33,7 +33,7 @@ class AllTests implements Buddy<[
 	NestedBeforeAfter,
 	SimpleNestedBeforeAfter,
 	CallDoneTest,
-	HugeTest
+	#if !php HugeTest #end
 ]> {}
 
 class EmptyTestClass { public function new() {} }

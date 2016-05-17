@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "releasenote": "Possible fix for stackoverflow problems on some targets.",
-  "version": "2.0.2",
+  "releasenote": "Stackoverflow fix on all targets except php.",
+  "version": "2.0.3",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }
