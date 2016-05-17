@@ -770,6 +770,8 @@ class NestedBeforeAfter extends BuddySuite
 				it('should run the before defined up to this level', function () {
 					order.push("IT3");
 					a.should.be(2);
+					
+					//trace(CallStack.callStack().map(function(s) return s + "\n"));
 				});
 
 				afterEach({

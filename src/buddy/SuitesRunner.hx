@@ -3,6 +3,7 @@ import buddy.internal.GenerateMain;
 import buddy.reporting.Reporter;
 import haxe.CallStack;
 import haxe.CallStack.StackItem;
+import haxe.Constraints.Function;
 import haxe.Log;
 import haxe.PosInfos;
 import haxe.rtti.Meta;
@@ -25,6 +26,12 @@ extern class PythonSys {
 	public static function setrecursionlimit(i : Int) : Void;
 } 
 #end
+
+private typedef Tests<T : Function> = {
+	buddySuite: BuddySuite,
+	testSuite: TestSuite,
+	run: T
+}
 
 @:keep // Prevent dead code elimination, since SuitesRunner is created dynamically
 class SuitesRunner
@@ -70,37 +77,68 @@ class SuitesRunner
 		});
 		
 		return runCompletedPromise;
-	}	
-
+	}
+	
 	private function runDescribes(cb : Dynamic -> Void) : Void {
-		// Process the queue of describe calls
-		AsyncTools.aEachSeries(buddySuites, function(suite, cb) {
-			var queue = suite.describeQueue;
-			function processQueue() {
-				try {
-					if (queue.empty()) return cb(null);
-					
-					var current = queue.pop();
-					
-					// Set current suite, that will collect all describe/it/after/before calls.
-					suite.currentSuite = current.suite;
+		var asyncQueue = new Array<Tests<(Void -> Void) -> Void>>();
+		var syncQueue = new Array<Tests<Void -> Void>>();
+		
+		function processSuiteDescribes(suite : BuddySuite) {
+			while (!suite.describeQueue.empty()) {
+				var current = suite.describeQueue.pop();
 				
-					switch current.spec {
-						case Async(f): f(processQueue);
-						case Sync(f): f(); processQueue();
-					}
-				} catch (e : Dynamic) {
-					cb(e);
+				switch current.spec {
+					case Async(f): asyncQueue.push({
+						buddySuite: suite,
+						testSuite: current.suite,
+						run: f
+					});
+						
+					case Sync(f): syncQueue.push({
+						buddySuite: suite,
+						testSuite: current.suite,
+						run: f
+					});
 				}
 			}
-			processQueue(); // Neko couldn't do self-calls
-		}, function(err) {
+		}
+		
+		function processCompleted(err : Dynamic) {
 			if (err != null) return cb(err);
-			
+
 			// If includes exists, start pruning the Suite tree.
 			if (Reflect.hasField(Meta.getType(BuddySuite), "includeMode")) startIncludeMode();
 			cb(null);
-		});
+		}
+		
+		function processBuddySuites() : Void {
+			// Process the queue of describe calls
+			for (buddySuite in buddySuites) processSuiteDescribes(buddySuite);
+			
+			if(syncQueue.length > 0) {
+				try for (test in syncQueue) {
+					test.buddySuite.currentSuite = test.testSuite;
+					test.run();
+				} catch (err : Dynamic) {
+					return processCompleted(err);
+				}
+				
+				syncQueue = [];
+				processBuddySuites();
+			} else if(asyncQueue.length > 0) {
+				AsyncTools.aEachSeries(asyncQueue, function(test : Tests<(Void -> Void) -> Void>, cb : Dynamic -> Void) {
+					test.buddySuite.currentSuite = test.testSuite;
+					test.run(function() cb(null));
+				}, function(err) {
+					if (err != null) return processCompleted(err);
+					asyncQueue = [];
+					processBuddySuites();
+				});
+			} else
+				cb(null);
+		}
+		
+		processBuddySuites();
 	}
 	
 	public function failed() return !allTestsPassed;
