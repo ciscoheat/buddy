@@ -32,7 +32,8 @@ class AllTests implements Buddy<[
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
 	SimpleNestedBeforeAfter,
-	CallDoneTest
+	CallDoneTest,
+	HugeTest
 ]> {}
 
 class EmptyTestClass { public function new() {} }
@@ -928,5 +929,801 @@ class CallDoneTest extends BuddySuite
 				done();
 			});
 		});
+	}
+}
+
+class HugeTest extends BuddySuite
+{
+	public function new()
+	{
+		describe("Testing many and deep tests synchronously", {
+			it('should not cause a stack overflow', { (true).should.be(true); });
+			describe("Testing many and deep tests synchronously", {	
+				it('should not cause a stack overflow', { (true).should.be(true); });				
+			});
+			
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {	
+					it('should not cause a stack overflow', { (true).should.be(true); }); 					
+				});
+			});
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+				});
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); } );
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});								
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});							
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+					});
+				});
+			});		
+		});
+		
+
+		
+		
+		describe("Testing many and deep tests synchronously", {
+			it('should not cause a stack overflow', { (true).should.be(true); });
+			describe("Testing many and deep tests synchronously", {	
+				it('should not cause a stack overflow', { (true).should.be(true); });				
+			});
+			
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {	
+					it('should not cause a stack overflow', { (true).should.be(true); }); 					
+				});
+			});
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+				});
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); } );
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});								
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});							
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+					});
+				});
+			});		
+		});
+		describe("Testing many and deep tests synchronously", {
+			it('should not cause a stack overflow', { (true).should.be(true); });
+			describe("Testing many and deep tests synchronously", {	
+				it('should not cause a stack overflow', { (true).should.be(true); });				
+			});
+			
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {	
+					it('should not cause a stack overflow', { (true).should.be(true); }); 					
+				});
+			});
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+				});
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); } );
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});								
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});							
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+					});
+				});
+			});		
+		});
+		describe("Testing many and deep tests synchronously", {
+			it('should not cause a stack overflow', { (true).should.be(true); });
+			describe("Testing many and deep tests synchronously", {	
+				it('should not cause a stack overflow', { (true).should.be(true); });				
+			});
+			
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {	
+					it('should not cause a stack overflow', { (true).should.be(true); }); 					
+				});
+			});
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+				});
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); } );
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});								
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});							
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+					});
+				});
+			});		
+		});
+		describe("Testing many and deep tests synchronously", {
+			it('should not cause a stack overflow', { (true).should.be(true); });
+			describe("Testing many and deep tests synchronously", {	
+				it('should not cause a stack overflow', { (true).should.be(true); });				
+			});
+			
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {	
+					it('should not cause a stack overflow', { (true).should.be(true); }); 					
+				});
+			});
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+				});
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); } );
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});								
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});							
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+					});
+				});
+			});		
+		});
+		describe("Testing many and deep tests synchronously", {
+			it('should not cause a stack overflow', { (true).should.be(true); });
+			describe("Testing many and deep tests synchronously", {	
+				it('should not cause a stack overflow', { (true).should.be(true); });				
+			});
+			
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {	
+					it('should not cause a stack overflow', { (true).should.be(true); }); 					
+				});
+			});
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+				});
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); } );
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});								
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});							
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+					});
+				});
+			});		
+		});
+		describe("Testing many and deep tests synchronously", {
+			it('should not cause a stack overflow', { (true).should.be(true); });
+			describe("Testing many and deep tests synchronously", {	
+				it('should not cause a stack overflow', { (true).should.be(true); });				
+			});
+			
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {	
+					it('should not cause a stack overflow', { (true).should.be(true); }); 					
+				});
+			});
+			describe("Testing many and deep tests synchronously", {
+				it('should not cause a stack overflow', { (true).should.be(true); });
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+				});
+				describe("Testing many and deep tests synchronously", {
+					it('should not cause a stack overflow', { (true).should.be(true); });
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); });
+					});
+					describe("Testing many and deep tests synchronously", {
+						it('should not cause a stack overflow', { (true).should.be(true); } );
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});						
+								describe("Testing many and deep tests synchronously", {
+									it('should not cause a stack overflow', { (true).should.be(true); } );
+								});								
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});						
+							describe("Testing many and deep tests synchronously", {
+								it('should not cause a stack overflow', { (true).should.be(true); } );
+							});							
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+						describe("Testing many and deep tests synchronously", {
+							it('should not cause a stack overflow', { (true).should.be(true); } );
+						});						
+					});
+				});
+			});		
+		});
+		
 	}
 }
