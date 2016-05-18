@@ -33,9 +33,14 @@ private typedef Tests<T : Function> = {
 	run: T
 }
 
-private enum TestFuncBlock {
-	SingleAsync(func : (Void -> Void) -> Void);
-	BlockWithSync(funcs : Iterable<Void -> Void>);
+private typedef SyncTestResult = {
+	error : Dynamic,
+	step : Step
+}
+
+private typedef SyncSuiteResult = {
+	error : Dynamic,
+	suite : Suite
 }
 
 @:keep // Prevent dead code elimination, since SuitesRunner is created dynamically
@@ -70,7 +75,7 @@ class SuitesRunner
 	
 	public function run() : Promise<SuitesRunner> {
 		#if python
-		PythonSys.setrecursionlimit(10000);
+		PythonSys.setrecursionlimit(100000);
 		#end
 
 		runCompleted = new Deferred<SuitesRunner>();
@@ -220,83 +225,82 @@ class SuitesRunner
 		beforeEachStack.push(testSuite.beforeEach.array());
 		afterEachStack.unshift(testSuite.afterEach.array());
 
+		var allSync = isSync(testSuite.beforeAll) && isSync(testSuite.afterAll);
+		var result : SyncSuiteResult = null;
+		var syncResultCount = 0;
+		
 		// === Run beforeAll
 		runTestFuncs(testSuite.beforeAll, function(err) {
-			if (err != null) return done(err, currentSuite);
+			if (err != null) {
+				if (isSync(testSuite.beforeAll)) result = { error: err, suite: null };
+				else done(err, currentSuite);
+				return;
+			}
+			
 			// === Map TestSpec -> Step
 			AsyncTools.aMapSeries(testSuite.specs, function(testSpec : TestSpec, cb : Dynamic -> Step -> Void) {
-				mapTestSpec(buddySuite, testSuite, beforeEachStack, afterEachStack, testSpec, cb);
+				var result2 = mapTestSpec(buddySuite, testSuite, beforeEachStack, afterEachStack, testSpec, cb);
+				if (result2 != null) {
+					syncResultCount++;
+					cb(result2.error, result2.step);
+				}
 			}, function(err : Dynamic, testSteps : Array<Step>) {
-				if (err != null) return done(err, currentSuite);
+				allSync = allSync && testSteps.length == syncResultCount;
+				
+				if (err != null) {
+					if (!allSync) done(err, currentSuite);
+					else result = { error: err, suite: null };
+					return;
+				}
+				
 				// === Run afterAll
 				runTestFuncs(testSuite.afterAll, function(err) {
-					if (err != null) return done(err, currentSuite);
+					if (err != null) {
+						if (!allSync) done(err, currentSuite);
+						else result = { error: err, suite: null };
+						return;
+					}
+					
 					currentSuite.steps = testSteps;
 					beforeEachStack.pop();
 					afterEachStack.shift();
 
-					done(null, currentSuite);
+					if (!allSync) done(null, currentSuite);
+					else result = { error: null, suite: currentSuite };
 				});
 			});
 		});
+		
+		if (result != null) done(result.error, result.suite);
 	}
 
 	private function runTestFuncs(funcs : Iterable<TestFunc>, done : Dynamic -> Void) {
-		var blocks = new Array<TestFuncBlock>();
-		var currentBlocks = [];
-		
-		function addCurrentBlocks() {
-			if (currentBlocks.length == 0) return;
-			blocks.push(TestFuncBlock.BlockWithSync(currentBlocks));
-		}
+		var syncQ = [];
+		var asyncQ = [];
 		
 		for(func in funcs) switch func {
-			case Async(f): 
-				addCurrentBlocks();
-				blocks.push(TestFuncBlock.SingleAsync(f));
-			
-			case Sync(f):
-				currentBlocks.push(f);
+			case Async(f): asyncQ.push(f);			
+			case Sync(f): syncQ.push(f);
 		}
-		addCurrentBlocks();
-		
-		var it = blocks.iterator();
-		function processNextBatch() {
-			if (!it.hasNext()) return done(null);
-			
-			switch it.next() {
-				case SingleAsync(f):
-					f(function() {
-						processNextBatch();
-					});
-						
-				case BlockWithSync(funcs): 
-					try {
-						for (f in funcs) f();
-						processNextBatch();
-					}
-					catch (err : Dynamic) {
-						done(err);
-					}
-			}
-		}
-		
-		processNextBatch();
+
+		try for (f in syncQ) f()
+		catch (err : Dynamic) return done(err);
+
+		AsyncTools.aEachSeries(asyncQ, function(f, done) {
+			f(function() done());
+		}, done);
 	}
 
-	private function runTestFunc(func : TestFunc, done : Dynamic -> Void) {
-		try {
-			switch func {
-				case Async(f): f(function() done(null));
-				case Sync(f): f(); done(null);
-			}
-		} catch (e : Dynamic) {
-			done(e);
-		}
-	}
-	
 	private function flatten<T>(arr : Array<Array<T>>) : Array<T> {
 		return [for(a in arr) for(b in a) b];
+	}
+	
+	private function isSync(funcs : Iterable<TestFunc>) : Bool {
+		for (f in funcs) switch f {
+			case Async(_): return false;
+			case Sync(_):
+		}
+		return true;
 	}
 
 	private	function mapTestSpec(
@@ -306,7 +310,9 @@ class SuitesRunner
 		afterEachStack : Array<Array<TestFunc>>,
 		testSpec : TestSpec,
 		done : Dynamic -> Step -> Void
-	) : Void {
+	) 
+		: Null<SyncTestResult> 
+	{
 		var hasCompleted = false;
 		var oldFail : ?Dynamic -> ?PosInfos -> Void = null;
 		
@@ -327,11 +333,22 @@ class SuitesRunner
 					if (err != null) done(err, null);
 					else done(null, TSuite(newSuite));
 				});
+				return null;
 				
 			case It(desc, test, _):
 				// Assign top-level spec var here, so it can be used in reporting.
 				//trace("Starting it: " + desc);
 				var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
+				
+				var beforeEach = flatten(beforeEachStack);
+				var afterEach = flatten(afterEachStack);					
+				
+				var eachIsSync = isSync(beforeEach) && isSync(afterEach);
+
+				var returnSync = if(test == null) eachIsSync else switch test {
+					case Sync(_): eachIsSync;
+					case Async(_): false;
+				}
 				
 				// Log traces for each Spec, so they can be outputted in the reporter
 				if(!BuddySuite.useDefaultTrace) Log.trace = function(v, ?pos : PosInfos) {
@@ -345,9 +362,9 @@ class SuitesRunner
 					spec.failures.push(new Failure(error, stack));
 				}
 				
-				function specCompleted(status : SpecStatus) : Void {
-					if (hasCompleted) return;
-					hasCompleted = true;					
+				function specCompleted(status : SpecStatus) : Null<SyncTestResult> {
+					if (hasCompleted) return null;
+					hasCompleted = true;		
 					
 					if(spec.status == Unknown) spec.status = status;
 					
@@ -355,18 +372,28 @@ class SuitesRunner
 					if(!BuddySuite.useDefaultTrace) Log.trace = oldLog;
 					buddySuite.fail = oldFail;
 					buddySuite.pending = oldPending;
-
+					
+					var syncResult = null;
+					
 					// === Run afterEach
-					runTestFuncs(flatten(afterEachStack), function(err : Dynamic) {
-						if (err != null) done(err, null);
-						else reporter.progress(spec).then(function(_) done(null, TSpec(spec)));
+					runTestFuncs(afterEach, function(err : Dynamic) {
+						if (returnSync) {
+							syncResult = {error: err, step: err == null ? TSpec(spec) : null};
+							reporter.progress(spec);
+						} else {
+							if (err != null) done(err, null);
+							else reporter.progress(spec).then(function(_) {
+								done(null, TSpec(spec));
+							});
+						}
 					});
+					
+					return syncResult;
 				}
 
 				// Test if spec is Pending (has only description)
 				if (test == null) {
-					specCompleted(Pending);
-					return; // C# and Java cannot return specCompleted directly.
+					return specCompleted(Pending);
 				}
 
 				// Create a test function that will be used in Should
@@ -395,13 +422,8 @@ class SuitesRunner
 				#end
 				
 				#if (!php && !macro)
-				var isAsync = switch test {
-					case Async(_): true;
-					case Sync(_): false;
-				}
-				
 				// Set up timeout for the current spec
-				if(isAsync && buddySuite.timeoutMs > 0) {
+				if(!returnSync && buddySuite.timeoutMs > 0) {
 					BuddyAsync.wait(buddySuite.timeoutMs)
 						.catchError(function(e : Dynamic) { 
 							reportFailure(e, CallStack.exceptionStack());
@@ -414,35 +436,59 @@ class SuitesRunner
 				}
 				#end
 				
+				////////////////////////////////////////////////////////////////////////////
+				
+				var _syncResult : SyncTestResult = null;
+				
+				function setSyncResult(status) {
+					if (!returnSync || _syncResult != null) return; 
+					_syncResult = status;
+				}
+				
 				// Set up fail and pending function
 				buddySuite.fail = function(err : Dynamic = "Manually", ?p : PosInfos) {
 					reportFailure(err, posInfosToStack(p));
-					specCompleted(Failed);
+					setSyncResult(specCompleted(Failed));
 				}
 
 				buddySuite.pending = function(?message : String, ?p : PosInfos) {
 					var msg = p.fileName + ":" + p.lineNumber + (message != null ? ': $message' : '');
 					spec.traces.push(msg);
-					specCompleted(Pending);
+					setSyncResult(specCompleted(Pending));
 				}
-
+				
 				// === Run beforeEach
-				runTestFuncs(flatten(beforeEachStack), function(err) {
-					if (err != null) return done(err, null);
+				runTestFuncs(beforeEach, function(err) {
+					if (err != null) {
+						if(returnSync) setSyncResult({ error: err, step: null });
+						else done(err, null);
+						return;
+					}
 
-					// Run the test function, synchronous exceptions will be reported in 'err'.
+					function runTestFunc(func : TestFunc, done : Dynamic -> Void) {
+						try switch func {
+							case Async(f): f(function() done(null));
+							case Sync(f): f(); done(null);
+						} catch (e : Dynamic) {
+							done(e);
+						}
+					}
+					
 					runTestFunc(test, function(err) {
 						#if utest
 						checkUtestResults();
 						#end
 						if (err != null) {
 							reportFailure(err, CallStack.exceptionStack());
-							specCompleted(Failed);
+							setSyncResult(specCompleted(Failed));
 						}
-						else 
-							specCompleted(Passed);
+						else
+							setSyncResult(specCompleted(Passed));
 					});
 				});
+
+				//trace(_syncResult);
+				return _syncResult;
 		}
 	}	
 
