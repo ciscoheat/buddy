@@ -33,7 +33,7 @@ class AllTests implements Buddy<[
 	NestedBeforeAfter,
 	SimpleNestedBeforeAfter,
 	CallDoneTest,
-	#if !php HugeTest #end
+	HugeTest
 ]> {}
 
 class EmptyTestClass { public function new() {} }
@@ -772,7 +772,7 @@ class NestedBeforeAfter extends BuddySuite
 					order.push("IT3");
 					a.should.be(2);
 					
-					//trace(CallStack.callStack().map(function(s) return s + "\n"));
+					trace(CallStack.callStack().map(function(s) return s + "\n"));
 				});
 
 				afterEach({

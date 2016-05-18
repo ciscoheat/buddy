@@ -167,19 +167,25 @@ class SuitesRunner
 			var afterEachStack = [[]];
 			
 			AsyncTools.aMapSeries(buddySuites, function(buddySuite, done) { 
-				mapTestSuite(
-					buddySuite, 
-					buddySuite.suite, 
-					beforeEachStack, 
-					afterEachStack, 
-				function(err, suite) {
+				function suiteDone(err : Dynamic, suite : Suite) {
+					if (err == null && suite == null) return;
 					// Errors outside it()
 					if (err != null) {
 						suite.error = err;
 						suite.stack = CallStack.exceptionStack();
 					}
-					done(null, suite);
-				});
+					done(err, suite);
+				}
+				
+				var syncSuite = mapTestSuite(
+					buddySuite, 
+					buddySuite.suite, 
+					beforeEachStack, 
+					afterEachStack, 
+					suiteDone
+				);
+				if (syncSuite != null) suiteDone(syncSuite.error, syncSuite.suite);
+				
 			}, function(err, suites) {
 				if (err != null) haveUnrecoverableError(err);
 				else {
@@ -219,7 +225,7 @@ class SuitesRunner
 		beforeEachStack : Array<Array<TestFunc>>,
 		afterEachStack : Array<Array<TestFunc>>,
 		done : Dynamic -> Suite -> Void
-	) : Void {
+	) : Null<SyncSuiteResult> {
 		var currentSuite = buddy.tests.SelfTest.lastSuite = new Suite(testSuite.description);
 		
 		beforeEachStack.push(testSuite.beforeEach.array());
@@ -271,7 +277,8 @@ class SuitesRunner
 			});
 		});
 		
-		if (result != null) done(result.error, result.suite);
+		if (result != null) done(null, null);		
+		return result;
 	}
 
 	private function runTestFuncs(funcs : Iterable<TestFunc>, done : Dynamic -> Void) {
@@ -329,11 +336,13 @@ class SuitesRunner
 		switch testSpec {
 			case Describe(testSuite, _): 
 				// === Map TestSuite -> Suite
-				mapTestSuite(buddySuite, testSuite, beforeEachStack, afterEachStack, function(err : Dynamic, newSuite : Suite) {
+				var result = mapTestSuite(buddySuite, testSuite, beforeEachStack, afterEachStack, function(err : Dynamic, newSuite : Suite) {
+					if (err == null && newSuite == null) return;					
 					if (err != null) done(err, null);
 					else done(null, TSuite(newSuite));
 				});
-				return null;
+				if (result != null) return { error: result.error, step: TSuite(result.suite) };
+				else return null;
 				
 			case It(desc, test, _):
 				// Assign top-level spec var here, so it can be used in reporting.
