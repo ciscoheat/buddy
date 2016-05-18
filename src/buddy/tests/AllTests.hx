@@ -772,7 +772,7 @@ class NestedBeforeAfter extends BuddySuite
 					order.push("IT3");
 					a.should.be(2);
 					
-					trace(CallStack.callStack().map(function(s) return s + "\n"));
+					//trace(CallStack.callStack().map(function(s) return s + "\n"));
 				});
 
 				afterEach({
