@@ -130,7 +130,11 @@ class TraceReporter implements Reporter
 
 	private function println(s : String) {
 		// Override when needed.
+		#if flash
+		flash.Lib.trace(s);
+		#else
 		trace(s);
+		#end
 	}
 	
 	private function strCol(color : Color) return this.colors ? color.ansiCode() : "";
