@@ -39,7 +39,11 @@ class TraceReporter implements Reporter
 	}
 
 	public function done(suites : Iterable<Suite>, status : Bool) {
+		#if (js && !nodejs)
+		// Skip newline, already printed in console.log()
+		#else
 		println("");
+		#end
 
 		var total = 0;
 		var failures = 0;

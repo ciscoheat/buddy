@@ -22,6 +22,8 @@ private typedef Sys = Flash;
 
 class ConsoleReporter extends TraceReporter
 {
+	var progressString = "";
+	
 	public function new(colors = false) {
 		super(colors);
 	}
@@ -31,9 +33,6 @@ class ConsoleReporter extends TraceReporter
 		// A small convenience for PHP, to avoid creating a new reporter.
 		#if php
 		if (untyped __call__("php_sapi_name") != "cli") println("<pre>");
-		#elseif (js && !nodejs)
-		Js.outputElement = Browser.document.createPreElement();
-		Browser.document.body.appendChild(Js.outputElement);
 		#end
 
 		return resolveImmediately(true);
@@ -41,18 +40,25 @@ class ConsoleReporter extends TraceReporter
 
 	override public function progress(spec : Spec)
 	{
-		print((switch(spec.status) {
+		var status = switch(spec.status) {
 			case Failed: strCol(Red) + "X";
 			case Passed: strCol(Green) + ".";
 			case Pending: strCol(Yellow) + "P";
 			case Unknown: strCol(Yellow) + "?";
-		}) + strCol(Default));
+		}
+		
+		progressString += status;
+		print(status + strCol(Default));
 
 		return resolveImmediately(spec);
 	}
 
 	override public function done(suites : Iterable<Suite>, status : Bool)
 	{
+		#if (js && !nodejs)
+		Sys.println(progressString);
+		#end
+		
 		var output = super.done(suites, status);
 
 		#if php

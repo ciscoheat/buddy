@@ -1,23 +1,30 @@
 package buddy.internal.sys;
+
 #if js
-import js.html.Element;
-import js.html.DivElement;
-import js.html.Text;
-import js.html.SpanElement;
 import js.Browser;
 using StringTools;
 
 class Js
 {
-	// Set in ConsoleReporter
-	public static var outputElement : Element;
+	static var completed = ~/^\d+ specs, (\d+) failures, (\d+) pending$/;
 	
 	public static function print(s : String) {
-		outputElement.innerHTML += s;
 	}
 
 	public static function println(s : String) {
-		outputElement.innerHTML += s + "\n";
+		var log = Browser.window.console;
+		if (completed.match(s)) {
+			switch Std.parseInt(completed.matched(1)) {
+				case 0: 
+					switch Std.parseInt(completed.matched(2)) {
+						case 0: log.info('%c$s', 'color: green');
+						case _: log.warn('%c$s', 'color: green');
+					}
+					
+				case _: log.error(s);
+			}
+		} else 
+			log.log(s);
 	}
 }
 #end
