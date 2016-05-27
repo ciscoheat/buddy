@@ -5,6 +5,7 @@
 -lib slambda
 -js bin/buddy.js
 -main buddy.tests.AllTests
+-D reporter=buddy.reporting.TraceReporter
 -D buddy-no-colors
 -cmd echo "---------- JS (PhantomJS) ----------"
 -cmd cp src/buddy/tests/index.html bin

@@ -136,6 +136,8 @@ class TraceReporter implements Reporter
 		// Override when needed.
 		#if flash
 		flash.Lib.trace(s);
+		#elseif (js && !nodejs)
+		js.Browser.document.writeln(s);
 		#else
 		trace(s);
 		#end
