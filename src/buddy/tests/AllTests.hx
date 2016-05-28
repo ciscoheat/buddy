@@ -3,20 +3,20 @@ package buddy.tests ;
 import buddy.BuddySuite;
 import buddy.tests.AllTests.ColorTree;
 import buddy.tools.AsyncTools;
+import buddy.CompilationShould;
+
 import haxe.CallStack;
 import haxe.Int64;
 import promhx.Deferred;
 import promhx.Promise;
-
 import Slambda.fn;
 import utest.Assert;
 
 using buddy.Should;
-
 using Slambda;
 using StringTools;
 
-@colors
+@colorize
 class AllTests implements Buddy<[
 	TestBasicFeatures,
 	TestExclude,
@@ -33,6 +33,7 @@ class AllTests implements Buddy<[
 	NestedBeforeAfter,
 	SimpleNestedBeforeAfter,
 	CallDoneTest,
+	CompilationFailTest,
 	HugeTest
 ]> {}
 
@@ -931,6 +932,35 @@ class CallDoneTest extends BuddySuite
 		});
 	}
 }
+
+class CompilationFailTest extends BuddySuite
+{
+	public function new()
+	{
+		describe("A test calling CompilationShould.failFor with an non-compiling expression", {
+			it('should pass the test', {
+				CompilationShould.failFor(this.is.not.compiling);
+			});
+		});
+		
+		describe("A test calling CompilationShould.failFor with an compiling expression", {
+			it('should fail the test', {
+				CompilationShould.failFor(BuddySuite.useDefaultTrace);
+			});
+			
+			afterEach({
+				var test = SelfTest.lastSpec;
+				SelfTest.passLastSpecIf(test.failures.length == 1 && test.status == Failed, 
+					"Failed when calling 'CompilationShould.failFor' with a valid expression."
+				);
+			});
+		});
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class HugeTest extends BuddySuite
 {

@@ -7,7 +7,7 @@
 -main buddy.tests.AllTests
 --times
 -D reporter=buddy.reporting.TraceReporter
--D fdb-ci
+-D flash-exit
 -D macro-times
 -cmd echo "---------- Flash (xvfb-run) ----------"
 -cmd chmod +x flash-travis-run.sh && ./flash-travis-run.sh

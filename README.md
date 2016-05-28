@@ -189,6 +189,10 @@ Same as Int plus
 
 `a.should.match(regexp)` - Test if `a` matches a regular expression (`EReg`).
 
+`a.should.startWith(substr)` - Test if `a` starts with a given substring.
+
+`a.should.endWith(substr)` - Test if `a` ends with a given substring.
+
 ### Date
 
 `a.should.beOn(date)` - Test if `a` is on a given date
@@ -227,7 +231,11 @@ If the function signature is `String -> Void` then apply the string argument lik
 
 `a.bind("test").should.throwAnything()`
 
-The above methods will return the exception object, so it can be tested further. This works synchonously only.
+You can also test an anonymous function directly:
+	
+`(function() { throw "error"; }).should.throwType(String)`
+
+The throw methods will return the exception object, so it can be tested further. This works synchonously only.
 
 ### Inverting assertions
 
@@ -257,6 +265,27 @@ it("should also fail when throwing an exception", {
     throw "But only synchronously!";
 });
 ```
+
+## Testing compilation failures
+
+If you want to test if some part of your code fails to compile, guess what, there is a macro for that:
+
+```haxe
+import buddy.CompilationShould;
+
+class Main extends buddy.SingleSuite
+{
+    public function new() {
+        describe("Using CompilationShould", {
+            it("should pass if an expression won't compile", {
+				CompilationShould.failFor(this.will.not.compile);
+			});
+        });
+    }
+}
+```
+
+The method will return a string representation of the compilation failure, or an empty string if compilation succeded, in case you want to test it further.
 
 ## General error handling
 
@@ -332,23 +361,35 @@ class Tests extends BuddySuite
 }
 ```
 
-## Customizing reporting and output
+## Customizing output and reporting
 
-If the default console reporter isn't to your liking, you can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are two ways to use it:
+### Adding colors
 
-### Metadata
+Enable ANSI color output is easy:
 
 ```haxe
-@reporter("path.to.your.Reporter") // Set reporter
-@colors // Enable ANSI color output
-class Main implements Buddy<[Tests]> {}
+@colorize
+class Main extends buddy.SingleSuite {
+	// ...
+}
 ```
 
-### Compilation flags
+Or you can do it when compiling with `-D buddy-colors`, or disallow it with `-D buddy-no-colors`.
 
-`-D reporter=path.to.your.Reporter` - Set reporter
+The compilation flag will override the metadata, if both are set.
 
-`-D buddy-colors`, `-D buddy-no-colors` - Enable/disable ANSI color output (default is disabled)
+### Creating a custom reporter
+
+You can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are two ways to use it:
+
+```haxe
+@reporter("path.to.your.Reporter")
+class Main extends buddy.SingleSuite {
+	// ...
+}
+```
+
+Or do it when compiling with `-D reporter=path.to.your.Reporter`.
 
 The compilation flag will override the metadata, if both are set.
 
@@ -358,9 +399,9 @@ The compilation flag will override the metadata, if both are set.
 
 `buddy.reporting.ConsoleColorReporter` is identical to the default reporter but with ANSI color output. This reporter will be used if colors are enabled with metadata or compilation flags, as specified above.
 
-`buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI in Flash together with the `-D fdb-ci` compiler flag. See the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
+`buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI in Flash together with the `-D flash-exit` compiler flag. See the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
 
-`buddy.reporting.TravisHxReporter` is made for [travis-hx](https://github.com/waneck/travis-hx) which is a standardized solution for using [Travis](https://travis-ci.org/) with Haxe. Very nice!
+`buddy.reporting.TravisHxReporter` is made for [travis-hx](https://github.com/waneck/travis-hx) which is a standardized solution for using [Travis](https://travis-ci.org/) with Haxe, though I really recommend [travix](https://github.com/back2dos/travix) for that (quick and easy to set up, and it doesn't require a custom reporter).
 
 ## FAQ
 

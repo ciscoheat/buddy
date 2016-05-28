@@ -128,7 +128,7 @@ class GenerateMain
 		var cls = Context.getLocalClass().get();
 		
 		var colors = ["buddy-colors", "buddy_colors"].exists(Context.defined) || 
-			["buddy-colors", "buddy_colors", "colors", "color"].exists(cls.meta.has);
+			["buddy-colors", "buddy_colors", "colors", "color", "colorize"].exists(cls.meta.has);
 
 		if (["buddy-no-colors", "buddy_no_colors"].exists(Context.defined))
 			colors = false;
@@ -243,7 +243,7 @@ class GenerateMain
 				startRun(function() Sys.exit(runner.statusCode()));
 			};
 		}
-		else if (Context.defined("fdb-ci") || Context.defined("exit-flash"))
+		else if (Context.defined("fdb-ci") || Context.defined("exit-flash") || Context.defined("flash-exit"))
 		{
 			// If defined, flash will exit. (For CI usage)
 			body = macro {

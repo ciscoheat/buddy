@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.1.0",
-  "releasenote": "ConsoleReporter now outputs to console for js/browser.",
+  "version": "2.2.0",
+  "releasenote": "Compilation failures can now be tested.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }
