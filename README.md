@@ -399,9 +399,7 @@ The compilation flag will override the metadata, if both are set.
 
 `buddy.reporting.ConsoleColorReporter` is identical to the default reporter but with ANSI color output. This reporter will be used if colors are enabled with metadata or compilation flags, as specified above.
 
-`buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI in Flash together with the `-D flash-exit` compiler flag. See the [travis flash script](https://github.com/ciscoheat/buddy/blob/master/flash-travis-setup.sh) and the [flash hxml](https://github.com/ciscoheat/buddy/blob/master/buddy.flash.hxml), hopefully you can get some help from there.
-
-`buddy.reporting.TravisHxReporter` is made for [travis-hx](https://github.com/waneck/travis-hx) which is a standardized solution for using [Travis](https://travis-ci.org/) with Haxe, though I really recommend [travix](https://github.com/back2dos/travix) for that (quick and easy to set up, and it doesn't require a custom reporter).
+`buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI with flash. See the FAQ question for information how to use flash in CI tools like travis.
 
 ## FAQ
 
@@ -424,6 +422,14 @@ Yes, there is special support for [utest](http://code.google.com/p/utest/) and g
 ### There's an exception thrown in an asynchronous method, but Buddy won't catch it and fail the test?
 
 It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done` in the spec, or use the `fail` method as described in the section "Failing tests".
+
+### Is it really possible to use flash in CI?
+
+Yes, but doing it manually is quite tricky! The easiest way is to use [travix](https://github.com/back2dos/travix), with the following parameters:
+
+```
+haxelib run travix flash -D flash-exit -D reporter=buddy.reporting.TraceReporter
+```
 
 ### I'm having problem compiling with C++
 
