@@ -26,6 +26,7 @@ before_install:
   - haxelib install utest
   - haxelib install slambda
   - haxelib install asynctools
+  - haxelib install tink_await
 
   # apt packages for each target
   - sudo apt-get update

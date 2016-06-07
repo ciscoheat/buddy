@@ -4,6 +4,7 @@ import buddy.BuddySuite;
 import buddy.tests.AllTests.ColorTree;
 import buddy.tools.AsyncTools;
 import buddy.CompilationShould;
+import tink.core.Future;
 
 import haxe.CallStack;
 import haxe.Int64;
@@ -36,6 +37,7 @@ class AllTests implements Buddy<[
 	SimpleNestedBeforeAfter,
 	CallDoneTest,
 	CompilationFailTest,
+	TinkAwaitTest,
 	HugeTest
 ]> {}
 
@@ -957,6 +959,33 @@ class CompilationFailTest extends BuddySuite
 				);
 			});
 		});
+	}
+}
+
+@await
+class TinkAwaitTest extends BuddySuite 
+{
+	@:await public function new() {
+		describe("Using tink_await with @await and @async on a BuddySuite", @await function() {
+			it("should work properly", @await function(done) {
+				var status : Bool = @:await new UsingTinkAwait().waitForIt();
+				status.should.be(true);
+				done();
+			});
+		});
+	}
+}
+
+class UsingTinkAwait
+{
+	public function new() {}
+
+	public function waitForIt() {
+		#if !php
+		return Future.async(function(cb) AsyncTools.wait(1).then(cb));
+		#else
+		return Future.sync(true);
+		#end
 	}
 }
 
