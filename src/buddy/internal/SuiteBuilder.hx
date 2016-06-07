@@ -89,16 +89,22 @@ class SuiteBuilder
 				injectAsync(e);
 			
 			///// Describe
-
-			case macro describe($s, function() $f):
-				var change = macro describe($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
-				e.expr = change.expr;
-				f.iter(injectAsync);
-
-			case macro describe($s, function($n) $f):
-				var change = macro describe($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
-				e.expr = change.expr;
-				f.iter(injectAsync);
+			
+			case macro describe($s, $f):
+				var change = switch getFunction(f) {
+					case null:
+						var change = macro describe($s, function() $f);
+						e.expr = change.expr;
+						injectAsync(e);
+					case fun if(fun.args.length == 0):
+						var change = macro describe($s, buddy.BuddySuite.TestFunc.Sync($f));
+						e.expr = change.expr;
+						f.iter(injectAsync);
+					default:
+						var change = macro describe($s, buddy.BuddySuite.TestFunc.Async($f));
+						e.expr = change.expr;
+						f.iter(injectAsync);
+				}
 
 			case macro describe($s, function() $f, $i):
 				var change = macro describe($s, buddy.BuddySuite.TestFunc.Sync(function() $f), $i);
@@ -109,11 +115,6 @@ class SuiteBuilder
 				var change = macro describe($s, buddy.BuddySuite.TestFunc.Async(function($n) $f), $i);
 				e.expr = change.expr;
 				f.iter(injectAsync);
-
-			case macro describe($s, $f):
-				var change = macro describe($s, function() $f);
-				e.expr = change.expr;
-				injectAsync(e);
 
 			case macro describe($s, $f, $i):
 				var change = macro describe($s, function() $f, $i);
@@ -159,18 +160,20 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
-			case macro beforeEach(function($n) $f):
-				var change = macro beforeEach(buddy.BuddySuite.TestFunc.Async(function($n) $f));
-				e.expr = change.expr;
-				f.iter(injectAsync);
-
 			case macro before(function() $f), macro before($f):
 				var change = macro @:pos(e.pos) before(buddy.BuddySuite.TestFunc.Sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
-
-			case macro beforeEach(function() $f), macro beforeEach($f):
-				var change = macro beforeEach(buddy.BuddySuite.TestFunc.Sync(function() $f));
+				
+			case macro beforeEach($f):
+				var change = switch getFunction(f) {
+					case null:
+						macro beforeEach(buddy.BuddySuite.TestFunc.Sync(function() $f));
+					case fun if(fun.args.length == 0):
+						macro beforeEach(buddy.BuddySuite.TestFunc.Sync($f));
+					default:
+						macro beforeEach(buddy.BuddySuite.TestFunc.Async($f));
+				}
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
@@ -217,40 +220,48 @@ class SuiteBuilder
 				f.iter(injectAsync);			
 				
 			///// It
-
-			case macro it($s), macro it($s, {}), macro it($s, function() {}):
+			
+			case macro it($s):
 				var change = macro xit($s, null);
 				e.expr = change.expr;
-
-			case macro it($s, function($n) $f):
-				var change = macro it($s, buddy.BuddySuite.TestFunc.Async(function($n) $f));
-				e.expr = change.expr;
-				f.iter(injectAsync);
 				
-			case macro it($s, function() $f):
-				var change = macro it($s, buddy.BuddySuite.TestFunc.Sync(function() $f));
-				e.expr = change.expr;
-				f.iter(injectAsync);
-
-			case macro it($s, function() $f, $i):
-				var change = macro it($s, buddy.BuddySuite.TestFunc.Sync(function() $f), $i);
-				e.expr = change.expr;
-				f.iter(injectAsync);
-
-			case macro it($s, function($n) $f, $i):
-				var change = macro it($s, buddy.BuddySuite.TestFunc.Async(function($n) $f), $i);
-				e.expr = change.expr;
-				f.iter(injectAsync);
-
 			case macro it($s, $f):
-				var change = macro it($s, function() $f);
-				e.expr = change.expr;
-				injectAsync(e);				
+				if(isEmptyBlock(f)) {
+					var change = macro xit($s, null);
+					e.expr = change.expr; 
+				} else {
+					switch getFunction(f) {
+						case null: 
+							var change = macro it($s, function() $f);
+							e.expr = change.expr;
+							injectAsync(e);
+						case fun if(fun.args.length == 0):
+							var change = macro it($s, buddy.BuddySuite.TestFunc.Sync($f));
+							e.expr = change.expr;
+							f.iter(injectAsync);
+						default:
+							var change = macro it($s, buddy.BuddySuite.TestFunc.Async($f));
+							e.expr = change.expr;
+							f.iter(injectAsync);
+					}
+				}
 				
 			case macro it($s, $f, $i):
-				var change = macro it($s, function() $f, $i);
-				e.expr = change.expr;
-				injectAsync(e);
+				switch getFunction(f) {
+					case null: 
+						var change = macro it($s, function() $f, $i);
+						e.expr = change.expr;
+						injectAsync(e);
+					case fun if(fun.args.length == 0):
+						var change = macro it($s, buddy.BuddySuite.TestFunc.Sync($f), $i);
+						e.expr = change.expr;
+						f.iter(injectAsync);
+					default:
+						var change = macro it($s, buddy.BuddySuite.TestFunc.Async($f), $i);
+						e.expr = change.expr;
+						f.iter(injectAsync);
+				
+				}
 
 			///// Xit
 
@@ -288,6 +299,20 @@ class SuiteBuilder
 			case _: e.iter(injectAsync);
 		}
 	}
+	
+	static function getFunction(e:Expr)
+		return switch e.expr {
+			case EFunction(_, f): f;
+			case EMeta(_, e): getFunction(e);
+			default: null;
+		}
+		
+	static function isEmptyBlock(e:Expr)
+		return switch e.expr {
+			case EBlock(a) if(a.length == 0): true;
+			case EMeta(_, e): isEmptyBlock(e);
+			default: false;
+		}
 
 	macro public static function build() : Array<Field>
 	{
