@@ -94,7 +94,7 @@ class SuiteBuilder
 			///// Describe
 			
 			case macro describe($s, $f):
-				var change = switch getFunction(f) {
+				switch getFunction(f) {
 					case null:
 						var change = macro describe($s, function() $f);
 						e.expr = change.expr;
