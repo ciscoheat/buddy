@@ -305,7 +305,7 @@ class SuitesRunner
 	private function isSync(funcs : Iterable<TestFunc>) : Bool {
 		for (f in funcs) switch f {
 			case Async(_): return false;
-			case Sync(_):
+			default:
 		}
 		return true;
 	}
