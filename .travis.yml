@@ -18,8 +18,8 @@ env:
 
 before_install:
   # Install Haxe
-  - wget http://www.openfl.org/builds/haxe/haxe-3.2.1-linux-installer.tar.gz -O - | tar -xv
-  - sudo sh install-haxe.sh -y
+  - wget http://ciscoheat.github.io/cdn/haxe/haxe-3.2.1-linux-installer.sh
+  - sudo sh haxe-3.2.1-linux-installer.sh -y
 
   # haxelib dependencies for all targets
   - haxelib install promhx
