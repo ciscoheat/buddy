@@ -400,8 +400,6 @@ The compilation flag will override the metadata, if both are set.
 `buddy.reporting.ConsoleColorReporter` is identical to the default reporter but with ANSI color output. This reporter will be used if colors are enabled with metadata or compilation flags, as specified above.
 
 `buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI with flash. If you define `-D flash-exit`, the default reporter will be the TraceReporter, and flash will exit if the correct permissions are set. This is tricky to get right, so the easiest way is to use [travix](https://github.com/back2dos/travix/).
-```
-
 
 ## FAQ
 
