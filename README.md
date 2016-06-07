@@ -399,7 +399,9 @@ The compilation flag will override the metadata, if both are set.
 
 `buddy.reporting.ConsoleColorReporter` is identical to the default reporter but with ANSI color output. This reporter will be used if colors are enabled with metadata or compilation flags, as specified above.
 
-`buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI with flash. See the FAQ question for information how to use flash in CI tools like travis.
+`buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI with flash. If you define `-D flash-exit`, the default reporter will be the TraceReporter, and flash will exit if the correct permissions are set. This is tricky to get right, so the easiest way is to use [travix](https://github.com/back2dos/travix/).
+```
+
 
 ## FAQ
 
@@ -422,14 +424,6 @@ Yes, there is special support for [utest](http://code.google.com/p/utest/) and g
 ### There's an exception thrown in an asynchronous method, but Buddy won't catch it and fail the test?
 
 It's not possible to do that, since the program has already passed the exception handling code when the exception is thrown. You need to handle asynchronous exceptions yourself and test if something went wrong before calling `done` in the spec, or use the `fail` method as described in the section "Failing tests".
-
-### Is it really possible to use flash in CI?
-
-Yes, but doing it manually is quite tricky! The easiest way is to use [travix](https://github.com/back2dos/travix), with the following parameters:
-
-```
-haxelib run travix flash -D flash-exit -D reporter=buddy.reporting.TraceReporter
-```
 
 ### I'm having problem compiling with C++
 

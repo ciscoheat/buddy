@@ -133,7 +133,12 @@ class GenerateMain
 		if (["buddy-no-colors", "buddy_no_colors"].exists(Context.defined))
 			colors = false;
 
-		var reporter = colors ? "buddy.reporting.ConsoleColorReporter" : "buddy.reporting.ConsoleReporter";
+		// Set default reporter
+		var reporter = if (flashCI()) {
+			"buddy.reporting.TraceReporter";
+		} else {
+			colors ? "buddy.reporting.ConsoleColorReporter" : "buddy.reporting.ConsoleReporter";
+		}
 
 		if (Context.defined("reporter"))
 		{
@@ -163,6 +168,9 @@ class GenerateMain
 
 		return include.length > 0 ? include : output;
 	}
+	
+	private static function flashCI() 
+		return Context.defined("fdb-ci") || Context.defined("exit-flash") || Context.defined("flash-exit");
 
 	private static function buildMain(exprs : Array<Expr>, cls : ClassType, reporter : String, ?allSuites : ExprOf<Array<BuddySuite>>) {
 		if (allSuites == null) Context.error("No BuddySuites found.", cls.pos);
@@ -243,9 +251,8 @@ class GenerateMain
 				startRun(function() Sys.exit(runner.statusCode()));
 			};
 		}
-		else if (Context.defined("fdb-ci") || Context.defined("exit-flash") || Context.defined("flash-exit"))
+		else if (flashCI())
 		{
-			// If defined, flash will exit. (For CI usage)
 			body = macro {
 				startRun(function() flash.system.System.exit(runner.statusCode()));
 			}

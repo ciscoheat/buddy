@@ -16,7 +16,9 @@ using buddy.Should;
 using Slambda;
 using StringTools;
 
+#if !flash
 @colorize
+#end
 class AllTests implements Buddy<[
 	TestBasicFeatures,
 	TestExclude,
