@@ -3,6 +3,7 @@
 -lib promhx
 -lib utest
 -lib slambda
+-lib tink_await
 -swf bin/buddy.swf
 -main buddy.tests.AllTests
 --times

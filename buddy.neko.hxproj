@@ -33,7 +33,7 @@
     <library name="promhx" />
     <library name="utest" />
     <library name="slambda" />
-    <library name="HaxeContracts" />
+    <library name="tink_await" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
