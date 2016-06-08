@@ -38,7 +38,7 @@ class AllTests implements Buddy<[
 	SimpleNestedBeforeAfter,
 	CallDoneTest,
 	CompilationFailTest,
-	HugeTest
+//	HugeTest
 ]> {}
 
 class EmptyTestClass { public function new() {} }
@@ -125,7 +125,7 @@ class TestBasicFeatures extends BuddySuite
 			});			
 		});
 
-		#if (!php && !lua)
+		#if !php
 		describe("Testing async describe definitions", function(done) {
 			var a = 0;
 
