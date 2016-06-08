@@ -125,7 +125,7 @@ class TestBasicFeatures extends BuddySuite
 			});			
 		});
 
-		#if !php
+		#if (!php && !lua)
 		describe("Testing async describe definitions", function(done) {
 			var a = 0;
 
@@ -345,10 +345,10 @@ class TestBasicFeatures extends BuddySuite
 			var k = function(a : String) : String { return throw a.toUpperCase(); };
 
 			it("should have a be method", {
-				f.should().be(f);
-				j.should().be(j);
+				f.should.be(f); // Fails on lua?
+				j.should.be(j);
 				
-				f.should().not.be(function() { throw "a"; });
+				f.should().not.be(function() { return throw "a"; });
 				j.should().not.be(k);
 			});
 			
