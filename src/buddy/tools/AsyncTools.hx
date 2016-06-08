@@ -54,7 +54,7 @@ class AsyncTools
 		});
 		#elseif python
 		new Timer(ms / 1000, done).start();
-		#elseif (js || flash)
+		#elseif (js || flash || lua)
 		Timer.delay(function() done(), ms);
 		#elseif cs
 		var t = new Timer(ms);

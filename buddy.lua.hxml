@@ -1,0 +1,10 @@
+-cp src 
+-lib asynctools
+-lib promhx
+-lib utest
+-lib slambda
+-lib tink_await
+-lua bin/buddy.lua.lua
+-main buddy.tests.AllTests
+-cmd echo "---------- Lua ----------"
+-cmd lua bin/buddy.lua.lua
