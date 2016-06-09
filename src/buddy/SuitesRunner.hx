@@ -184,7 +184,9 @@ class SuitesRunner
 					afterEachStack, 
 					suiteDone
 				);
-				if (syncSuite != null) suiteDone(syncSuite.error, syncSuite.suite);
+				if (syncSuite != null) {
+					suiteDone(syncSuite.error, syncSuite.suite);
+				}
 				
 			}, function(err, suites) {
 				if (err != null) haveUnrecoverableError(err);
@@ -238,7 +240,7 @@ class SuitesRunner
 		// === Run beforeAll
 		runTestFuncs(testSuite.beforeAll, function(err) {
 			if (err != null) {
-				if (isSync(testSuite.beforeAll)) result = { error: err, suite: null };
+				if (isSync(testSuite.beforeAll)) result = { error: err, suite: currentSuite };
 				else done(err, currentSuite);
 				return;
 			}
@@ -251,19 +253,21 @@ class SuitesRunner
 					cb(result2.error, result2.step);
 				}
 			}, function(err : Dynamic, testSteps : Array<Step>) {
+				// It's important to return currentSuite as well in this function, not null.
+				
 				allSync = allSync && testSteps.length == syncResultCount;
 				
 				if (err != null) {
-					if (!allSync) done(err, currentSuite);
-					else result = { error: err, suite: null };
+					if (allSync) result = { error: err, suite: currentSuite }; 
+					else done(err, currentSuite);
 					return;
 				}
 				
 				// === Run afterAll
 				runTestFuncs(testSuite.afterAll, function(err) {
 					if (err != null) {
-						if (!allSync) done(err, currentSuite);
-						else result = { error: err, suite: null };
+						if (allSync) result = { error: err, suite: currentSuite };
+						else done(err, currentSuite);
 						return;
 					}
 					
@@ -271,8 +275,8 @@ class SuitesRunner
 					beforeEachStack.pop();
 					afterEachStack.shift();
 
-					if (!allSync) done(null, currentSuite);
-					else result = { error: null, suite: currentSuite };
+					if (allSync) result = { error: null, suite: currentSuite };
+					else done(null, currentSuite);
 				});
 			});
 		});
@@ -337,7 +341,7 @@ class SuitesRunner
 			case Describe(testSuite, _): 
 				// === Map TestSuite -> Suite
 				var result = mapTestSuite(buddySuite, testSuite, beforeEachStack, afterEachStack, function(err : Dynamic, newSuite : Suite) {
-					if (err == null && newSuite == null) return;					
+					if (err == null && newSuite == null) return;
 					if (err != null) done(err, null);
 					else done(null, TSuite(newSuite));
 				});
