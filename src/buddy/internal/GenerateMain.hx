@@ -260,13 +260,7 @@ class GenerateMain
 		else if(Context.defined('js') && Context.defined('travix') && !Context.defined('nodejs'))
 		{
 			body = macro {
-				startRun(function() {
-					var callPhantom = untyped js.Browser.window.callPhantom;
-					callPhantom({
-						cmd: 'travix:exit',
-						exitCode: runner.statusCode()
-					});
-				});
+				startRun(function() travix.Logger.exit(runner.statusCode()));
 			}
 		}
 		else

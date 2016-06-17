@@ -10,21 +10,13 @@ class Js
 	
 	public static function print(s : String) {
 		#if travix
-			var callPhantom = untyped js.Browser.window.callPhantom;
-			callPhantom({
-				cmd: 'travix:print',
-				message: s
-			});
+			travix.Logger.print(s);
 		#end
 	}
 
 	public static function println(s : String) {
 		#if travix
-			var callPhantom = untyped js.Browser.window.callPhantom;
-			callPhantom({
-				cmd: 'travix:println',
-				message: s
-			});
+			travix.Logger.println(s);
 		#else
 			var log = Browser.window.console;
 			if (completed.match(s)) {
