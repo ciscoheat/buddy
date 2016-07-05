@@ -257,6 +257,12 @@ class GenerateMain
 				startRun(function() flash.system.System.exit(runner.statusCode()));
 			}
 		}
+		else if(Context.defined('js') && Context.defined('travix') && !Context.defined('nodejs'))
+		{
+			body = macro {
+				startRun(function() travix.Logger.exit(runner.statusCode()));
+			}
+		}
 		else
 		{
 			body = macro {
