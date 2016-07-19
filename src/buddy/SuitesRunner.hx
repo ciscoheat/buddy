@@ -56,6 +56,7 @@ class SuitesRunner
 	private var buddySuites : Iterable<BuddySuite>;
 	private var reporter : Reporter;
 	private var runCompleted : Deferred<SuitesRunner>;
+	private var includeMode : Bool;
 	
 	private var oldLog : Dynamic -> ?PosInfos -> Void;
 
@@ -71,6 +72,7 @@ class SuitesRunner
 		this.buddySuites = buddySuites;
 		this.reporter = reporter == null ? new buddy.reporting.ConsoleReporter() : reporter;
 		this.oldLog = Log.trace;
+		this.includeMode = Reflect.hasField(Meta.getType(BuddySuite), "includeMode");
 	}
 	
 	public function run() : Promise<SuitesRunner> {
@@ -82,8 +84,13 @@ class SuitesRunner
 		var runCompletedPromise = runCompleted.promise();
 
 		runDescribes(function(err) {
-			if (err != null) haveUnrecoverableError(err);
-			else startRun();
+			if (err != null) {
+				haveUnrecoverableError(err);
+				return;
+			}
+			
+			if (includeMode) startIncludeMode();
+			startRun();
 		});
 		
 		return runCompletedPromise;
@@ -113,14 +120,6 @@ class SuitesRunner
 			}
 		}
 		
-		function processCompleted(err : Dynamic) {
-			if (err != null) return cb(err);
-
-			// If includes exists, start pruning the Suite tree.
-			if (Reflect.hasField(Meta.getType(BuddySuite), "includeMode")) startIncludeMode();
-			cb(null);
-		}
-		
 		function processBuddySuites() : Void {
 			// Process the queue of describe calls
 			for (buddySuite in buddySuites) processSuiteDescribes(buddySuite);
@@ -130,7 +129,7 @@ class SuitesRunner
 					test.buddySuite.currentSuite = test.testSuite;
 					test.run();
 				} catch (err : Dynamic) {
-					return processCompleted(err);
+					return cb(err);
 				}
 				
 				syncQueue = [];
@@ -140,7 +139,7 @@ class SuitesRunner
 					test.buddySuite.currentSuite = test.testSuite;
 					test.run(function() cb(null));
 				}, function(err) {
-					if (err != null) return processCompleted(err);
+					if (err != null) return cb(err);
 					asyncQueue = [];
 					processBuddySuites();
 				});
