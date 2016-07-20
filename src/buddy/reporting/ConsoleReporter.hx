@@ -55,7 +55,7 @@ class ConsoleReporter extends TraceReporter
 
 	override public function done(suites : Iterable<Suite>, status : Bool)
 	{
-		#if (js && !nodejs)
+		#if (js && !nodejs && !travix)
 		Sys.println(progressString);
 		#end
 		
