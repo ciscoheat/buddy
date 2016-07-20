@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.5.1",
-  "releasenote": "Fixed issue with include metadata.",
+  "version": "2.5.2",
+  "releasenote": "Travix output fix.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }
