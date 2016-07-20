@@ -39,7 +39,7 @@ class TraceReporter implements Reporter
 	}
 
 	public function done(suites : Iterable<Suite>, status : Bool) {
-		#if (js && !nodejs)
+		#if (js && !nodejs && !travix)
 		// Skip newline, already printed in console.log()
 		#else
 		println("");
