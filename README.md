@@ -329,7 +329,12 @@ There is also a `pending(reason : String)` method available to make a spec pendi
 
 ## Including and excluding tests
 
-Classes, suites and specs can all be marked with `@include` and `@exclude`. `@include` will only run the tests that are marked, `@exclude` does the opposite, it prevents the marked ones from running. If you have a huge test suite, it can be convenient to mark the suite you're currently working on with `@include`. You can also use `xit()` and `xdescribe()` to exclude specs and suites from running.
+Classes, suites and specs can all be marked with `@include` and `@exclude` metadata.
+
+* `@include` will only run the tests that are marked, removing everything else.
+* `@exclude` does the opposite, it removes the marked ones.
+
+If you have a huge test suite, it can be convenient to mark the suite you're currently working on with `@include`.
 
 ## Multiple test suites
 
