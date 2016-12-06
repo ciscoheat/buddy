@@ -1,6 +1,7 @@
 package buddy ;
 import buddy.reporting.Reporter;
 import haxe.CallStack;
+import haxe.macro.Expr;
 import haxe.PosInfos;
 import haxe.ds.GenericStack;
 import haxe.rtti.Meta;
@@ -84,10 +85,12 @@ class Spec
 	@:allow(buddy.SuitesRunner) public var status(default, null) : SpecStatus = Unknown;
 	@:allow(buddy.SuitesRunner) public var failures(default, null) = new Array<Failure>();
 	@:allow(buddy.SuitesRunner) public var traces(default, null) = new Array<String>();
+	@:allow(buddy.SuitesRunner) public var fileName(default, null) : String = "";
 
-	public function new(description : String) {
+	public function new(description : String, fileName : String) {
 		if(description == null) throw "Spec must have a description.";
 		this.description = description;
+		this.fileName = fileName;
 	}
 }
 
@@ -114,7 +117,7 @@ enum TestFunc {
 
 enum TestSpec {
 	Describe(suite : TestSuite, included : Bool);
-	It(description : String, test : Null<TestFunc>, included : Bool);
+	It(description : String, test : Null<TestFunc>, included : Bool, pos : PosInfos);
 }
 
 class TestSuite
@@ -229,9 +232,9 @@ class BuddySuite
 	 * @param	spec A block or function of tests, or leave out for pending
 	 * @param	hasInclude Used internally only
 	 */
-	private function it(desc : String, ?spec : TestFunc, _hasInclude = false) : Void {
+	private function it(desc : String, ?spec : TestFunc, _hasInclude = false, ?pos:PosInfos) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
-		currentSuite.specs.add(TestSpec.It(desc, spec, _hasInclude));
+		currentSuite.specs.add(TestSpec.It(desc, spec, _hasInclude, pos));
 	}
 
 	/**
@@ -240,9 +243,9 @@ class BuddySuite
 	 * @param	spec A block or function of tests, or leave out
 	 * @param	hasInclude Used internally only
 	 */
-	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false) : Void {
+	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false, ?pos:PosInfos) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
-		currentSuite.specs.add(TestSpec.It(desc, null, _hasInclude));
+		currentSuite.specs.add(TestSpec.It(desc, null, _hasInclude, pos));
 	}
 
 	/**

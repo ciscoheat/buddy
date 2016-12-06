@@ -205,7 +205,7 @@ class SuitesRunner
 					case Describe(suite, included):
 						if (included) return true;
 						else return traverse(suite);
-					case It(desc, _, included):
+					case It(desc, _, included, _):
 						return included;
 				}
 			});
@@ -347,10 +347,10 @@ class SuitesRunner
 				if (result != null) return { error: result.error, step: TSuite(result.suite) };
 				else return null;
 				
-			case It(desc, test, _):
+			case It(desc, test, _, pos):
 				// Assign top-level spec var here, so it can be used in reporting.
 				//trace("Starting it: " + desc);
-				var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc);
+				var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc, pos.fileName);
 				
 				var beforeEach = flatten(beforeEachStack);
 				var afterEach = flatten(afterEachStack);					
