@@ -402,7 +402,7 @@ The compilation flag will override the metadata, if both are set.
 
 `buddy.reporting.ConsoleReporter` is the default reporter.
 
-`buddy.reporting.ConsoleColorReporter` is identical to the default reporter but with ANSI color output. This reporter will be used if colors are enabled with metadata or compilation flags, as specified above.
+`buddy.reporting.ConsoleFileReporter` splits the test progress meter per file, in case you have many test suites in different files.
 
 `buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI with flash. If you define `-D flash-exit`, the default reporter will be the TraceReporter, and flash will exit if the correct permissions are set. This is tricky to get right, so the easiest way is to use [travix](https://github.com/back2dos/travix/).
 
@@ -434,14 +434,14 @@ This usually happens if you're not linking in the correct `.ndll` files. An easy
 
 ### Can I run the tests manually, without generating main?
 
-Yes, but make sure you know what you're doing, some targets requires a wait loop if you have asynchronous tests, for example... Here's a minimal setup for synchronous execution:
+Yes, but make sure you know what you're doing, for example some targets requires a wait loop if you have asynchronous tests... Here's a minimal setup for synchronous execution:
 
 ```haxe
 import buddy.reporting.ConsoleColorReporter;
 
 class Main {
     public static function main() {
-        var reporter = new ConsoleColorReporter();
+        var reporter = new ConsoleReporter();
 
         var runner = new buddy.SuitesRunner([
             new FirstTestSuite(),
@@ -457,7 +457,7 @@ class Main {
 }
 ```
 
-Please make sure that the auto-generated version doesn't work in your case before doing this.
+Please make sure that the auto-generated version doesn't work in your case, before doing this.
 
 ## The story behind Buddy
 
