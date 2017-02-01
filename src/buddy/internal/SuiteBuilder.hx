@@ -13,8 +13,9 @@ class SuiteBuilder
 	private static var buddySuiteClass : ClassType;
 
 	private static function setIncludeMode() {
-		if (!buddySuiteClass.meta.has("includeMode"))
-			buddySuiteClass.meta.add("includeMode", [], Context.currentPos());
+		var cls = Context.getLocalClass().get();
+		if (!cls.meta.has("includeMode"))
+			cls.meta.add("includeMode", [], Context.currentPos());
 	}
 	
 	private static var sync = macro buddy.BuddySuite.TestFunc.Sync;

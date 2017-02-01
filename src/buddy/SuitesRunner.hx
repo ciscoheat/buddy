@@ -72,7 +72,10 @@ class SuitesRunner
 		this.buddySuites = buddySuites;
 		this.reporter = reporter == null ? new buddy.reporting.ConsoleReporter() : reporter;
 		this.oldLog = Log.trace;
-		this.includeMode = Reflect.hasField(Meta.getType(BuddySuite), "includeMode");
+		this.includeMode = buddySuites.exists(function(suite) { 
+			var metaData = Meta.getType(Type.getClass(suite));
+			return Reflect.hasField(metaData, "includeMode");
+		});
 	}
 	
 	public function run() : Promise<SuitesRunner> {
