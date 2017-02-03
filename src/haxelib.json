@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.6.1",
-  "releasenote": "Fixed include mode for specs.",
+  "version": "2.6.2",
+  "releasenote": "Lua support",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }

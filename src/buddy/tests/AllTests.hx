@@ -133,7 +133,9 @@ class TestBasicFeatures extends BuddySuite
 				a.should().be(1);
 			});
 			
-			AsyncTools.wait(10).then(function(_) {
+			// lua fix, needs temp var
+			var r = AsyncTools.wait(10);
+			r.then(function(_) {
 				a = 1;
 				done();
 			});
@@ -527,7 +529,9 @@ class TestAsync extends BuddySuite
 			beforeEach(function(done) {
 				a = 0;
 				timeoutMs = 10;
-				AsyncTools.wait(1).then(function(_) { a = 1; done(); } );
+				// lua fix, needs temp var
+				var r = AsyncTools.wait(1);
+				r.then(function(_) { a = 1; done(); } );
 			});
 
 			it("should set the variable a to 1 in before, even though it's an async operation", {
@@ -537,7 +541,8 @@ class TestAsync extends BuddySuite
 			var timeoutTestDescription = "should timeout with an error after an amount of time specified outside it()";
 			it(timeoutTestDescription, function(done) {
 				// Wait long enough for all targets to fail properly. (Had problems on flash when wait = 20)
-				AsyncTools.wait(100).then(function(_) {
+				var r = AsyncTools.wait(100);
+				r.then(function(_) {
 					true.should.be(true);
 					done();
 				});
@@ -611,7 +616,9 @@ class UtestUsage extends BuddySuite
 
 			#if !php
 			it("should pass on asynchronous tests.", function(done) {
-				AsyncTools.wait(5).then(function(_) {
+				// lua fix, needs temp var
+				var r = AsyncTools.wait(5);
+				r.then(function(_) {
 					Assert.match(~/\d{3}/, "abc123");
 					done();
 				});
@@ -944,7 +951,11 @@ class UsingTinkAwait
 	public function new() {}
 
 	public function waitForIt() {
-		return Future.async(function(cb) AsyncTools.wait(1).then(cb));
+		return Future.async(function(cb) {
+			// lua fix, needs temp var
+			var r = AsyncTools.wait(1);
+			r.then(cb);
+		});
 	}
 }
 #end

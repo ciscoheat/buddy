@@ -159,9 +159,12 @@ class SuitesRunner
 	/////////////////////////////////////////////////////////////////////////////
 
 	private function startRun() : Void {
-		reporter.start().then(function(go) {
+		// lua fix, needs temp var
+		var r = reporter.start();
+		r.then(function(go) {
 			if (!go) {
-				reporter.done([], false).then(function(_) runCompleted.resolve(this));
+				var r = reporter.done([], false);
+				r.then(function(_) runCompleted.resolve(this));
 				return;
 			}
 			
@@ -194,7 +197,8 @@ class SuitesRunner
 				if (err != null) haveUnrecoverableError(err);
 				else {
 					allTestsPassed = !suites.exists(function(suite) return !suite.passed());
-					reporter.done(suites, allTestsPassed).then(function(_) runCompleted.resolve(this));
+					var r = reporter.done(suites, allTestsPassed);
+					r.then(function(_) runCompleted.resolve(this));
 				}
 			});
 		});
@@ -397,9 +401,13 @@ class SuitesRunner
 							reporter.progress(spec);
 						} else {
 							if (err != null) done(err, null);
-							else reporter.progress(spec).then(function(_) {
-								done(null, TSpec(spec));
-							});
+							else {
+								// lua fix, needs temp var
+								var r = reporter.progress(spec);
+								r.then(function(_) {
+									done(null, TSpec(spec));
+								});
+							}
 						}
 					});
 					
@@ -439,15 +447,16 @@ class SuitesRunner
 				#if (!php && !macro)
 				// Set up timeout for the current spec
 				if(!returnSync && buddySuite.timeoutMs > 0) {
-					BuddyAsync.wait(buddySuite.timeoutMs)
-						.catchError(function(e : Dynamic) { 
-							reportFailure(e, CallStack.exceptionStack());
-							specCompleted(Failed);
-						})
-						.then(function(_) {
-							reportFailure('Timeout after ${buddySuite.timeoutMs} ms', []);
-							specCompleted(Failed);
-						});
+					// lua fix, needs temp var
+					var r = BuddyAsync.wait(buddySuite.timeoutMs);
+					r.catchError(function(e : Dynamic) { 
+						reportFailure(e, CallStack.exceptionStack());
+						specCompleted(Failed);
+					});
+					r.then(function(_) {
+						reportFailure('Timeout after ${buddySuite.timeoutMs} ms', []);
+						specCompleted(Failed);
+					});
 				}
 				#end
 				

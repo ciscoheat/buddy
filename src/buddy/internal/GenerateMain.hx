@@ -212,7 +212,9 @@ class GenerateMain
 			
 			function startRun(done : Void -> Void) : Void {				
 				runner = new buddy.SuitesRunner($allSuites, new $rep());
-				runner.run().then(function(_) {
+				// lua fix, needs temp var
+				var r = runner.run();
+				r.then(function(_) {
 					if (runner.unrecoverableError != null) outputError();
 					done();
 				});

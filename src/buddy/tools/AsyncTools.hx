@@ -91,7 +91,9 @@ class AsyncTools
 		}
 		else {
 			var n = it.next();
-			action(n).then(function(_) { next(it, action, def, resolveWith); } );
+			// lua fix, needs temp var
+			var r = action(n);
+			r.then(function(_) { next(it, action, def, resolveWith); } );
 		}
 	}
 }
