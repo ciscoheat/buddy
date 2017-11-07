@@ -129,23 +129,23 @@ class BeforeAfterTest extends buddy.SingleSuite {
                 test.should.be(2);
             });
 
-			describe("When nesting describes", {
-				beforeEach({
-					test++;
-				});
-				
-				it("should run all before/afterEach defined here or above", {
-					test.should.be(3);
-				});
-				
-				afterEach({
-					test--;
-				});
-			});
-			
-			it("should run in correct order too", {
-				test.should.be(2);
-			});
+            describe("When nesting describes", {
+                beforeEach({
+                    test++;
+                });
+                
+                it("should run all before/afterEach defined here or above", {
+                    test.should.be(3);
+                });
+                
+                afterEach({
+                    test--;
+                });
+            });
+            
+            it("should run in correct order too", {
+                test.should.be(2);
+            });
 
             // Will run after each "it" in the current and before each "it" in any nested describes.
             afterEach({
@@ -232,7 +232,7 @@ If the function signature is `String -> Void` then apply the string argument lik
 `a.bind("test").should.throwAnything()`
 
 You can also test an anonymous function directly:
-	
+    
 `(function() { throw "error"; }).should.throwType(String)`
 
 The throw methods will return the exception object, so it can be tested further. This works synchonously only.
@@ -278,8 +278,8 @@ class Main extends buddy.SingleSuite
     public function new() {
         describe("Using CompilationShould", {
             it("should pass if an expression won't compile", {
-				CompilationShould.failFor(this.will.not.compile);
-			});
+                CompilationShould.failFor(this.will.not.compile);
+            });
         });
     }
 }
@@ -348,7 +348,7 @@ using buddy.Should;
 
 // Implement "Buddy" and define an array of classes within the brackets:
 class Main implements Buddy<[
-	Tests,
+    Tests,
     path.to.YourBuddySuite,
     AnotherTestSuite,
     new SpecialSuite("Constant value", 123)
@@ -375,7 +375,7 @@ Enable ANSI color output is easy:
 ```haxe
 @colorize
 class Main extends buddy.SingleSuite {
-	// ...
+    // ...
 }
 ```
 
@@ -390,7 +390,7 @@ You can make your own reporter by implementing the [buddy.reporting.Reporter](ht
 ```haxe
 @reporter("path.to.your.Reporter")
 class Main extends buddy.SingleSuite {
-	// ...
+    // ...
 }
 ```
 
@@ -449,10 +449,10 @@ class Main {
         ], reporter);
 
         runner.run();
-		
-		#if sys
-		Sys.exit(runner.statusCode());
-		#end
+        
+        #if sys
+        Sys.exit(runner.statusCode());
+        #end
     }
 }
 ```
