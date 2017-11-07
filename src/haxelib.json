@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.7.0",
-  "releasenote": "Reporter for the Karma test runner added",
+  "version": "2.7.1",
+  "releasenote": "Haxe 4 compatibility fix for Node.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }
