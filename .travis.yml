@@ -1,51 +1,32 @@
-# The first thing is to tell which VM environment we want the test to be run on.
-# It dosen't quite matter for Haxe, just choose one of the targets our project support (e.g. PHP),
-# and than apt-get install the others (e.g. Neko, C++).
-# For more info, see http://about.travis-ci.org/docs/user/ci-environment/
-language: node_js
+sudo: required
+dist: trusty
 
-env:
-    matrix:
-    - TARGET=cpp
-    - TARGET=cs
-    - TARGET=java
-    - TARGET=js
-    - TARGET=neko
-    - TARGET=nodejs
-    - TARGET=php
-    - TARGET=flash
-    - TARGET=python
+language: haxe
 
-before_install:
-  # Install Haxe
-  - wget http://ciscoheat.github.io/cdn/haxe/haxe-3.2.1-linux-installer.sh
-  - sudo sh haxe-3.2.1-linux-installer.sh -y
+os:
+  - linux
+  - osx
+  
+haxe:
+  - "3.4.0"
+  - development
+  
+matrix:
+  allow_failures:
+    - haxe: development
+    
+install:
+  - haxelib install travix
+  - haxelib run travix install
 
-  # haxelib dependencies for all targets
-  - haxelib install promhx
-  - haxelib install utest
-  - haxelib install slambda
-  - haxelib install asynctools
-  - haxelib install tink_await
-
-  # apt packages for each target
-  - sudo apt-get update
-  - sh -c "if [ '$TARGET' = 'cpp' ]; then sudo apt-get install gcc-multilib g++-multilib -y; fi"
-  - sh -c "if [ '$TARGET' = 'cs' ]; then sudo apt-get install mono-devel -y; fi"
-  - sh -c "if [ '$TARGET' = 'js' ]; then sudo apt-get install phantomjs -y; fi"
-  - sh -c "if [ '$TARGET' = 'php' ]; then sudo apt-get install php5-cli -y; fi"
-  - sh -c "if [ '$TARGET' = 'flash' ]; then chmod +x ./flash-travis-setup.sh && ./flash-travis-setup.sh; fi"
-  - sh -c "if [ '$TARGET' = 'python' ]; then sudo apt-get install python3 -y; fi"
-
-  # haxelib dependencies for each target
-  - sh -c "if [ '$TARGET' = 'cpp' ]; then haxelib install hxcpp; fi"
-  - sh -c "if [ '$TARGET' = 'java' ]; then haxelib install hxjava; fi"
-  - sh -c "if [ '$TARGET' = 'cs' ]; then haxelib install hxcs; fi"
-
-# Run the test!
 script:
-  - haxe buddy.${TARGET}.hxml && haxe -dce full buddy.${TARGET}.hxml
-
-branches:
-      only:
-          - master
+  - haxelib run travix neko
+  - haxelib run travix python
+  - haxelib run travix node
+  - haxelib run travix js
+  - haxelib run travix flash
+  - haxelib run travix java
+  - haxelib run travix cpp
+  - haxelib run travix cs
+  - haxelib run travix php
+  - haxelib run travix lua

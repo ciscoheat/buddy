@@ -1,4 +1,4 @@
-package buddy.internal ;
+package buddy.internal;
 
 #if macro
 import buddy.reporting.ConsoleReporter;
@@ -199,13 +199,22 @@ class GenerateMain
 			
 			function outputError() {
 				haxe.Log.trace = oldTrace; // Restore original trace
-				trace(runner.unrecoverableError);
+
+				var pos = {
+					fileName : "Buddy",
+					lineNumber : 0,
+					className : "",
+					methodName : ""
+				};
+				
+				haxe.Log.trace(runner.unrecoverableError, pos);
 
 				var stack = runner.unrecoverableErrorStack;
 				if (stack == null || stack.length == 0) return;
 				
 				for (s in stack) switch s {
-					case FilePos(_, file, line) if(line > 0): trace(file+":"+line);
+					case FilePos(_, file, line) if (line > 0): 
+						haxe.Log.trace(file + ":" + line, pos);
 					case _:
 				}
 			}

@@ -22,8 +22,6 @@ extern class Timer {
 	public function start() : Void;
 	public function cancel() : Void;
 }
-#else
-import haxe.Timer;
 #end
 
 class AsyncTools
@@ -54,8 +52,6 @@ class AsyncTools
 		});
 		#elseif python
 		new Timer(ms / 1000, done).start();
-		#elseif (js || flash)
-		Timer.delay(function() done(), ms);
 		#elseif cs
 		var t = new Timer(ms);
 		t.add_Elapsed(new ElapsedEventHandler(function(sender : Dynamic, e : ElapsedEventArgs) {
@@ -78,7 +74,7 @@ class AsyncTools
 		#elseif php
 		throw "AsyncTools.wait not supported for PHP.";
 		#else
-		throw "AsyncTools.wait not supported for current target.";
+		haxe.Timer.delay(function() done(), ms);
 		#end
 
 		return pr;

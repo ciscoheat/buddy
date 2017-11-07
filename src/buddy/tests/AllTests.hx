@@ -347,7 +347,9 @@ class TestBasicFeatures extends BuddySuite
 			var k = function(a : String) : String { return throw a.toUpperCase(); };
 
 			it("should have a be method", {
+				#if !lua
 				f.should().be(f);
+				#end
 				j.should().be(j);
 				
 				f.should().not.be(function() { throw "a"; });
@@ -412,7 +414,7 @@ class TestBasicFeatures extends BuddySuite
 				s.should.be(null);
 				d.should.be(null);
 				
-				#if (js || neko || php || python)
+				#if (js || neko || php || python || lua)
 				var i : Int = null;
 				i.should.be(null);
 				#end
