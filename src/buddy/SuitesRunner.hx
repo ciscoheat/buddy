@@ -444,7 +444,7 @@ class SuitesRunner
 				}
 				#end
 				
-				#if (!php && !macro)
+				#if (!php && !macro && !interp)
 				// Set up timeout for the current spec
 				if(!returnSync && buddySuite.timeoutMs > 0) {
 					// lua fix, needs temp var

@@ -28,12 +28,12 @@ class AllTests implements Buddy<[
 	TestAsync,
 	FailTestAsync,
 	TinkAwaitTest,
+	BeforeAfterDescribe2,
 	CallDoneTest,
 	#end
 	UtestUsage,
 	TestExceptionHandling,
 	BeforeAfterDescribe,
-	BeforeAfterDescribe2,
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
 	SimpleNestedBeforeAfter,
@@ -676,14 +676,16 @@ class BeforeAfterDescribe extends BuddySuite
 	}
 }
 
+#if (!php && !interp)
 class BeforeAfterDescribe2 extends BuddySuite
 {
 	public function new()
 	{
 		var a = 0;
 
-		afterEach(function() {
+		afterEach(function(done) {
 			a = 1;
+			done();
 		});
 
 		describe("Using an 'after' block outside describe", {
@@ -699,6 +701,7 @@ class BeforeAfterDescribe2 extends BuddySuite
 		});
 	}
 }
+#end
 
 class BeforeAfterDescribe3 extends BuddySuite
 {

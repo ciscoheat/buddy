@@ -101,7 +101,7 @@ class Main extends buddy.SingleSuite {
 }
 ```
 
-You can set `timeoutMs` to 0 to disable the timeout check. **Note:** When using `function(done)`, on some targets the timeout check will run in a separate thread. Also, timeouts and asynchronous behavior aren't supported when targeting PHP.
+You can set `timeoutMs` to 0 to disable the timeout check. **Note:** When using `function(done)`, on some targets the timeout check will run in a separate thread. Also, timeouts and asynchronous behavior aren't supported when targeting PHP or interp.
 
 ## Before/After
 
