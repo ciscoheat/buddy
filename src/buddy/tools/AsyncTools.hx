@@ -45,7 +45,11 @@ class AsyncTools
 		var pr = def.promise();
 		var done = function() { if (!pr.isFulfilled()) def.resolve(true); };
 
-		#if (neko && !macro)
+		#if interp
+		throw "Asynchronous wait not supported for interp.";
+		#elseif php
+		throw "Asynchronous wait not supported for PHP.";
+		#elseif (neko && !macro)
 		Thread.create(function() {
 			Sys.sleep(ms / 1000);
 			done();
@@ -71,8 +75,6 @@ class AsyncTools
 			Sys.sleep(ms / 1000);
 			done();
 		});
-		#elseif php
-		throw "AsyncTools.wait not supported for PHP.";
 		#else
 		haxe.Timer.delay(function() done(), ms);
 		#end

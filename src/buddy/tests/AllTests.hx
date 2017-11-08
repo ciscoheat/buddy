@@ -24,10 +24,11 @@ class AllTests implements Buddy<[
 	TestBasicFeatures,
 	TestExclude,
 	FailTest,
-	#if !php
+	#if (!php && !interp)
 	TestAsync,
 	FailTestAsync,
 	TinkAwaitTest,
+	CallDoneTest,
 	#end
 	UtestUsage,
 	TestExceptionHandling,
@@ -36,7 +37,6 @@ class AllTests implements Buddy<[
 	BeforeAfterDescribe3,
 	NestedBeforeAfter,
 	SimpleNestedBeforeAfter,
-	CallDoneTest,
 	CompilationFailTest,
 	HugeTest
 ]> {}
@@ -125,7 +125,7 @@ class TestBasicFeatures extends BuddySuite
 			});			
 		});
 
-		#if !php
+		#if (!php && !interp)
 		describe("Testing async describe definitions", function(done) {
 			var a = 0;
 
@@ -414,7 +414,7 @@ class TestBasicFeatures extends BuddySuite
 				s.should.be(null);
 				d.should.be(null);
 				
-				#if (js || neko || php || python || lua)
+				#if (js || neko || php || python || lua || interp)
 				var i : Int = null;
 				i.should.be(null);
 				#end
@@ -518,7 +518,7 @@ class TestExclude extends BuddySuite
 	}
 }
 
-#if !php
+#if (!php && !interp)
 class TestAsync extends BuddySuite
 {
 	public function new()
@@ -616,7 +616,7 @@ class UtestUsage extends BuddySuite
 				Assert.isTrue(false);
 			});
 
-			#if !php
+			#if (!php && !interp)
 			it("should pass on asynchronous tests.", function(done) {
 				// lua fix, needs temp var
 				var r = AsyncTools.wait(5);
@@ -682,9 +682,8 @@ class BeforeAfterDescribe2 extends BuddySuite
 	{
 		var a = 0;
 
-		afterEach(function(done) {
+		afterEach(function() {
 			a = 1;
-			done();
 		});
 
 		describe("Using an 'after' block outside describe", {
@@ -910,7 +909,7 @@ class FailTest extends BuddySuite
 	}
 }
 
-#if !php
+#if (!php && !interp)
 class FailTestAsync extends BuddySuite
 {
 	public function new()
@@ -960,7 +959,6 @@ class UsingTinkAwait
 		});
 	}
 }
-#end
 
 class CallDoneTest extends BuddySuite
 {
@@ -973,6 +971,7 @@ class CallDoneTest extends BuddySuite
 		});
 	}
 }
+#end
 
 class CompilationFailTest extends BuddySuite
 {
