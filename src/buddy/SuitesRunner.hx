@@ -440,6 +440,10 @@ class SuitesRunner
 							reportFailure(e, stack);
 						case TimeoutError(e, stack):
 							reportFailure(e, stack);
+						#if (utest >= "1.7.1")
+						case Ignore(reason):
+							spec.traces.push("Assertation ignored: " + reason);
+						#end
 					}
 				}
 				#end
