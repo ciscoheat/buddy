@@ -374,8 +374,11 @@ class SuitesRunner
 					if (pos == null) 
 						spec.traces.push(Std.string(v));
 					else {
-						if (pos.customParams != null) v += "," + pos.customParams.join(",");
-						spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
+						var output = pos.customParams != null
+							? Std.string(v) + "," + pos.customParams.map(function(v2) return Std.string(v2)).join(',')
+							: Std.string(v);
+						
+						spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + output);
 					}
 				};
 				
