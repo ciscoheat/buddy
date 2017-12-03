@@ -467,7 +467,7 @@ class TestBasicFeatures extends BuddySuite
 
 		describe("Using trace() calls", {
 			it("should reroute the trace output to the reporter", {
-				trace("Test trace");
+				trace("Test", "trace");
 				trace("Test trace 2");
 			});
 
@@ -475,7 +475,7 @@ class TestBasicFeatures extends BuddySuite
 				var test = SelfTest.lastSpec;
 				if (test.traces[0].startsWith("AllTests.hx")
 					&& test.traces.length == 2
-					&& test.traces[0].endsWith("Test trace")
+					&& test.traces[0].endsWith("Test,trace")
 					&& test.traces[1].endsWith("Test trace 2"))
 				{
 					SelfTest.setLastSpec(Passed);

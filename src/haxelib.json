@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.8.0",
-  "releasenote": "Now working with interp.",
+  "version": "2.8.2",
+  "releasenote": "trace now outputs all arguments.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }

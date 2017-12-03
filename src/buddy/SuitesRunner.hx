@@ -370,9 +370,13 @@ class SuitesRunner
 				}
 				
 				// Log traces for each Spec, so they can be outputted in the reporter
-				if(!BuddySuite.useDefaultTrace) Log.trace = function(v, ?pos : PosInfos) {
-					if(pos == null) spec.traces.push(Std.string(v));
-					else spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
+				if(!BuddySuite.useDefaultTrace) Log.trace = function(v : Dynamic, ?pos : PosInfos) {
+					if (pos == null) 
+						spec.traces.push(Std.string(v));
+					else {
+						if (pos.customParams != null) v += "," + pos.customParams.join(",");
+						spec.traces.push(pos.fileName + ":" + pos.lineNumber + ": " + v);
+					}
 				};
 				
 				function reportFailure(error : Dynamic, stack : Array<StackItem>) : Void {
