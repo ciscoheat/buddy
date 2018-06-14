@@ -46,7 +46,7 @@ class ShouldEnum extends Should<EnumValue>
 	private function get_not() { return new ShouldEnum(value, !inverse); }
 
 	//////////
-	
+
 	@:deprecated("Use should.equal instead for enum comparisons")
 	override public function be(expected : EnumValue, ?p : PosInfos) : Void {
 		equal(expected, p);
@@ -58,7 +58,7 @@ class ShouldEnum extends Should<EnumValue>
 			'Expected ${quote(expected)}, was ${quote(value)}',
 			'Didn\'t expect ${quote(value)} but was equal to that'
 		);
-	}	
+	}
 }
 
 class ShouldInt extends Should<Int>
@@ -120,7 +120,7 @@ class ShouldInt64 extends Should<Int64>
 			'Didn\'t expect ${quote(expected)} but was equal to that'
 		);
 	}
-	
+
 	public function beLessThan(expected : Int64, ?p : PosInfos)
 	{
 		test(value < expected, p,
@@ -174,7 +174,10 @@ class ShouldFloat extends Should<Float>
 	public function beCloseTo(expected : Float, precision : Null<Float> = 2, ?p : PosInfos)
 	{
 		// For some reason, precision must be of a Nullable type in flash or it will be 0 sometimes?!
-		var expr = Math.abs(expected - value) < (Math.pow(10, -precision) / 2);
+		// Also, haxe 4 -> C# breaks here when inlining the two vars
+		var diff = Math.abs(expected - value);
+		var threshold = Math.pow(10, -precision) / 2;
+		var expr = diff < threshold;
 
 		test(expr, p,
 			'Expected close to ${quote(expected)}, was ${quote(value)}',
@@ -229,7 +232,7 @@ class ShouldDate extends Should<Date>
 
 	public function beBeforeStr(expected : String, ?p : PosInfos)
 		return beBefore(Date.fromString(expected), p);
-		
+
 	public function beAfterStr(expected : String, ?p : PosInfos)
 		return beAfter(Date.fromString(expected), p);
 }
@@ -254,10 +257,10 @@ class ShouldString extends Should<String>
 	public function contain(substring : String, ?p : PosInfos)
 	{
 		if (value == null) return fail(
-			'Expected string to contain ${quote(substring)} but string was null', 
+			'Expected string to contain ${quote(substring)} but string was null',
 			'Expected string not to contain ${quote(substring)} but string was null',
 			p);
-		
+
 		test(value.indexOf(substring) >= 0, p,
 			'Expected ${quote(value)} to contain ${quote(substring)}',
 			'Expected ${quote(value)} not to contain ${quote(substring)}'
@@ -267,10 +270,10 @@ class ShouldString extends Should<String>
 	public function startWith(substring : String, ?p : PosInfos)
 	{
 		if (value == null) return fail(
-			'Expected string to start with ${quote(substring)} but string was null', 
-			'Expected string not to start with ${quote(substring)} but string was null', 
+			'Expected string to start with ${quote(substring)} but string was null',
+			'Expected string not to start with ${quote(substring)} but string was null',
 			p);
-		
+
 		test(value.startsWith(substring), p,
 			'Expected ${quote(value)} to start with ${quote(substring)}',
 			'Expected ${quote(value)} not to start with ${quote(substring)}'
@@ -280,10 +283,10 @@ class ShouldString extends Should<String>
 	public function endWith(substring : String, ?p : PosInfos)
 	{
 		if (value == null) return fail(
-			'Expected string to end with ${quote(substring)} but string was null', 
-			'Expected string not to end with ${quote(substring)} but string was null', 
+			'Expected string to end with ${quote(substring)} but string was null',
+			'Expected string not to end with ${quote(substring)} but string was null',
 			p);
-		
+
 		test(value.endsWith(substring), p,
 			'Expected ${quote(value)} to end with ${quote(substring)}',
 			'Expected ${quote(value)} not to end with ${quote(substring)}'
@@ -293,10 +296,10 @@ class ShouldString extends Should<String>
 	public function match(regexp : EReg, ?p : PosInfos)
 	{
 		if (value == null) return fail(
-			'Expected string to match regular expression but string was null', 
-			'Expected string not to match regular expression but string was null', 
+			'Expected string to match regular expression but string was null',
+			'Expected string not to match regular expression but string was null',
 			p);
-		
+
 		test(regexp.match(value), p,
 			'Expected ${quote(value)} to match regular expression',
 			'Expected ${quote(value)} not to match regular expression'
@@ -404,7 +407,7 @@ class ShouldFunctions
 	{
 		var caught = false;
 		var exception : Dynamic = null;
-		
+
 		try { value(); }
 		catch (e : Dynamic) { exception = e; caught = true; };
 
@@ -412,7 +415,7 @@ class ShouldFunctions
 			'Expected ${quote(value)} to throw anything, nothing was thrown',
 			'Expected ${quote(value)} not to throw anything, ${quote(exception)} was thrown'
 		);
-		
+
 		return exception;
 	}
 
@@ -423,7 +426,7 @@ class ShouldFunctions
 	{
 		var caught = false;
 		var exception : T = null;
-		
+
 		try { value(); }
 		catch (e : Dynamic)
 		{
@@ -435,7 +438,7 @@ class ShouldFunctions
 			'Expected ${quote(value)} to throw ${quote(v)}',
 			'Expected ${quote(value)} not to throw ${quote(v)}'
 		);
-		
+
 		return exception;
 	}
 
@@ -456,14 +459,14 @@ class ShouldFunctions
 			exceptionName = Type.getClassName(Type.getClass(e));
 			caught = Std.is(e, type);
 		}
-		
+
 		if (exceptionName == null) exceptionName = "no exception";
 
 		test(caught, p,
 			'Expected ${quote(value)} to throw type $name, $exceptionName was thrown instead',
 			'Expected ${quote(value)} not to throw type $name'
 		);
-		
+
 		return exception;
 	}
 
@@ -488,7 +491,7 @@ class ShouldFunctions
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
 		if (SuitesRunner.currentTest == null) throw "SuitesRunner.currentTest was null";
-		
+
 		if(!inverse)
 			SuitesRunner.currentTest(expr, error, SuitesRunner.posInfosToStack(p));
 		else
@@ -535,7 +538,7 @@ class Should<T>
 			'Expected ${quote(value)} not to be type ${quote(type)}'
 		);
 	}
-	
+
 	private function quote(v : Dynamic)
 	{
 		if (Std.is(v, String)) return '"$v"';
@@ -547,11 +550,11 @@ class Should<T>
 	{
 		SuitesRunner.currentTest(false, inverse ? errorInverted : error, SuitesRunner.posInfosToStack(p));
 	}
-	
+
 	private function test(expr : Bool, p : PosInfos, error : String, errorInverted : String)
 	{
 		if (SuitesRunner.currentTest == null) throw "SuitesRunner.currentTest was null";
-		
+
 		if(!inverse)
 			SuitesRunner.currentTest(expr, error, SuitesRunner.posInfosToStack(p));
 		else
