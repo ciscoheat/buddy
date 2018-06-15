@@ -52,7 +52,7 @@ Using Buddy
 2 specs, 0 failures, 0 pending
 ```
 
-But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! The only thing you need to remember is to add `-D nodejs` to your hxml, if you're targeting Node.js.
+But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! Except Hashlink, which has to wait until Haxe 4 is released. The only thing you need to remember is to add `-D nodejs` to your hxml if you're targeting Node.js, but that is usually taken care of by libraries like hxnodejs.
 
 ## Asynchronous support
 
@@ -113,6 +113,7 @@ using buddy.Should;
 class BeforeAfterTest extends buddy.SingleSuite {
     public function new() {
         describe("Using before/after", {
+            // vars will be set one time only, before any tests run.
             var test = 0;
 
             // Will run once as the first thing in the current describe block
