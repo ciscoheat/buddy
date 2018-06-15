@@ -471,12 +471,14 @@ class TestBasicFeatures extends BuddySuite
 				trace("Test trace 2");
 			});
 
+			var trace1 = ~/AllTests\.hx:[0-9]+:\sTest,a,trace$/;
+			var trace2 = ~/AllTests\.hx:[0-9]+:\sTest trace 2$/;
+
 			afterEach({
 				var test = SelfTest.lastSpec;
-				if (test.traces[0].startsWith("AllTests.hx")
-					&& test.traces.length == 2
-					&& test.traces[0].endsWith("Test,a,trace")
-					&& test.traces[1].endsWith("Test trace 2"))
+				if (test.traces.length == 2
+					&& trace1.match(test.traces[0])
+					&& trace2.match(test.traces[1]))
 				{
 					SelfTest.setLastSpec(Passed);
 				} else {
