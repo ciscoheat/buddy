@@ -8,7 +8,7 @@ os:
   - osx
   
 haxe:
-  - "3.4.0"
+  - "3.4.7"
   - development
   
 matrix:
