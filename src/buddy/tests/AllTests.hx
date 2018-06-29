@@ -4,7 +4,9 @@ import buddy.BuddySuite;
 import buddy.tests.AllTests.ColorTree;
 import buddy.tools.AsyncTools;
 import buddy.CompilationShould;
+#if !java
 import tink.core.Future;
+#end
 
 import haxe.CallStack;
 import haxe.Int64;
@@ -27,7 +29,9 @@ class AllTests implements Buddy<[
 	#if (!php && !interp)
 	TestAsync,
 	FailTestAsync,
+	#if !java
 	TinkAwaitTest,
+	#end
 	BeforeAfterDescribe2,
 	CallDoneTest,
 	#end
@@ -46,6 +50,13 @@ class EmptyTestClass { public function new() {} }
 enum Color { Red; Green; Blue; }
 
 enum ColorTree { Leaf(c : Color); Node(l : ColorTree, r : ColorTree); }
+
+class ThrowInConstructor
+{
+	public function new() {
+		throw "ThrowInConstructor";
+	}
+}
 
 class TestBasicFeatures extends BuddySuite
 {
@@ -396,7 +407,13 @@ class TestBasicFeatures extends BuddySuite
 				
 				attr.fn("test", _1 + "-" + _2);
 				attr.fn("test", [a,b] => a + "-" + b);
-			});			
+			});
+
+			it("should throw a correct exception if an exception is thrown in the constructor", {
+				(function() { new ThrowInConstructor(); }).should.throwType(String);
+				(function() { new ThrowInConstructor(); }).should.throwValue("ThrowInConstructor");
+				(function() { new ThrowInConstructor(); }).should.throwAnything();
+			});
 		});
 
 		describe("Testing should.not", {
@@ -937,6 +954,7 @@ class FailTestAsync extends BuddySuite
 	}
 }
 
+#if !java
 @await
 class TinkAwaitTest extends BuddySuite 
 {
@@ -964,6 +982,7 @@ class UsingTinkAwait
 		});
 	}
 }
+#end
 
 class CallDoneTest extends BuddySuite
 {

@@ -424,17 +424,26 @@ class ShouldFunctions
 	 */
 	public function throwValue<T>(v : T, ?p : PosInfos) : Null<T>
 	{
-		var caught = false;
-		var exception : T = null;
+		var exception : Dynamic = null;
 
 		try { value(); }
-		catch (e : Dynamic)
-		{
-			exception = e;
-			caught = e == v;
+		catch (e : Dynamic) {
+			var cause : Dynamic = null;
+			#if java
+			// Handles exceptions that sneaks into the runtime,
+			// like exceptions thrown in the constructor.
+			if(Std.is(e, java.lang.Throwable)) {
+				cause = cast(e, java.lang.Throwable).getCause();
+
+				if(cause != null && Type.getClassName(Type.getClass(cause)) == "haxe.lang.HaxeException")
+					cause = cause.getObject();
+			}
+			#end
+			exception = cause == null ? e : cause;
 		}
 
-		test(caught, p,
+		var isCaught = exception == v;		
+		test(isCaught, p,
 			'Expected ${quote(value)} to throw ${quote(v)}',
 			'Expected ${quote(value)} not to throw ${quote(v)}'
 		);
@@ -447,31 +456,40 @@ class ShouldFunctions
 	 */
 	public function throwType<T>(type : Class<T>, ?p : PosInfos) : Null<T>
 	{
-		var caught = false;
-		var name : String = Type.getClassName(type);
-		var exceptionName : String = null;
-		var exception : T = null;
+		var exception : Dynamic = null;
 
 		try { value(); }
-		catch (e : Dynamic)
-		{
-			exception = e;
-			exceptionName = Type.getClassName(Type.getClass(e));
-			caught = Std.is(e, type);
+		catch (e : Dynamic) {
+			var cause : Dynamic = null;
+			#if java
+			// Handles exceptions that sneaks into the runtime,
+			// like exceptions thrown in the constructor.
+			if(Std.is(e, java.lang.Throwable)) {
+				cause = cast(e, java.lang.Throwable).getCause();
+
+				if(cause != null && Type.getClassName(Type.getClass(cause)) == "haxe.lang.HaxeException")
+					cause = cause.getObject();
+			}
+			#end
+			exception = cause == null ? e : cause;
 		}
 
+		var typeName : String = Type.getClassName(type);
+
+		var exceptionName = Type.getClassName(Type.getClass(exception));
 		if (exceptionName == null) exceptionName = "no exception";
 
-		test(caught, p,
-			'Expected ${quote(value)} to throw type $name, $exceptionName was thrown instead',
-			'Expected ${quote(value)} not to throw type $name'
+		var isCaught = Std.is(exception, type);
+		test(isCaught, p,
+			'Expected ${quote(value)} to throw type $typeName, $exceptionName was thrown instead',
+			'Expected ${quote(value)} not to throw type $typeName'
 		);
 
 		return exception;
 	}
 
 	/**
-	 * Test for equality between two value types (bool, int, float), or identity for reference types
+	 * Test for equality between two value types (bool, int, float and string), or identity for reference types
 	 */
 	public function be(expected : Void -> Void, ?p : PosInfos) : Void
 	{

@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.8.3",
-  "releasenote": "C# compilation fix",
+  "version": "2.8.4",
+  "releasenote": "Now catches exceptions thrown in constructors correctly.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }
