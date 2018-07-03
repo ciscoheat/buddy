@@ -19,7 +19,7 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 /**
  * This must be the first class in this package, since it overrides all other assertions otherwise.
  */
-class ShouldDynamic extends Should<Dynamic>
+@:keep class ShouldDynamic extends Should<Dynamic>
 {
 	static public function should(d : Dynamic)
 	{
@@ -30,7 +30,7 @@ class ShouldDynamic extends Should<Dynamic>
 	private function get_not() { return new ShouldDynamic(value, !inverse); }
 }
 
-class ShouldEnum extends Should<EnumValue>
+@:keep class ShouldEnum extends Should<EnumValue>
 {
 	static public function should(e : EnumValue)
 	{
@@ -61,7 +61,7 @@ class ShouldEnum extends Should<EnumValue>
 	}
 }
 
-class ShouldInt extends Should<Int>
+@:keep class ShouldInt extends Should<Int>
 {
 	static public function should(i : Int)
 	{
@@ -95,7 +95,7 @@ class ShouldInt extends Should<Int>
 	}
 }
 
-class ShouldInt64 extends Should<Int64>
+@:keep class ShouldInt64 extends Should<Int64>
 {
 	static public function should(i : Int64)
 	{
@@ -138,7 +138,7 @@ class ShouldInt64 extends Should<Int64>
 	}
 }
 
-class ShouldFloat extends Should<Float>
+@:keep class ShouldFloat extends Should<Float>
 {
 	static public function should(i : Float)
 	{
@@ -186,7 +186,7 @@ class ShouldFloat extends Should<Float>
 	}
 }
 
-class ShouldDate extends Should<Date>
+@:keep class ShouldDate extends Should<Date>
 {
 	static public function should(i : Date)
 	{
@@ -237,7 +237,7 @@ class ShouldDate extends Should<Date>
 		return beAfter(Date.fromString(expected), p);
 }
 
-class ShouldString extends Should<String>
+@:keep class ShouldString extends Should<String>
 {
 	static public function should(str : String)
 	{
@@ -307,7 +307,7 @@ class ShouldString extends Should<String>
 	}
 }
 
-class ShouldIterable<T> extends Should<Iterable<T>>
+@:keep class ShouldIterable<T> extends Should<Iterable<T>>
 {
 	static public function should<T>(value : Iterable<T>)
 	{
@@ -381,7 +381,7 @@ class ShouldIterable<T> extends Should<Iterable<T>>
 }
 
 // Some problem with C++ forces this class not to be derived from Should<T>
-class ShouldFunctions
+@:keep class ShouldFunctions
 {
 	var value : Void -> Void;
 	var inverse : Bool;
@@ -519,7 +519,7 @@ class ShouldFunctions
 
 //////////
 
-class Should<T>
+@:keep class Should<T>
 {
 	var value : T;
 	var inverse : Bool;
