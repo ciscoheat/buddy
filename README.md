@@ -442,7 +442,7 @@ import buddy.reporting.ConsoleColorReporter;
 
 class Main {
     public static function main() {
-        var reporter = new ConsoleReporter();
+        var reporter = new ConsoleColorReporter();
 
         var runner = new buddy.SuitesRunner([
             new FirstTestSuite(),
