@@ -52,7 +52,7 @@ Using Buddy
 2 specs, 0 failures, 0 pending
 ```
 
-But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux! Except Hashlink, which has to wait until Haxe 4 is released. The only thing you need to remember is to add `-D nodejs` to your hxml if you're targeting Node.js, but that is usually taken care of by libraries like hxnodejs.
+But please don't stop there. Try using it on other targets than Neko, Buddy supports them all on both Windows and Linux, even Hashlink if you're using Haxe 4. The only thing you need to remember is to add `-D nodejs` to your hxml if you're targeting Node.js, but that is usually taken care of by libraries like hxnodejs.
 
 ## Asynchronous support
 

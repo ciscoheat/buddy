@@ -21,13 +21,15 @@ install:
 
 script:
   - haxelib run travix interp
-  - haxelib run travix neko
-  - haxelib run travix python
-  - haxelib run travix node
   - haxelib run travix js
-  - haxelib run travix php
-  - haxelib run travix lua
-  - haxelib run travix cs
   - haxelib run travix flash
+  - if [[ "$(haxe -version)" =~ ^4.* ]]; then haxelib run travix hl; fi
+  - haxelib run travix php
+  - haxelib run travix php7
+  - haxelib run travix node
+  - haxelib run travix neko
+  - if [ "$TRAVIS_OS_NAME" != "osx" ]; then haxelib run travix python; fi
+  - haxelib run travix lua
   - haxelib run travix java
-  - haxelib run travix cpp
+  - haxelib run travix cs
+  - haxelib run travix cpp -lib hxcpp
