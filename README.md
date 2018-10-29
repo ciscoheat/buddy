@@ -384,6 +384,10 @@ Or you can do it when compiling with `-D buddy-colors`, or disallow it with `-D 
 
 The compilation flag will override the metadata, if both are set.
 
+### Displaying only failing and pending tests
+
+If you have lots of tests, failures may drown in the output. By defining `-D buddy-ignore-passing-specs`, only failed and pending test suites will be displayed in the final output.
+
 ### Creating a custom reporter
 
 You can make your own reporter by implementing the [buddy.reporting.Reporter](https://github.com/ciscoheat/buddy/blob/master/src/buddy/reporting/Reporter.hx) interface. Then there are two ways to use it:
