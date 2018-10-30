@@ -219,7 +219,7 @@ class GenerateMain
 				}
 			}
 			
-			function startRun(done : Void -> Void) : Void {				
+			function startRun(done : Void -> Void) : Void {
 				runner = new buddy.SuitesRunner($allSuites, new $rep());
 				// lua fix, needs temp var
 				var r = runner.run();
@@ -227,11 +227,26 @@ class GenerateMain
 					if (runner.unrecoverableError != null) outputError();
 					done();
 				});
-			}				
+			}
 		};
 
 		// Targets that requires a waiting loop
-		if (Context.defined("neko") || Context.defined("cpp") || Context.defined("python"))
+		if (Context.defined("neko"))
+		{
+			body = macro {
+				haxe.EntryPoint.run();
+				haxe.EntryPoint.addThread(function () {
+					while (!testsDone) Sys.sleep(0.1);
+					haxe.EntryPoint.runInMainThread(function () {
+						Sys.exit(runner.statusCode());
+					});
+				});
+				haxe.EntryPoint.runInMainThread(function () {
+					startRun(function() testsDone = true);
+				});
+			};
+		}
+		else if (Context.defined("cpp") || Context.defined("python"))
 		{
 			body = macro {
 				startRun(function() testsDone = true);
