@@ -50,7 +50,7 @@ class TraceReporter implements Reporter
 		var pending = 0;
 
 		var countTests : Suite -> Void = null;
-		var printTests : Suite -> Int -> Bool = null;
+		var printTests : Suite -> Int -> { success : Bool, lines : Array<String> } = null;
 
 		countTests = function(s : Suite) {
 			if (s.error != null) failures++; // Count a crashed BuddySuite as a failure?
@@ -95,8 +95,7 @@ class TraceReporter implements Reporter
 				// The whole suite crashed.
 				print("ERROR: " + s.error, Red);
 				printStack('  ', s.stack);
-				lines.iter(println);
-				return false;
+				return { success: false, lines: lines };
 			}
 
 			for (step in s.steps) switch step {
@@ -117,17 +116,21 @@ class TraceReporter implements Reporter
 					printTraces(sp);
 
 				case TSuite(s):
-					success = success && printTests(s, indentLevel + 1);
+					var ret = printTests(s, indentLevel + 1);
+					success = success && ret.success;
+					lines = lines.concat(ret.lines);
 			}
 
-
-			#if buddy_ignore_passing_specs if (!success) #end
-			lines.iter(println);
-
-			return success;
+			return { 
+				success: success, 
+				lines: #if buddy_ignore_passing_specs !success ? lines : [] #else lines #end 
+			};
 		};
 
-		suites.iter(printTests.bind(_, -1));
+		suites.iter(function (s) {
+			var ret = printTests(s, -1);
+			ret.lines.iter(println);
+		});
 
 		var totalColor = if (failures > 0) Red else Green;
 		var pendingColor = if (pending > 0) Yellow else totalColor;
