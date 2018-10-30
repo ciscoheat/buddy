@@ -250,10 +250,15 @@ class GenerateMain
 		else if(Context.defined("nodejs"))
 		{
 			body = macro {
-				untyped __js__("process.on('uncaughtException', function(err) {");
-				runner.haveUnrecoverableError(untyped err);
-				untyped __js__("})");
-				startRun(function() untyped __js__("process.exit(runner.statusCode())"));
+				untyped __js__("process.on('uncaughtException', {0})", function (err) {
+					runner.haveUnrecoverableError(err);
+				});
+				#if buddy_suppress_unhandled_rejection
+				untyped __js__("process.on('unhandledRejection', {0})", function (_) {});
+				#end
+				startRun(function () {
+					untyped __js__("process.exit({0})", runner.statusCode());
+				});
 			};
 		}
 		else if(Context.defined("sys"))
