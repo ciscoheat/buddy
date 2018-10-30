@@ -49,11 +49,6 @@ class AsyncTools
 		throw "Asynchronous wait not supported for interp.";
 		#elseif php
 		throw "Asynchronous wait not supported for PHP.";
-		#elseif (neko && !macro)
-		Thread.create(function() {
-			Sys.sleep(ms / 1000);
-			done();
-		});
 		#elseif python
 		new Timer(ms / 1000, done).start();
 		#elseif cs
