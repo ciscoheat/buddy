@@ -231,7 +231,7 @@ class GenerateMain
 		};
 
 		// Targets that requires a waiting loop
-		if (Context.defined("neko"))
+		if (Context.defined("neko") && !Context.defined('interp'))
 		{
 			body = macro {
 				haxe.EntryPoint.run();
