@@ -22,7 +22,6 @@ install:
 script:
   - haxelib run travix interp
   - haxelib run travix js
-  - haxelib run travix flash
   - if [[ "$(haxe -version)" =~ ^4.* ]]; then haxelib run travix hl; fi
   - haxelib run travix php
   - haxelib run travix php7
