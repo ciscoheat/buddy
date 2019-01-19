@@ -243,7 +243,7 @@ class BuddySuite
 	 * @param	spec A block or function of tests, or leave out for pending
 	 * @param	hasInclude Used internally only
 	 */
-	private function it(desc : String, ?spec : TestFunc, _hasInclude = false, time:Float = 0, ?pos:PosInfos) : Void {
+	private function it(desc : String, ?spec : TestFunc, _hasInclude = false, ?pos:PosInfos, time:Float = 0) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
 		currentSuite.specs.add(TestSpec.It(desc, spec, _hasInclude, pos, time));
 	}
@@ -254,7 +254,7 @@ class BuddySuite
 	 * @param	spec A block or function of tests, or leave out
 	 * @param	hasInclude Used internally only
 	 */
-	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false, time:Float = 0, ?pos:PosInfos) : Void {
+	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false, ?pos:PosInfos, time:Float = 0) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
 		currentSuite.specs.add(TestSpec.It(desc, null, _hasInclude, pos, time));
 	}
