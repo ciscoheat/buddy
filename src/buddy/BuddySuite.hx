@@ -63,6 +63,16 @@ class Suite
 		}
 		return output;
 	}
+
+	public var time(get, never) : Float;
+	private function get_time() {
+		var total = 0.0;
+		for(step in steps) switch step {
+			case TSuite(s): total += s.time;
+			case TSpec(s): total += s.time;
+		}
+		return total;
+	}
 	
 	/**
 	 * Returns true if this suite and all below it passed.
@@ -86,6 +96,7 @@ class Spec
 	@:allow(buddy.SuitesRunner) public var failures(default, null) = new Array<Failure>();
 	@:allow(buddy.SuitesRunner) public var traces(default, null) = new Array<String>();
 	@:allow(buddy.SuitesRunner) public var fileName(default, null) : String = "";
+	@:allow(buddy.SuitesRunner) public var time(default, null) : Float = 0;
 
 	public function new(description : String, fileName : String) {
 		if(description == null) throw "Spec must have a description.";
@@ -117,7 +128,7 @@ enum TestFunc {
 
 enum TestSpec {
 	Describe(suite : TestSuite, included : Bool);
-	It(description : String, test : Null<TestFunc>, included : Bool, pos : PosInfos);
+	It(description : String, test : Null<TestFunc>, included : Bool, pos : PosInfos, time : Float);
 }
 
 class TestSuite
@@ -232,9 +243,9 @@ class BuddySuite
 	 * @param	spec A block or function of tests, or leave out for pending
 	 * @param	hasInclude Used internally only
 	 */
-	private function it(desc : String, ?spec : TestFunc, _hasInclude = false, ?pos:PosInfos) : Void {
+	private function it(desc : String, ?spec : TestFunc, _hasInclude = false, time:Float = 0, ?pos:PosInfos) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
-		currentSuite.specs.add(TestSpec.It(desc, spec, _hasInclude, pos));
+		currentSuite.specs.add(TestSpec.It(desc, spec, _hasInclude, pos, time));
 	}
 
 	/**
@@ -243,9 +254,9 @@ class BuddySuite
 	 * @param	spec A block or function of tests, or leave out
 	 * @param	hasInclude Used internally only
 	 */
-	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false, ?pos:PosInfos) : Void {
+	private function xit(desc : String, ?spec : TestFunc, _hasInclude = false, time:Float = 0, ?pos:PosInfos) : Void {
 		if (currentSuite == suite) throw "Cannot use 'it' outside of a describe block.";
-		currentSuite.specs.add(TestSpec.It(desc, null, _hasInclude, pos));
+		currentSuite.specs.add(TestSpec.It(desc, null, _hasInclude, pos, time));
 	}
 
 	/**
