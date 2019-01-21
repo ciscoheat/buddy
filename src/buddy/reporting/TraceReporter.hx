@@ -104,6 +104,7 @@ class TraceReporter implements Reporter
 
 					if (sp.status == Failed) {
 						print("  " + sp.description + " (FAILED)", Red);
+						printTraces(sp);
 
 						for(failure in sp.failures) {
 							print("    " + failure.error, Yellow);
@@ -112,8 +113,8 @@ class TraceReporter implements Reporter
 					}
 					else {
 						print("  " + sp.description + " (" + sp.status + ")", sp.status == Passed ? Green : Yellow);
+						printTraces(sp);
 					}
-					printTraces(sp);
 
 				case TSuite(s):
 					var ret = printTests(s, indentLevel + 1);
