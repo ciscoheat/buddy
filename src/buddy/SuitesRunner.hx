@@ -354,7 +354,7 @@ class SuitesRunner
 				if (result != null) return { error: result.error, step: TSuite(result.suite) };
 				else return null;
 				
-			case It(desc, test, _, pos):
+			case It(desc, test, _, pos, time):
 				// Assign top-level spec var here, so it can be used in reporting.
 				//trace("Starting it: " + desc);
 				var spec = buddy.tests.SelfTest.lastSpec = new Spec(desc, pos.fileName);
@@ -474,10 +474,13 @@ class SuitesRunner
 				////////////////////////////////////////////////////////////////////////////
 				
 				var _syncResult : SyncTestResult = null;
+				var _startTime = haxe.Timer.stamp();
 				
 				function setSyncResult(status) {
 					if (!returnSync || _syncResult != null) return; 
 					_syncResult = status;
+
+					spec.time = haxe.Timer.stamp() - _startTime;
 				}
 				
 				// Set up fail and pending function
