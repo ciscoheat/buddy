@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.9.2",
-  "releasenote": "Fixed interp problem with async tests.",
+  "version": "2.10.0",
+  "releasenote": "Spec and suites now contain the time taken to run.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }
