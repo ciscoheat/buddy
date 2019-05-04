@@ -476,7 +476,7 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 
 		var typeName : String = Type.getClassName(type);
 
-		var exceptionName = Type.getClassName(Type.getClass(exception));
+		var exceptionName = exception == null ? null : Type.getClassName(Type.getClass(exception));
 		if (exceptionName == null) exceptionName = "no exception";
 
 		var isCaught = Std.is(exception, type);

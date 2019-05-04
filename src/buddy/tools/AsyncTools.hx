@@ -14,7 +14,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 #elseif cpp
+#if (haxe_ver < 4)
 import cpp.vm.Thread;
+#else
+import sys.thread.Thread;
+#end
 #elseif python
 @:pythonImport("threading", "Timer")
 extern class Timer {

@@ -32,7 +32,13 @@ class ConsoleReporter extends TraceReporter
 	{
 		// A small convenience for PHP, to avoid creating a new reporter.
 		#if php
-		if (untyped __call__("php_sapi_name") != "cli") println("<pre>");
+		if(
+			#if (haxe_ver < 4)
+				untyped __call__("php_sapi_name")
+			#else
+				php.Syntax.code("php_sapi_name()")
+			#end
+		!= "cli") println("<pre>");
 		#end
 
 		return resolveImmediately(true);
@@ -62,8 +68,14 @@ class ConsoleReporter extends TraceReporter
 		var output = super.done(suites, status);
 
 		#if php
-		if(untyped __call__("php_sapi_name") != "cli") println("</pre>");
-		#end	
+		if(
+			#if (haxe_ver < 4)
+				untyped __call__("php_sapi_name")
+			#else
+				php.Syntax.code("php_sapi_name()")
+			#end
+		!= "cli") println("</pre>");
+		#end
 		
 		return output;
 	}
@@ -72,7 +84,11 @@ class ConsoleReporter extends TraceReporter
 	{
 		Sys.print(s);
 		#if php
+		#if (haxe_ver < 4)
 		untyped __call__("flush");
+		#else
+		php.Syntax.code("flush()");
+		#end
 		#end
 	}
 
@@ -80,7 +96,11 @@ class ConsoleReporter extends TraceReporter
 	{
 		Sys.println(s);
 		#if php
+		#if (haxe_ver < 4)
 		untyped __call__("flush");
+		#else
+		php.Syntax.code("flush()");
+		#end
 		#end
 	}
 }
