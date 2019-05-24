@@ -237,76 +237,6 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 		return beAfter(Date.fromString(expected), p);
 }
 
-@:keep class ShouldString extends Should<String>
-{
-	static public function should(str : String)
-	{
-		return new ShouldString(str);
-	}
-
-	public function new(value : String, inverse = false)
-	{
-		super(value, inverse);
-	}
-
-	public var not(get, never) : ShouldString;
-	private function get_not() { return new ShouldString(value, !inverse); }
-
-	//////////
-
-	public function contain(substring : String, ?p : PosInfos)
-	{
-		if (value == null) return fail(
-			'Expected string to contain ${quote(substring)} but string was null',
-			'Expected string not to contain ${quote(substring)} but string was null',
-			p);
-
-		test(value.indexOf(substring) >= 0, p,
-			'Expected ${quote(value)} to contain ${quote(substring)}',
-			'Expected ${quote(value)} not to contain ${quote(substring)}'
-		);
-	}
-
-	public function startWith(substring : String, ?p : PosInfos)
-	{
-		if (value == null) return fail(
-			'Expected string to start with ${quote(substring)} but string was null',
-			'Expected string not to start with ${quote(substring)} but string was null',
-			p);
-
-		test(value.startsWith(substring), p,
-			'Expected ${quote(value)} to start with ${quote(substring)}',
-			'Expected ${quote(value)} not to start with ${quote(substring)}'
-		);
-	}
-
-	public function endWith(substring : String, ?p : PosInfos)
-	{
-		if (value == null) return fail(
-			'Expected string to end with ${quote(substring)} but string was null',
-			'Expected string not to end with ${quote(substring)} but string was null',
-			p);
-
-		test(value.endsWith(substring), p,
-			'Expected ${quote(value)} to end with ${quote(substring)}',
-			'Expected ${quote(value)} not to end with ${quote(substring)}'
-		);
-	}
-
-	public function match(regexp : EReg, ?p : PosInfos)
-	{
-		if (value == null) return fail(
-			'Expected string to match regular expression but string was null',
-			'Expected string not to match regular expression but string was null',
-			p);
-
-		test(regexp.match(value), p,
-			'Expected ${quote(value)} to match regular expression',
-			'Expected ${quote(value)} not to match regular expression'
-		);
-	}
-}
-
 @:keep class ShouldIterable<T> extends Should<Iterable<T>>
 {
 	static public function should<T>(value : Iterable<T>)
@@ -376,6 +306,76 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 		test(expr, p,
 			'Expected ${quote(value)} to contain exactly ${quote(values)}',
 			'Expected ${quote(value)} not to contain exactly ${quote(values)}'
+		);
+	}
+}
+
+@:keep class ShouldString extends Should<String>
+{
+	static public function should(str : String)
+	{
+		return new ShouldString(str);
+	}
+
+	public function new(value : String, inverse = false)
+	{
+		super(value, inverse);
+	}
+
+	public var not(get, never) : ShouldString;
+	private function get_not() { return new ShouldString(value, !inverse); }
+
+	//////////
+
+	public function contain(substring : String, ?p : PosInfos)
+	{
+		if (value == null) return fail(
+			'Expected string to contain ${quote(substring)} but string was null',
+			'Expected string not to contain ${quote(substring)} but string was null',
+			p);
+
+		test(value.indexOf(substring) >= 0, p,
+			'Expected ${quote(value)} to contain ${quote(substring)}',
+			'Expected ${quote(value)} not to contain ${quote(substring)}'
+		);
+	}
+
+	public function startWith(substring : String, ?p : PosInfos)
+	{
+		if (value == null) return fail(
+			'Expected string to start with ${quote(substring)} but string was null',
+			'Expected string not to start with ${quote(substring)} but string was null',
+			p);
+
+		test(value.startsWith(substring), p,
+			'Expected ${quote(value)} to start with ${quote(substring)}',
+			'Expected ${quote(value)} not to start with ${quote(substring)}'
+		);
+	}
+
+	public function endWith(substring : String, ?p : PosInfos)
+	{
+		if (value == null) return fail(
+			'Expected string to end with ${quote(substring)} but string was null',
+			'Expected string not to end with ${quote(substring)} but string was null',
+			p);
+
+		test(value.endsWith(substring), p,
+			'Expected ${quote(value)} to end with ${quote(substring)}',
+			'Expected ${quote(value)} not to end with ${quote(substring)}'
+		);
+	}
+
+	public function match(regexp : EReg, ?p : PosInfos)
+	{
+		if (value == null) return fail(
+			'Expected string to match regular expression but string was null',
+			'Expected string not to match regular expression but string was null',
+			p);
+
+		test(regexp.match(value), p,
+			'Expected ${quote(value)} to match regular expression',
+			'Expected ${quote(value)} not to match regular expression'
 		);
 	}
 }

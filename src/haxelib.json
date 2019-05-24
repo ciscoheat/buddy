@@ -4,8 +4,8 @@
   "url" : "https://github.com/ciscoheat/buddy",
   "license": "MIT",
   "tags": ["cross", "bdd", "testing"],
-  "version": "2.10.1",
-  "releasenote": "Exception error fix and some Haxe 4 compatibility fixes.",
+  "version": "2.10.2",
+  "releasenote": "Static ordering fix for should.",
   "contributors": ["ciscoheat"],
   "dependencies": { "promhx": "", "asynctools": "" }
 }
