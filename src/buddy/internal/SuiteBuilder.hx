@@ -208,7 +208,11 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro beforeAll(function() $f), macro beforeAll($f):
+			#else
+			case macro beforeAll(function() $f), macro beforeAll(() -> $f), macro beforeAll($f):
+			#end
 				var change = macro beforeAll($sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
@@ -218,7 +222,11 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro afterAll(function() $f), macro afterAll($f):
+			#else
+			case macro afterAll(function() $f), macro afterAll(() -> $f), macro afterAll($f):
+			#end
 				var change = macro afterAll($sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
