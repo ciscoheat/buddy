@@ -521,6 +521,40 @@ class TestBasicFeatures extends BuddySuite
 					SelfTest.setLastSpec(Failed);
 			});
 		});
+
+		#if (haxe_ver >= 4)
+		describe("Testing before with short lambda", {
+			beforeAll(() -> {});
+			beforeEach(() -> {});
+			beforeEach((done) -> done());
+		});
+
+		describe("Testing after with short lambda", {
+			afterAll(() -> {});
+			afterEach(() -> {});
+			afterEach((done) -> done());
+		});
+
+		describe("Testing describe with short lambda", () -> {});
+		describe("Testing describe with short lambda", () -> {}, false);
+		describe("Testing describe with short lambda", (done) -> done());
+		describe("Testing describe with short lambda", (done) -> done(), false);
+
+		xdescribe("Testing xdescribe with short lambda", () -> {});
+		xdescribe("Testing xdescribe with short lambda", () -> {}, false);
+		xdescribe("Testing xdescribe with short lambda", (_) -> {});
+		xdescribe("Testing xdescribe with short lambda", (_) -> {}, false);
+
+		describe("Testing it with short lambda", {
+			it("Should compile", () -> {});
+			it("Should compile", (done) -> done());
+		});
+
+		describe("Testing xit with short lambda", {
+			xit("Should compile", () -> {});
+			xit("Should compile", (_) -> {});
+		});
+		#end
 	}
 }
 

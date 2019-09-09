@@ -110,12 +110,20 @@ class SuiteBuilder
 						f.iter(injectAsync);
 				}
 
+			#if (haxe_ver < 4)
 			case macro describe($s, function() $f, $i):
+			#else
+			case macro describe($s, function() $f, $i), macro describe($s, () -> $f, $i):
+			#end
 				var change = macro describe($s, $sync(function() $f), $i);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro describe($s, function($n) $f, $i):
+			#else
+			case macro describe($s, function($n) $f, $i), macro describe($s, ($n) -> $f, $i):
+			#end
 				var change = macro describe($s, $async(function($n) $f), $i);
 				e.expr = change.expr;
 				f.iter(injectAsync);
@@ -127,22 +135,38 @@ class SuiteBuilder
 
 			///// Describe
 
+			#if (haxe_ver < 4)
 			case macro xdescribe($s, function() $f):
+			#else
+			case macro xdescribe($s, function() $f), macro xdescribe($s, () -> $f):
+			#end
 				var change = macro xdescribe($s, $sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro xdescribe($s, function($n) $f):
+			#else
+			case macro xdescribe($s, function($n) $f), macro xdescribe($s, ($n) -> $f):
+			#end
 				var change = macro xdescribe($s, $async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro xdescribe($s, function() $f, $i):
+			#else
+			case macro xdescribe($s, function() $f, $i), macro xdescribe($s, () -> $f, $i):
+			#end
 				var change = macro xdescribe($s, $sync(function() $f), $i);
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro xdescribe($s, function($n) $f, $i):
+			#else
+			case macro xdescribe($s, function($n) $f, $i), macro xdescribe($s, ($n) -> $f, $i):
+			#end
 				var change = macro xdescribe($s, $async(function($n) $f), $i);
 				e.expr = change.expr;
 				f.iter(injectAsync);
@@ -159,12 +183,20 @@ class SuiteBuilder
 
 			///// BeforeEach/AfterEach
 
+			#if (haxe_ver < 4)
 			case macro before(function($n) $f):
+			#else
+			case macro before(function($n) $f), macro before(($n) -> $f):
+			#end
 				var change = macro @:pos(e.pos) before($async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro before(function() $f), macro before($f):
+			#else
+			case macro before(function() $f), macro before(() -> $f), macro before($f):
+			#end
 				var change = macro @:pos(e.pos) before($sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
@@ -181,29 +213,49 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro after(function($n) $f):
+			#else
+			case macro after(function($n) $f), macro after(($n) -> $f):
+			#end
 				var change = macro @:pos(e.pos) after($async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro afterEach(function($n) $f):
+			#else
+			case macro afterEach(function($n) $f), macro afterEach(($n) -> $f):
+			#end
 				var change = macro afterEach($async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro after(function() $f), macro after($f):
+			#else
+			case macro after(function() $f), macro after(() -> $f), macro after($f):
+			#end
 				var change = macro @:pos(e.pos) after($sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro afterEach(function() $f), macro afterEach($f):
+			#else
+			case macro afterEach(function() $f), macro afterEach(() -> $f), macro afterEach($f):
+			#end
 				var change = macro afterEach($sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
 			///// BeforeAll/AfterAll
 
+			#if (haxe_ver < 4)
 			case macro beforeAll(function($n) $f):
+			#else
+			case macro beforeAll(function($n) $f), macro beforeAll(($n) -> $f):
+			#end
 				var change = macro beforeAll($async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
@@ -217,7 +269,11 @@ class SuiteBuilder
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro afterAll(function($n) $f):
+			#else
+			case macro afterAll(function($n) $f), macro afterAll(($n) -> $f):
+			#end
 				var change = macro afterAll($async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
@@ -277,21 +333,37 @@ class SuiteBuilder
 
 			///// Xit
 
+			#if (haxe_ver < 4)
 			case macro xit($s), macro xit($s, {}), macro xit($s, function() {}):
+			#else
+			case macro xit($s), macro xit($s, {}), macro xit($s, function() {}), macro xit($s, () -> {}):
+			#end
 				var change = macro xit($s, null);
 				e.expr = change.expr;
 
+			#if (haxe_ver < 4)
 			case macro xit($s, function($n) $f):
+			#else
+			case macro xit($s, function($n) $f), macro xit($s, ($n) -> $f):
+			#end
 				var change = macro xit($s, $async(function($n) $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro xit($s, function() $f):
+			#else
+			case macro xit($s, function() $f), macro xit($s, () -> $f):
+			#end
 				var change = macro xit($s, $sync(function() $f));
 				e.expr = change.expr;
 				f.iter(injectAsync);
 
+			#if (haxe_ver < 4)
 			case macro xit($s, function($n) $f, $i):
+			#else
+			case macro xit($s, function($n) $f, $i):
+			#end
 				var change = macro xit($s, $async(function($n) $f), $i);
 				e.expr = change.expr;
 				f.iter(injectAsync);
