@@ -447,9 +447,19 @@ class SuitesRunner
 							reportFailure(e, stack);
 						case TimeoutError(e, stack):
 							reportFailure(e, stack);
-						#if (utest >= "1.7.1")
+						#if haxe4
+							#if(utest >= version("1.7.1"))
 						case Ignore(reason):
 							spec.traces.push("Assertation ignored: " + reason);
+							#end
+						#else
+							#if(utest=="1.10.1")
+						case Ignore(reason):
+							spec.traces.push("Assertation ignored: " + reason);
+							#elseif(utest>="1.7.1")
+						case Ignore(reason):
+							spec.traces.push("Assertation ignored: " + reason);
+							#end
 						#end
 					}
 				}
