@@ -265,10 +265,10 @@ class GenerateMain
 		else if(Context.defined("nodejs"))
 		{
 			body = macro {
-				untyped __js__("process.on('uncaughtException', function(err) {");
-				runner.haveUnrecoverableError(untyped err);
-				untyped __js__("})");
-				startRun(function() untyped __js__("process.exit(runner.statusCode())"));
+				js.Node.process.on('uncaughtException', function(err) {
+					runner.haveUnrecoverableError(err);
+				});
+				startRun(function() js.Node.process.exit(runner.statusCode()));
 			};
 		}
 		else if(Context.defined("sys"))
