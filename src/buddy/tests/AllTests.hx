@@ -437,7 +437,7 @@ class TestBasicFeatures extends BuddySuite
 				#end
 				
 				#if js
-				var undef : Dynamic = untyped __js__("undefined");
+				var undef : Dynamic = js.Lib.undefined;
 				undef.should.be(null);
 				#end
 			});
