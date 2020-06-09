@@ -28,10 +28,6 @@ class XUnit2Reporter implements Reporter {
     var totalTime : Float;
 
     public function new() {
-        if (!isDefined('report-name')) {
-            throw 'report-name not defined';
-        }
-
         reportName = if (isDefined('report-name')) getDefine('report-name') else 'report';
         total      = 0;
         passing    = 0;
