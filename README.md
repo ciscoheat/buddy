@@ -411,6 +411,8 @@ The compilation flag will override the metadata, if both are set.
 
 `buddy.reporting.TraceReporter` outputs to `trace()`, and is especially useful for CI with flash. If you define `-D flash-exit`, the default reporter will be the TraceReporter, and flash will exit if the correct permissions are set. This is tricky to get right, so the easiest way is to use [travix](https://github.com/back2dos/travix/).
 
+`buddy.reporting.XUnit2Reporting` a reporter for [xUnit.net](https://xunit.net/).
+
 ## FAQ
 
 ### Where's main()?
