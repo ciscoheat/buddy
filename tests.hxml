@@ -4,4 +4,5 @@
 -lib utest
 -lib slambda
 -lib tink_await
+--macro nullSafety("buddy.tests", Strict)
 -main buddy.tests.AllTests

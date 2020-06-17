@@ -49,8 +49,8 @@ class SuitesRunner
 	// Used in Should
 	public static var currentTest : Should.SpecAssertion;
 	
-	public var unrecoverableError : Dynamic = null;
-	public var unrecoverableErrorStack : Array<StackItem> = null;
+	public var unrecoverableError : Null<Dynamic> = null;
+	public var unrecoverableErrorStack : Null<Array<StackItem>> = null;
 	
 	private var allTestsPassed : Bool = false;
 	private var buddySuites : Iterable<BuddySuite>;

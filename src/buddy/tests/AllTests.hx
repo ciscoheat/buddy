@@ -60,7 +60,7 @@ class ThrowInConstructor
 
 class TestBasicFeatures extends BuddySuite
 {
-	private var testAfter : String;
+	private var testAfter : String = "";
 
 	public function new()
 	{
@@ -95,7 +95,7 @@ class TestBasicFeatures extends BuddySuite
 
 		describe("Testing after", {
 			it("should not set the property testAfter in this first spec", {
-				testAfter.should.be(null);
+				testAfter.should.be("");
 			});
 
 			afterEach({
@@ -371,15 +371,26 @@ class TestBasicFeatures extends BuddySuite
 				f.should().throwValue("a");
 				var value = f.should().not.throwValue("b");
 				
-				value.length.should.be(1);
-				value.charCodeAt(0).should.be(97);
+				if(value == null) 
+					fail("value shouldn't be null");
+				else {
+					value.length.should.be(1);
+
+					var char = value.charCodeAt(0);
+					if(char == null) fail("char shouldn't be null");
+					else char.should.be(97);
+				}
 			});
 
 			it("should have a throwType() method", {
 				var obj = g.should().throwType(EmptyTestClass);
 				
-				g.should().not.throwType(String);
-				obj.should.beType(EmptyTestClass);
+				if(obj == null)
+					fail("obj shouldn't be null");
+				else {
+					g.should().not.throwType(String);
+					obj.should.beType(EmptyTestClass);
+				}
 			});
 
 			it("should have a throwType() method that can be used with bind", {
@@ -395,8 +406,9 @@ class TestBasicFeatures extends BuddySuite
 				[1, 2, 3].filter.fn(x => x > 1).should.containExactly([2, 3]);
 				[1, 1, 1].mapi.fn([i, a] => i + a).should.containExactly([1, 2, 3]);
 				[1, 2, 3].filter(fn(_ > 2)).should.containExactly([3]);
-				
-				["1", "1", "1"].fold.fn(_2 + Std.parseInt(_1), 10).should.be(13);
+
+				// Disabling due to deprecated library.
+				@:nullSafety(Off) ["1", "1", "1"].fold.fn(_2 + Std.parseInt(_1), 10).should.be(13);
 
 				fn('$$_1')().should.be("$_1");
 
@@ -424,7 +436,7 @@ class TestBasicFeatures extends BuddySuite
 			});
 		});
 
-		describe("Testing null", {
+		@:nullSafety(Off) describe("Testing null", {
 			it("should pass even if the var is null", {
 				var s : EmptyTestClass = null;
 				var d : Dynamic = null;
@@ -577,9 +589,7 @@ class TestAsync extends BuddySuite
 	public function new()
 	{
 		describe("Testing async", {
-			var a;
-			var timeoutErrorTest : buddy.BuddySuite.Spec;
-			var timeoutErrorTestDone : ?Bool -> Void = null;
+			var a = 0;
 
 			beforeEach(function(done) {
 				a = 0;

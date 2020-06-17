@@ -9,8 +9,8 @@ import buddy.BuddySuite.SpecStatus;
  * Used for Buddy to test itself
  */
 class SelfTest {
-	public static var lastSpec : Spec;
-	public static var lastSuite : Suite;
+	public static var lastSpec : Spec = new Spec("No spec", "No filename");
+	public static var lastSuite : Suite = new Suite("No suite");
 	
 	public static function passLastSpecIf(expr : Bool, failReason : String) {
 		if (expr) {

@@ -194,7 +194,7 @@ class GenerateMain
 		
 		var header = macro {
 			var testsDone : Bool = false; // For platforms without event loop
-			var runner : buddy.SuitesRunner = null;
+			var runner = new buddy.SuitesRunner($allSuites, new $rep());
 			var oldTrace = haxe.Log.trace;
 			
 			function outputError() {
@@ -220,7 +220,6 @@ class GenerateMain
 			}
 			
 			function startRun(done : Void -> Void) : Void {
-				runner = new buddy.SuitesRunner($allSuites, new $rep());
 				// lua fix, needs temp var
 				var r = runner.run();
 				r.then(function(_) {
