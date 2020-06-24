@@ -61,14 +61,14 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 	}
 }
 
-@:keep class ShouldInt extends Should<Int>
+@:keep class ShouldInt extends Should<Null<Int>>
 {
-	static public function should(i : Int)
+	static public function should(i : Null<Int>)
 	{
 		return new ShouldInt(i);
 	}
 
-	public function new(value : Int, inverse = false)
+	public function new(value : Null<Int>, inverse = false)
 	{
 		super(value, inverse);
 	}
@@ -138,14 +138,14 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 	}
 }
 
-@:keep class ShouldFloat extends Should<Float>
+@:keep class ShouldFloat extends Should<Null<Float>>
 {
-	static public function should(i : Float)
+	static public function should(i : Null<Float>)
 	{
 		return new ShouldFloat(i);
 	}
 
-	public function new(value : Float, inverse = false)
+	public function new(value : Null<Float>, inverse = false)
 	{
 		super(value, inverse);
 	}
