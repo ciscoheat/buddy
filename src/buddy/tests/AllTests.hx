@@ -387,10 +387,8 @@ class TestBasicFeatures extends BuddySuite
 				
 				if(obj == null)
 					fail("obj shouldn't be null");
-				else {
-					g.should().not.throwType(String);
+				else
 					obj.should.beType(EmptyTestClass);
-				}
 			});
 
 			it("should have a throwType() method that can be used with bind", {
