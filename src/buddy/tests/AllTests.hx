@@ -440,8 +440,14 @@ class TestBasicFeatures extends BuddySuite
 			it("should pass even if the var is null", {
 				var s : EmptyTestClass = null;
 				var d : Dynamic = null;
+				var i : Null<Int> = null;
+				var b : Null<Bool> = null;
+				var f : Null<Float> = null;
 				s.should.be(null);
 				d.should.be(null);
+				i.should.be(null);
+				b.should.be(null);
+				f.should.be(null);
 				
 				#if (js || neko || php || python || lua || interp)
 				var i : Int = null;
