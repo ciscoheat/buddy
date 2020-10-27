@@ -8,6 +8,12 @@ import python.internal.UBuiltins;
 import python.lib.Builtins;
 #end
 
+#if haxe4
+import Std.isOfType;
+#else
+import Std.is as isOfType;
+#end
+
 using Lambda;
 using StringTools;
 
@@ -432,7 +438,7 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 			#if java
 			// Handles exceptions that sneaks into the runtime,
 			// like exceptions thrown in the constructor.
-			if(Std.is(e, java.lang.Throwable)) {
+			if(isOfType(e, java.lang.Throwable)) {
 				cause = cast(e, java.lang.Throwable).getCause();
 
 				if(cause != null && Type.getClassName(Type.getClass(cause)) == "haxe.lang.HaxeException")
@@ -464,7 +470,7 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 			#if java
 			// Handles exceptions that sneaks into the runtime,
 			// like exceptions thrown in the constructor.
-			if(Std.is(e, java.lang.Throwable)) {
+			if(isOfType(e, java.lang.Throwable)) {
 				cause = cast(e, java.lang.Throwable).getCause();
 
 				if(cause != null && Type.getClassName(Type.getClass(cause)) == "haxe.lang.HaxeException")
@@ -479,7 +485,7 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 		var exceptionName = exception == null ? null : Type.getClassName(Type.getClass(exception));
 		if (exceptionName == null) exceptionName = "no exception";
 
-		var isCaught = Std.is(exception, type);
+		var isCaught = isOfType(exception, type);
 		test(isCaught, p,
 			'Expected ${quote(value)} to throw type $typeName, $exceptionName was thrown instead',
 			'Expected ${quote(value)} not to throw type $typeName'
@@ -501,8 +507,8 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 
 	private function quote(v : Dynamic)
 	{
-		if (Std.is(v, String)) return '"$v"';
-		if (Std.is(v, List)) return Std.string(Lambda.array(v));
+		if (isOfType(v, String)) return '"$v"';
+		if (isOfType(v, List)) return Std.string(Lambda.array(v));
 		return Std.string(v);
 	}
 
@@ -551,7 +557,7 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 
 	public function beType(type : Dynamic, ?p : PosInfos)
 	{
-		test(Std.is(value, type), p,
+		test(isOfType(value, type), p,
 			'Expected ${quote(value)} to be type ${quote(type)}',
 			'Expected ${quote(value)} not to be type ${quote(type)}'
 		);
@@ -559,8 +565,8 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 
 	private function quote(v : Dynamic)
 	{
-		if (Std.is(v, String)) return '"$v"';
-		if (Std.is(v, List)) return Std.string(Lambda.array(v));
+		if (isOfType(v, String)) return '"$v"';
+		if (isOfType(v, List)) return Std.string(Lambda.array(v));
 		return Std.string(v);
 	}
 
