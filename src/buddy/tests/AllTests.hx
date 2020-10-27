@@ -1030,7 +1030,7 @@ class UsingTinkAwait
 	public function new() {}
 
 	public function waitForIt() {
-		return Future.async(function(cb) {
+		return Future.irreversible(function(cb) {
 			// lua fix, needs temp var
 			var r = AsyncTools.wait(1);
 			r.then(cb);
