@@ -271,6 +271,7 @@ class TestBasicFeatures extends BuddySuite
 			it("should have a beCloseTo() method", {
 				number.should().beCloseTo(3.14);
 				number.should().beCloseTo(3.1, 1);
+				(3.1412).should().beCloseTo(3.1411, 3);
 				number.should().beCloseTo(3.141);
 
 				number.should().beCloseTo(lostSignificance);
@@ -279,6 +280,7 @@ class TestBasicFeatures extends BuddySuite
 				number.should().not.beCloseTo(3.1);
 				number.should().not.beCloseTo(3.13);
 				number.should().not.beCloseTo(3.15);
+				(3.1412).should().not.beCloseTo(3.1417, 3);
 			});
 		});
 

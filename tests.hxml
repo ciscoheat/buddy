@@ -4,5 +4,6 @@
 -lib utest
 -lib slambda
 -lib tink_await
+-lib hxnodejs
 --macro nullSafety("buddy.tests", Strict)
 -main buddy.tests.AllTests
