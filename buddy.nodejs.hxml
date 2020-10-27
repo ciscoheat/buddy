@@ -1,9 +1,10 @@
--cp src 
+-cp src
 -lib asynctools
 -lib promhx
 -lib utest
 -lib slambda
 -lib tink_await
+-lib hxnodejs
 -D nodejs
 -js bin/buddy.nodejs.js
 -main buddy.tests.AllTests
