@@ -122,7 +122,7 @@ class TestBasicFeatures extends BuddySuite
 				color1.should.beType(Color);
 				color2.should.not.beType(Int); 
 				
-				Std.is([1, 2, 3], Array).should.be(true);
+				Std.isOfType([1, 2, 3], Array).should.be(true);
 				// Problem on C#:
 				//[1, 2, 3].should.beType(Array);
 			});
