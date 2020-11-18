@@ -8,7 +8,7 @@ import python.internal.UBuiltins;
 import python.lib.Builtins;
 #end
 
-#if haxe4
+#if (haxe_ver >= 4.1)
 import Std.isOfType;
 #else
 import Std.is as isOfType;

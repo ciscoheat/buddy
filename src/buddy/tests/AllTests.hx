@@ -15,7 +15,7 @@ import promhx.Promise;
 import Slambda.fn;
 import utest.Assert;
 
-#if haxe4
+#if (haxe_ver >= 4.1)
 import Std.isOfType;
 #else
 import Std.is as isOfType;
