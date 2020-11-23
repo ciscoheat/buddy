@@ -176,7 +176,11 @@ As you've seen in the examples, testing if specifications are correct is as simp
 
 `a.should.beLessThan(b)`
 
+`a.should.beLessThanOrEqualTo(b)`
+
 `a.should.beGreaterThan(b)`
+
+`a.should.beGreaterThanOrEqualTo(b)`
 
 ### Float
 
