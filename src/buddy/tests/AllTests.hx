@@ -220,11 +220,11 @@ class TestBasicFeatures extends BuddySuite
 				int.should.beLessThan(3.1);
 			});
 
-			it("should have a beMoreThan() method", {
+			it("should have a beGreaterThan() method", {
 				int.should.beGreaterThan(2);
 			});
 
-			it("beMoreThan should compare against float", {
+			it("beGreaterThan should compare against float", {
 				int.should.beGreaterThan(2.9);
 			});
 		});
