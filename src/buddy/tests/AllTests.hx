@@ -236,7 +236,7 @@ class TestBasicFeatures extends BuddySuite
 				int64.should.beLessThan(Int64.make(2, 0));
 			});
 
-			it("should have a beMoreThan() method", {
+			it("should have a beGreaterThan() method", {
 				int64.should.beGreaterThan(2147483647);
 			});
 			
@@ -260,11 +260,11 @@ class TestBasicFeatures extends BuddySuite
 				number.should.beLessThan(cast(4, Int));
 			});
 
-			it("should have a beMoreThan() method", {
+			it("should have a beGreaterThan() method", {
 				number.should.beGreaterThan(2.9);
 			});
 
-			it("beMoreThan should compare against int", {
+			it("beGreaterThan should compare against int", {
 				number.should.beGreaterThan(cast(2, Int));
 			});
 
