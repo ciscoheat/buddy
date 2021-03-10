@@ -92,11 +92,27 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 		);
 	}
 
+	public function beLessThanOrEqualTo(expected : Int, ?p : PosInfos)
+	{
+		test(value <= expected, p,
+			'Expected less than or equal to ${quote(expected)}, was ${quote(value)}',
+			'Expected not less than or equal to ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
 	public function beGreaterThan(expected : Int, ?p : PosInfos)
 	{
 		test(value > expected, p,
 			'Expected greater than ${quote(expected)}, was ${quote(value)}',
 			'Expected not greater than ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
+	public function beGreaterThanOrEqualTo(expected : Int, ?p : PosInfos)
+	{
+		test(value >= expected, p,
+			'Expected greater than or equal to ${quote(expected)}, was ${quote(value)}',
+			'Expected not greater than or equal to ${quote(expected)}, was ${quote(value)}'
 		);
 	}
 }
@@ -135,11 +151,27 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 		);
 	}
 
+	public function beLessThanOrEqualTo(expected : Int64, ?p : PosInfos)
+	{
+		test(value <= expected, p,
+			'Expected less than or equal to ${quote(expected)}, was ${quote(value)}',
+			'Expected not less than or equal to ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
 	public function beGreaterThan(expected : Int64, ?p : PosInfos)
 	{
 		test(value > expected, p,
 			'Expected greater than ${quote(expected)}, was ${quote(value)}',
 			'Expected not greater than ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
+	public function beGreaterThanOrEqualTo(expected : Int64, ?p : PosInfos)
+	{
+		test(value >= expected, p,
+			'Expected greater than or equal to ${quote(expected)}, was ${quote(value)}',
+			'Expected not greater than or equal to ${quote(expected)}, was ${quote(value)}'
 		);
 	}
 }
@@ -169,11 +201,27 @@ typedef SpecAssertion = Bool -> String -> Array<StackItem> -> Void;
 		);
 	}
 
+	public function beLessThanOrEqualTo(expected : Float, ?p : PosInfos)
+	{
+		test(value <= expected, p,
+			'Expected less than or equal to ${quote(expected)}, was ${quote(value)}',
+			'Expected not less than or equal to ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
 	public function beGreaterThan(expected : Float, ?p : PosInfos)
 	{
 		test(value > expected, p,
 			'Expected greater than ${quote(expected)}, was ${quote(value)}',
 			'Expected not greater than ${quote(expected)}, was ${quote(value)}'
+		);
+	}
+
+	public function beGreaterThanOrEqualTo(expected : Float, ?p : PosInfos)
+	{
+		test(value >= expected, p,
+			'Expected greater than or equal to ${quote(expected)}, was ${quote(value)}',
+			'Expected not greater than or equal to ${quote(expected)}, was ${quote(value)}'
 		);
 	}
 

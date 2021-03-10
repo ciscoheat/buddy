@@ -220,12 +220,32 @@ class TestBasicFeatures extends BuddySuite
 				int.should.beLessThan(3.1);
 			});
 
-			it("should have a beMoreThan() method", {
+			it("should have a beLessThanOrEqualTo() method", {
+				int.should.beLessThanOrEqualTo(4);
+				int.should.beLessThanOrEqualTo(int);
+			});
+
+			it("beLessThanOrEqualTo should compare against float", {
+				int.should.beLessThanOrEqualTo(3.1);
+				int.should.beLessThanOrEqualTo(int);
+			});
+
+			it("should have a beGreaterThan() method", {
 				int.should.beGreaterThan(2);
 			});
 
-			it("beMoreThan should compare against float", {
+			it("beGreaterThan should compare against float", {
 				int.should.beGreaterThan(2.9);
+			});
+
+			it("should have a beGreaterThanOrEqualTo() method", {
+				int.should.beGreaterThanOrEqualTo(2);
+				int.should.beGreaterThanOrEqualTo(int);
+			});
+
+			it("beGreaterThanOrEqualTo should compare against float", {
+				int.should.beGreaterThanOrEqualTo(2.9);
+				int.should.beGreaterThanOrEqualTo(int);
 			});
 		});
 
@@ -236,8 +256,18 @@ class TestBasicFeatures extends BuddySuite
 				int64.should.beLessThan(Int64.make(2, 0));
 			});
 
-			it("should have a beMoreThan() method", {
+			it("should have a beLessThanOrEqualTo() method", {
+				int64.should.beLessThanOrEqualTo(Int64.make(2, 0));
+				int64.should.beLessThanOrEqualTo(int64);
+			});
+
+			it("should have a beGreaterThan() method", {
 				int64.should.beGreaterThan(2147483647);
+			});
+
+			it("should have a beGreaterThanOrEqualTo() method", {
+				int64.should.beGreaterThanOrEqualTo(2147483647);
+				int64.should.beGreaterThanOrEqualTo(int64);
 			});
 			
 			it("should test 'be' with equality, not identity", {
@@ -260,12 +290,32 @@ class TestBasicFeatures extends BuddySuite
 				number.should.beLessThan(cast(4, Int));
 			});
 
-			it("should have a beMoreThan() method", {
+			it("should have a beLessThanOrEqualTo() method", {
+				number.should.beLessThanOrEqualTo(4.23);
+				number.should.beLessThanOrEqualTo(number);
+			});
+
+			it("beLessThanOrEqualTo should compare against int", {
+				number.should.beLessThanOrEqualTo(cast(4, Int));
+				number.should.beLessThanOrEqualTo(number);
+			});
+
+			it("should have a beGreaterThan() method", {
 				number.should.beGreaterThan(2.9);
 			});
 
-			it("beMoreThan should compare against int", {
+			it("beGreaterThan should compare against int", {
 				number.should.beGreaterThan(cast(2, Int));
+			});
+
+			it("should have a beGreaterThanOrEqualTo() method", {
+				number.should.beGreaterThanOrEqualTo(2.9);
+				number.should.beGreaterThanOrEqualTo(number);
+			});
+
+			it("beGreaterThanOrEqualTo should compare against int", {
+				number.should.beGreaterThanOrEqualTo(cast(2, Int));
+				number.should.beGreaterThanOrEqualTo(number);
 			});
 
 			it("should have a beCloseTo() method", {
